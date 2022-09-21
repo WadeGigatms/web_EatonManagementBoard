@@ -1,0 +1,220 @@
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #E01A76;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+/* layout */
+.vh-10 {
+    height: 10vh;
+}
+
+.vh-90 {
+    height: 90vh;
+}
+
+.h-3 {
+    height: 32.8% !important;
+}
+
+.h-5 {
+    height: 19.3% !important;
+}
+
+.p-025 {
+    padding: 0.25% !important;
+}
+
+.bg-eaton-blue {
+    background-color: #1861ac;
+}
+
+.circle-size {
+    font-size: 24px;
+}
+
+.btn-app {
+    margin: 0rem !important;
+    padding: 0.5rem !important;
+    min-width: 100px !important;
+}
+
+.footer {
+    margin: 0px !important;
+}
+
+/* color */
+.color-w {
+    color: white;
+}
+
+.color-g {
+    color: lawngreen;
+}
+
+.color-b {
+    color: black;
+}
+
+.color-r {
+    color: red;
+}
+
+/* table text */
+.table-sm th {
+    padding: 0.1rem !important;
+    font-size: 14px;
+}
+
+.table-sm td {
+    padding-left: 0.2rem !important;
+    padding-right: 0.2rem !important;
+    padding-top: 0rem !important;
+    padding-bottom: 0rem !important;
+    font-size: 18px;
+}
+
+/* text */
+.text-align-r {
+    text-align: right;
+}
+
+.text-align-l {
+    text-align: left !important;
+}
+
+.text-align-c {
+    text-align: center;
+}
+
+.text-title {
+    text-align: center !important;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+}
+
+/* navbar */
+.navbar-item-text {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-weight: bolder !important;
+    font-size: 14px !important;
+}
+
+/* content */
+.content-header-p-2 {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+}
+
+/* card */
+.card:hover {
+    border: solid;
+}
+
+.card {
+    margin-bottom: 0rem !important;
+}
+
+.card-header {
+    padding: 0.1rem 0.5rem;
+    background-color: lightgray !important;
+    color: black !important;
+    font-weight: bold;
+}
+
+.card-display-left {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+.card-display-right {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+}
+
+.card-flex-w {
+    padding: 0.5rem 0.1rem !important;
+    text-align: center !important;
+    background-color: lightgray !important;
+    color: black !important;
+    width: 2rem;
+    font-weight: bold !important;
+    font-size: 20px;
+}
+
+.card-margin-top {
+    margin-top: 1.5%;
+}
+
+/* img bg */
+.bg-1f {
+    background: url("../img/1F.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+.bg-a-3f {
+    background: url("../img/A-3F.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+.bg-a-2f {
+    background: url("../img/A-2F.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+.bg-b-3f {
+    background: url("../img/B-3F.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    z-index: 1;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+/* block */
+.block-header-bg-gray {
+    background-color: lightgray !important;
+    color: black !important;
+    font-weight: bold !important;
+}
