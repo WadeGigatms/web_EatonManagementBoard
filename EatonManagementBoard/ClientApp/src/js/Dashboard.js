@@ -23,7 +23,6 @@ import {
     BLOCK_H,
     BLOCK_I,
     NAV_TERMINAL,
-    URL_HOST,
     URL_EPC_ALL,
     URL_EPC,
     _3A_modal_target,
@@ -64,7 +63,7 @@ const Dashboard = ({ showDashboard }) => {
             try {
                 setLoading(true)
                 const response = await fetch(url)
-                const { result, error, dashboardDto, selectionDto } = await response.json()
+                const { result, dashboardDto, selectionDto } = await response.json()
                 if (result === true) {
                     setResult(result)
                     setDashboard(dashboardDto)
@@ -82,7 +81,7 @@ const Dashboard = ({ showDashboard }) => {
 
     useEffect(() => {
         fetchRequest(URL_EPC_ALL)
-    }, [])
+    }, [fetchRequest])
 
     useEffect(() => {
         if (searchParameter) {
@@ -92,7 +91,7 @@ const Dashboard = ({ showDashboard }) => {
                 fetchRequest(url)
             }
         }
-    }, [searchParameter])
+    }, [searchParameter, fetchRequest])
 
     function renderDashboard() {
         return <>

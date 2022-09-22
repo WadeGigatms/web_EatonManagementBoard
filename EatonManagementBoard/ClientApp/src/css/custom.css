@@ -14,6 +14,14 @@ code {
 }
 
 /* layout */
+.vh-1 {
+    height: 1vh;
+}
+
+.vh-9 {
+    height: 9vh;
+}
+
 .vh-10 {
     height: 10vh;
 }

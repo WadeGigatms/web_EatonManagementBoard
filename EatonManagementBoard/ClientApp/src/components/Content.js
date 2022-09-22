@@ -45,7 +45,7 @@ const Content = ({ children }) => {
                     <nav className="navbar navbar-expand h-100 p-0">
                         <ul className="navbar-nav ml-auto h-100">
                             <li className="nav-item nav-link h-100">
-                                <button type="button" className="btn btn-app color-w p-0 h-100" h-100 onClick={handleHomeClick} >
+                                <button type="button" className="btn btn-app color-w p-0 h-100" onClick={handleHomeClick} >
                                     <i className="fas fa-house"></i>
                                     <label className="navbar-item-text">{NAV_HOME}</label>
                                 </button>

@@ -11,9 +11,9 @@ namespace EatonManagementBoard.Services
 {
     public class EpcService
     {
-        public EpcService(EatonManagementBoardDbContext eatonWebToolDbContext)
+        public EpcService(EatonManagementBoardDbContext eatonmanagementboardDbContext)
         {
-            _dbContext = eatonWebToolDbContext;
+            _dbContext = eatonmanagementboardDbContext;
         }
 
         private readonly EatonManagementBoardDbContext _dbContext;
@@ -173,12 +173,20 @@ namespace EatonManagementBoard.Services
             foreach(var eatonEpc in eatonEpcs)
             {
                 string epcString = GetHexToAscii(eatonEpc.Epc);
-                string wo = epcString.Split("##")[1].Split("&&")[0];
-                string qty = epcString.Split("##")[1].Split("&&")[1];
-                string pn = epcString.Split("##")[1].Split("&&")[2];
-                string line = epcString.Split("##")[1].Split("&&")[3];
-                string barcode = epcString.Split("##")[1].Split("&&")[4];
-                List<EatonEpc> dbSameEpcs = dbEatonEpcs
+                bool isCorrectStringFormat = true;
+                // Error string format
+                if (epcString.Split("##").Count() == 0 || epcString.Split("##")[1].Split("&&").Count() != 5)
+                {
+                    isCorrectStringFormat = false;
+                }
+                // Correct string format
+                string wo = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[0] : "";
+                string qty = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[1] : "";
+                string pn = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[2] : "";
+                string line = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[3] : "";
+                string barcode = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[4] : "";
+                string error = isCorrectStringFormat == true ? "" : epcString;
+                List <EatonEpc> dbSameEpcs = dbEatonEpcs
                     .Where(dbEatonEpc => dbEatonEpc.Epc == eatonEpc.Epc)
                     .OrderBy(dbEatonEpc => dbEatonEpc.TransTime)
                     .ToList();
@@ -194,6 +202,7 @@ namespace EatonManagementBoard.Services
                         Pn = pn,
                         Line = line,
                         Barcode = barcode,
+                        Error = error,
                         LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
                     });
                 }
@@ -212,6 +221,7 @@ namespace EatonManagementBoard.Services
                             Pn = pn,
                             Line = line,
                             Barcode = barcode,
+                            Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
                         });
                     }
@@ -228,6 +238,7 @@ namespace EatonManagementBoard.Services
                             Pn = pn,
                             Line = line,
                             Barcode = barcode,
+                            Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
                         });
                     }
@@ -244,6 +255,7 @@ namespace EatonManagementBoard.Services
                             Pn = pn,
                             Line = line,
                             Barcode = barcode,
+                            Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
                         });
                     }
@@ -260,6 +272,7 @@ namespace EatonManagementBoard.Services
                             Pn = pn,
                             Line = line,
                             Barcode = barcode,
+                            Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
                         });
                     }
@@ -276,6 +289,7 @@ namespace EatonManagementBoard.Services
                             Pn = pn,
                             Line = line,
                             Barcode = barcode,
+                            Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
                         });
                     }
@@ -292,6 +306,7 @@ namespace EatonManagementBoard.Services
                             Pn = pn,
                             Line = line,
                             Barcode = barcode,
+                            Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
                         });
                     }
@@ -308,6 +323,7 @@ namespace EatonManagementBoard.Services
                             Pn = pn,
                             Line = line,
                             Barcode = barcode,
+                            Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
                         });
                     }

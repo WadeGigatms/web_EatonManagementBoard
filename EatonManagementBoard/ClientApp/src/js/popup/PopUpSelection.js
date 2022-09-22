@@ -1,5 +1,4 @@
 ﻿import React, { useEffect, useState } from 'react'
-import $ from 'jquery'
 import {
     LIMIT,
     SAVE,
@@ -17,7 +16,7 @@ const PopUpSelection = ({ id, title, limit, setLimit }) => {
     }, [limit])
 
     useEffect(() => {
-        jQuery('#' + id).on('hide.bs.modal', function () {
+        window.jQuery('#' + id).on('hide.bs.modal', function () {
             setCurrentLimit(limit)
         })
     }, [])
@@ -28,7 +27,7 @@ const PopUpSelection = ({ id, title, limit, setLimit }) => {
 
     function handleSubmit() {
         setLimit(currentLimit)
-        jQuery('#' + id).modal('hide')
+        window.jQuery('#' + id).modal('hide')
     }
 
     function render() {

@@ -16,7 +16,7 @@ namespace EatonManagementBoard
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            // Scaffold-DbContext "Server=localhost,1433;Database=scannel;User ID=scannel;Password=26954214" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Force -Context EatonWebToolDbContext
+            // Scaffold-DbContext "Server=localhost,1433;Database=scannel;User ID=scannel;Password=26954214" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Force -Context eatonmanagementboardDbContext
         }
 
         public IConfiguration Configuration { get; }

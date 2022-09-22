@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react'
+import $ from 'jquery'
 import {
-    URL_EPC,
     SELECT,
     SEARCH,
     TH_PN,
@@ -16,7 +16,7 @@ const PopUpForm = ({ id, setSearchParameter, selection } ) => {
     const [error, setError] = useState("")
 
     useEffect(() => {
-        jQuery('#' + id).on('hide.bs.modal', function () {
+        window.jQuery('#' + id).on('hide.bs.modal', function () {
             setWo("")
             setPn("")
             setPalletId("")
