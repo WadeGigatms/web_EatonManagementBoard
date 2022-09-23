@@ -94,7 +94,6 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 const { result, dashboardDto, selectionDto } = await response.json()
                 if (result === true) {
                     setResult(result)
-                    console.log("in fetch request [searchStateRef.current] = " + searchStateRef.current)
                     if (searchStateRef.current === false) {
                         setAllDashboard(dashboardDto)
                         setOnDashboard(dashboardDto)

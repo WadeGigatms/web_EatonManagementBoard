@@ -1,7 +1,7 @@
 ﻿export const VERSION = "v0.0.0"
 
 //export const URL_HOST = "https://localhost:44391"
-export const URL_HOST = "http://192.168.100.44"
+export const URL_HOST = "http://192.168.100.148"
 export const URL_EPC_ALL = `${URL_HOST}/api/epc`
 export const URL_EPC = `${URL_HOST}/api/epc?`
 export const URL_TERMINAL = `${URL_HOST}/api/terminal`
