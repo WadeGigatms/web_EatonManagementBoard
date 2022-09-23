@@ -1,5 +1,4 @@
 ﻿import React, { useEffect, useState } from 'react'
-import $ from 'jquery'
 import {
     SELECT,
     SEARCH,
@@ -9,7 +8,7 @@ import {
     ERROR
 } from '../constants'
 
-const PopUpForm = ({ id, setSearchParameter, selection } ) => {
+const PopUpForm = ({ id, setSearchParameter, selection }) => {
     const [wo, setWo] = useState("")
     const [pn, setPn] = useState("")
     const [palletId, setPalletId] = useState("")
@@ -37,7 +36,7 @@ const PopUpForm = ({ id, setSearchParameter, selection } ) => {
 
     function handleSubmit() {
         if (wo || pn || palletId) {
-            $('#' + id).modal('hide')
+            window.jQuery('#' + id).modal('hide')
             setError("")
             setSearchParameter({ wo, pn, palletId })
         } else {

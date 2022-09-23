@@ -6,7 +6,7 @@ const TimelineBlock = ({ palletId, locationTimeDto }) => {
             const { location, transTime, durationTime } = locationTimeDto
             return <div className="timeline">
                 <div>
-                    <i class="fas fa-clock bg-blue"></i>
+                    <i className="fas fa-clock bg-blue"></i>
                     <div className="timeline-item">
                         <span className="time">
                             {durationTime !== "" ? <><i className="fas fa-clock"></i> {durationTime}</> : <></> }

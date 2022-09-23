@@ -1,9 +1,8 @@
-﻿import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback, useRef } from 'react'
 import Block from './block/Block'
 import LeftBlock from './block/LeftBlock'
 import RightBlock from './block/RightBlock'
 import TerminalBlock from './block/TerminalBlock'
-import Refresh from '../components/Refresh'
 import PopUpSelection from './popup/PopUpSelection'
 import PopUpForm from './popup/PopUpForm'
 import PopUpTimeline from './popup/PopUpTimeline'
@@ -32,9 +31,41 @@ import {
     _timeline_modal_target
 } from './constants'
 
-const Dashboard = ({ showDashboard }) => {
+const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef }) => {
     const [result, setResult] = useState()
-    const [dashboard, setDashboard] = useState({
+    const [onDashboard, setOnDashboard] = useState({
+        warehouseAEpcDtos: null,
+        warehouseBEpcDtos: null,
+        warehouseCEpcDtos: null,
+        warehouseDEpcDtos: null,
+        warehouseEEpcDtos: null,
+        warehouseFEpcDtos: null,
+        warehouseGEpcDtos: null,
+        warehouseHEpcDtos: null,
+        warehouseIEpcDtos: null,
+        elevatorEpcDtos: null,
+        secondFloorEpcDtos: null,
+        thirdFloorAEpcDtos: null,
+        thirdFloorBEpcDtos: null,
+        terminalEpcDtos: null
+    })
+    const [allDashboard, setAllDashboard] = useState({
+        warehouseAEpcDtos: null,
+        warehouseBEpcDtos: null,
+        warehouseCEpcDtos: null,
+        warehouseDEpcDtos: null,
+        warehouseEEpcDtos: null,
+        warehouseFEpcDtos: null,
+        warehouseGEpcDtos: null,
+        warehouseHEpcDtos: null,
+        warehouseIEpcDtos: null,
+        elevatorEpcDtos: null,
+        secondFloorEpcDtos: null,
+        thirdFloorAEpcDtos: null,
+        thirdFloorBEpcDtos: null,
+        terminalEpcDtos: null
+    })
+    const [searchDashboard, setSearchDashboard] = useState({
         warehouseAEpcDtos: null,
         warehouseBEpcDtos: null,
         warehouseCEpcDtos: null,
@@ -51,22 +82,27 @@ const Dashboard = ({ showDashboard }) => {
         terminalEpcDtos: null
     })
     const [selection, setSelection] = useState()
-    const [loading, setLoading] = useState(true)
     const [_3A_limit, set3ALimit] = useState(6)
     const [_2A_limit, set2ALimit] = useState(6)
     const [_3B_limit, set3BLimit] = useState(6)
-    const [searchParameter, setSearchParameter] = useState()
     const [timelineEpc, setTimelineEpc] = useState()
     
     const fetchRequest = useCallback((url) => {
         const fetchData = async () => {
             try {
-                setLoading(true)
                 const response = await fetch(url)
                 const { result, dashboardDto, selectionDto } = await response.json()
                 if (result === true) {
                     setResult(result)
-                    setDashboard(dashboardDto)
+                    console.log("in fetch request [searchStateRef.current] = " + searchStateRef.current)
+                    if (searchStateRef.current === false) {
+                        setAllDashboard(dashboardDto)
+                        setOnDashboard(dashboardDto)
+                    }
+                    else {
+                        setSearchDashboard(dashboardDto)
+                        setOnDashboard(dashboardDto)
+                    }
                     setSelection(selectionDto)
                 }
                 else {
@@ -74,19 +110,27 @@ const Dashboard = ({ showDashboard }) => {
                 }
             } catch (error) {
             }
-            setLoading(false)
         }
         fetchData()
-    }, [])
+    }, [searchStateRef])
 
     useEffect(() => {
         fetchRequest(URL_EPC_ALL)
-    }, [fetchRequest])
+
+        const interval = setInterval(() => {
+            if (searchStateRef.current === false) {
+                fetchRequest(URL_EPC_ALL)
+            }
+        }, 3000)
+
+        return () => clearInterval(interval)
+    }, [searchStateRef, fetchRequest])
 
     useEffect(() => {
         if (searchParameter) {
             const { wo, pn, palletId } = searchParameter
             if (wo || pn || palletId) {
+                searchStateRef.current = true
                 const url = URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
                 fetchRequest(url)
             }
@@ -104,31 +148,31 @@ const Dashboard = ({ showDashboard }) => {
                                 height={"h-5"}
                                 title={BLOCK_E}
                                 result={result}
-                                epcs={dashboard.warehouseEEpcDtos}
+                                epcs={onDashboard.warehouseEEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                             <LeftBlock
                                 height={"h-5 card-margin-top"}
                                 title={BLOCK_D}
                                 result={result}
-                                epcs={dashboard.warehouseDEpcDtos}
+                                epcs={onDashboard.warehouseDEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                             <LeftBlock
                                 height={"h-5 card-margin-top"}
                                 title={BLOCK_C}
                                 result={result}
-                                epcs={dashboard.warehouseCEpcDtos}
+                                epcs={onDashboard.warehouseCEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                             <LeftBlock
                                 height={"h-5 card-margin-top"}
                                 title={BLOCK_B}
                                 result={result}
-                                epcs={dashboard.warehouseBEpcDtos}
+                                epcs={onDashboard.warehouseBEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                             <LeftBlock
                                 height={"h-5 card-margin-top"}
                                 title={BLOCK_A}
                                 result={result}
-                                epcs={dashboard.warehouseAEpcDtos}
+                                epcs={onDashboard.warehouseAEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                         </div>
                     </div>
@@ -147,25 +191,25 @@ const Dashboard = ({ showDashboard }) => {
                                 height={"h-5 card-margin-top"}
                                 title={BLOCK_I}
                                 result={result}
-                                epcs={dashboard.warehouseIEpcDtos}
+                                epcs={onDashboard.warehouseIEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                             <RightBlock
                                 height={"h-5 card-margin-top"}
                                 title={BLOCK_H}
                                 result={result}
-                                epcs={dashboard.warehouseHEpcDtos}
+                                epcs={onDashboard.warehouseHEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                             <RightBlock
                                 height={"h-5 card-margin-top"}
                                 title={BLOCK_G}
                                 result={result}
-                                epcs={dashboard.warehouseGEpcDtos}
+                                epcs={onDashboard.warehouseGEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                             <RightBlock
                                 height={"h-5 card-margin-top"}
                                 title={BLOCK_F}
                                 result={result}
-                                epcs={dashboard.warehouseFEpcDtos}
+                                epcs={onDashboard.warehouseFEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                         </div>
                     </div>
@@ -177,7 +221,7 @@ const Dashboard = ({ showDashboard }) => {
                             modalId={null}
                             limit={null}
                             result={result}
-                            epcs={dashboard.elevatorEpcDtos}
+                            epcs={onDashboard.elevatorEpcDtos}
                             setTimelineEpc={setTimelineEpc} />
                     </div>
                 </div>
@@ -192,7 +236,7 @@ const Dashboard = ({ showDashboard }) => {
                         modalId={_3A_modal_target}
                         limit={_3A_limit}
                         result={result}
-                        epcs={dashboard.thirdFloorAEpcDtos}
+                        epcs={onDashboard.thirdFloorAEpcDtos}
                         setTimelineEpc={setTimelineEpc} />
                 </div>
                 <div className="h-3">
@@ -204,7 +248,7 @@ const Dashboard = ({ showDashboard }) => {
                         modalId={_2A_modal_target}
                         limit={_2A_limit}
                         result={result}
-                        epcs={dashboard.secondFloorEpcDtos}
+                        epcs={onDashboard.secondFloorEpcDtos}
                         setTimelineEpc={setTimelineEpc} />
                 </div>
                 <div className="h-3">
@@ -216,7 +260,7 @@ const Dashboard = ({ showDashboard }) => {
                         modalId={_3B_modal_target}
                         limit={_3B_limit}
                         result={result}
-                        epcs={dashboard.thirdFloorBEpcDtos}
+                        epcs={onDashboard.thirdFloorBEpcDtos}
                         setTimelineEpc={setTimelineEpc} />
                 </div>
             </div>
@@ -224,7 +268,7 @@ const Dashboard = ({ showDashboard }) => {
     }
 
     function renderTerminal() {
-        const { terminalEpcDtos } = dashboard
+        const { terminalEpcDtos } = onDashboard
         return <>
             <div className="col-sm h-100">
                 <div className="row h-100">
@@ -246,7 +290,7 @@ const Dashboard = ({ showDashboard }) => {
     function render() {
         return <div className="row h-100 p-3">
             <PopUpTimeline id={_timeline_modal_target} epc={timelineEpc} />
-            <PopUpForm id={_search_modal_target} setSearchParameter={setSearchParameter} selection={selection} />
+            <PopUpForm id={searchStateRef.current === false ? _search_modal_target : ""} setSearchParameter={setSearchParameter} selection={selection} />
             <PopUpSelection id={_3A_modal_target} title={BLOCK_3F_A} limit={_3A_limit} setLimit={set3ALimit} />
             <PopUpSelection id={_2A_modal_target} title={BLOCK_2F_A} limit={_2A_limit} setLimit={set2ALimit} />
             <PopUpSelection id={_3B_modal_target} title={BLOCK_3F_B} limit={_3B_limit} setLimit={set3BLimit} />
@@ -254,7 +298,7 @@ const Dashboard = ({ showDashboard }) => {
         </div>
     }
 
-    return <>{loading === false ? render() : <Refresh />}</>
+    return <>{render()}</>
 }
 
 export default Dashboard

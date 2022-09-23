@@ -32,6 +32,8 @@ export const CANCEL = "cancel"
 export const SAVE = "SAVE"
 export const SELECT = "選擇"
 export const SEARCH = "查詢"
+export const CANCELSEARCH = "取消查詢"
+
 export const ERROR = "查詢錯誤"
 export const CLOSE = "CLOSE"
 
