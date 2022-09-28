@@ -1,13 +1,9 @@
 ﻿export const VERSION = "v0.0.0"
 
-//export const URL_HOST = "https://localhost:44391"
-export const URL_HOST = "http://192.168.100.44"
-export const URL_EPC_ALL = `${URL_HOST}/api/epc`
-export const URL_EPC = `${URL_HOST}/api/epc?`
-export const URL_TERMINAL = `${URL_HOST}/api/terminal`
+export const URL_EPC_ALL = `/api/epc`
+export const URL_EPC = `/api/epc?`
+export const URL_TERMINAL = `/api/terminal`
 
-export const BLOCK_BRAND = "SCANNEL"
-export const BLOCK_DASHBOARD = "Dashboard"
 export const BLOCK_3F_A = "A-3F 成品區"
 export const BLOCK_3F_B = "B-3F 成品區"
 export const BLOCK_2F_A = "A-2F 成品區"

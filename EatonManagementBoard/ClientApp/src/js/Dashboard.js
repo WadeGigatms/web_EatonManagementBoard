@@ -23,7 +23,6 @@ import {
     BLOCK_I,
     NAV_TERMINAL,
     URL_EPC_ALL,
-    URL_EPC,
     _3A_modal_target,
     _2A_modal_target,
     _3B_modal_target,
@@ -94,7 +93,6 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 const { result, dashboardDto, selectionDto } = await response.json()
                 if (result === true) {
                     setResult(result)
-                    console.log("in fetch request [searchStateRef.current] = " + searchStateRef.current)
                     if (searchStateRef.current === false) {
                         setAllDashboard(dashboardDto)
                         setOnDashboard(dashboardDto)
@@ -115,11 +113,13 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }, [searchStateRef])
 
     useEffect(() => {
-        fetchRequest(URL_EPC_ALL)
+        const url = window.location.origin + URL_EPC_ALL
+        fetchRequest(url)
 
         const interval = setInterval(() => {
             if (searchStateRef.current === false) {
-                fetchRequest(URL_EPC_ALL)
+                const url = window.location.origin + URL_EPC_ALL
+                fetchRequest(url)
             }
         }, 3000)
 
@@ -131,7 +131,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             const { wo, pn, palletId } = searchParameter
             if (wo || pn || palletId) {
                 searchStateRef.current = true
-                const url = URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
+                const url = window.location.origin + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
                 fetchRequest(url)
             }
         }
@@ -270,7 +270,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     function renderTerminal() {
         const { terminalEpcDtos } = onDashboard
         return <>
-            <div className="col-sm h-100">
+            <div className="col-sm h-100 p-025">
                 <div className="row h-100">
                     <div className="h-100 bg-1f"></div>
                     <div className="col-sm h-100">
