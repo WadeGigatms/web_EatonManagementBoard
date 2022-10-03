@@ -18,14 +18,18 @@ namespace EatonManagementBoard.Models
         }
 
         public virtual DbSet<EatonEpc> EatonEpcs { get; set; }
+
+        /*
         public virtual DbSet<MonthlyVisualize> MonthlyVisualizes { get; set; }
         public virtual DbSet<PreparedTag> PreparedTags { get; set; }
         public virtual DbSet<RfidRssi> RfidRssis { get; set; }
         public virtual DbSet<RfidXiyuan> RfidXiyuans { get; set; }
         public virtual DbSet<RuDb> RuDbs { get; set; }
+        public virtual DbSet<TaipeiLogistic> TaipeiLogistics { get; set; }
         public virtual DbSet<TextileProduct> TextileProducts { get; set; }
         public virtual DbSet<TextileWorkStatus> TextileWorkStatuses { get; set; }
         public virtual DbSet<VWorkStatus> VWorkStatuses { get; set; }
+        */
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -38,13 +42,12 @@ namespace EatonManagementBoard.Models
 
             modelBuilder.Entity<EatonEpc>(entity =>
             {
-                entity.HasKey(e => e.Sid)
-                    .HasName("PK__eaton_ep__CA1E5D78B69E27F0");
+                entity.HasKey(e => e.Sid);
 
                 entity.ToTable("eaton_epc");
 
                 entity.Property(e => e.Epc)
-                    .HasMaxLength(100)
+                    .HasMaxLength(150)
                     .IsUnicode(false)
                     .HasColumnName("epc");
 
@@ -58,6 +61,7 @@ namespace EatonManagementBoard.Models
                     .HasColumnName("transTime");
             });
 
+            /*
             modelBuilder.Entity<MonthlyVisualize>(entity =>
             {
                 entity.HasNoKey();
@@ -182,6 +186,27 @@ namespace EatonManagementBoard.Models
                     .HasColumnName("usermemory");
             });
 
+            modelBuilder.Entity<TaipeiLogistic>(entity =>
+            {
+                entity.HasKey(e => e.Sid);
+
+                entity.ToTable("taipei_logistics");
+
+                entity.Property(e => e.Epc)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("epc");
+
+                entity.Property(e => e.ReaderId)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("readerId");
+
+                entity.Property(e => e.TransTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("transTime");
+            });
+
             modelBuilder.Entity<TextileProduct>(entity =>
             {
                 entity.HasKey(e => e.Sid)
@@ -302,6 +327,7 @@ namespace EatonManagementBoard.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
             });
+            */
 
             OnModelCreatingPartial(modelBuilder);
         }

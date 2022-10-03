@@ -11,9 +11,9 @@ namespace EatonManagementBoard.Services
 {
     public class EpcService
     {
-        public EpcService(EatonManagementBoardDbContext eatonmanagementboardDbContext)
+        public EpcService(EatonManagementBoardDbContext dbContext)
         {
-            _dbContext = eatonmanagementboardDbContext;
+            _dbContext = dbContext;
         }
 
         private readonly EatonManagementBoardDbContext _dbContext;

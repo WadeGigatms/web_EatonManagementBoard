@@ -23,6 +23,7 @@ import {
     BLOCK_I,
     NAV_TERMINAL,
     URL_EPC_ALL,
+    URL_EPC,
     _3A_modal_target,
     _2A_modal_target,
     _3B_modal_target,
@@ -131,7 +132,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             const { wo, pn, palletId } = searchParameter
             if (wo || pn || palletId) {
                 searchStateRef.current = true
-                const url = window.location.origin + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
+                const url = window.location.origin + URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
                 fetchRequest(url)
             }
         }
