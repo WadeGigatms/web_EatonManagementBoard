@@ -175,7 +175,7 @@ namespace EatonManagementBoard.Services
                 string epcString = GetHexToAscii(eatonEpc.Epc);
                 bool isCorrectStringFormat = true;
                 // Error string format
-                if (epcString.Split("##").Count() == 0 || epcString.Split("##")[1].Split("&&").Count() != 5)
+                if (epcString.Contains("##") == false || epcString.Split("##").Count() == 0 || epcString.Split("##")[1].Split("&&").Count() != 5)
                 {
                     isCorrectStringFormat = false;
                 }

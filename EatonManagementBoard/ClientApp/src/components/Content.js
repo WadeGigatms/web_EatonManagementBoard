@@ -1,7 +1,6 @@
 ﻿import React, { useEffect, useState, useRef } from 'react'
 import {
     NAV_TITLE,
-    NAV_HOME,
     SEARCH,
     CANCELSEARCH,
     NAV_TERMINAL,
@@ -39,11 +38,6 @@ const Content = ({ children }) => {
         }
     }, [searchState])
 
-    function handleHomeClick() {
-        setShowDashboard(true)
-        window.location.href = "./"
-    }
-
     function handleWarehouseClick() {
         setShowDashboard(true)
     }
@@ -78,14 +72,6 @@ const Content = ({ children }) => {
                 <div className="col-sm-4 h-100">
                     <nav className="navbar navbar-expand h-100 p-0">
                         <ul className="navbar-nav ml-auto h-100">
-                            {/*
-                            <li className="nav-item nav-link h-100">
-                                <button type="button" className="btn btn-app color-w p-0 h-100" onClick={handleHomeClick} >
-                                    <i className="fas fa-house"></i>
-                                    <label className="navbar-item-text">{NAV_HOME}</label>
-                                </button>
-                            </li>
-                            */}
                             <li className="nav-item nav-link h-100">
                                 <button type="button" className="btn btn-app color-w p-0 h-100" onClick={handleWarehouseClick} >
                                     <i className="fas fa-box"></i>

@@ -84,7 +84,8 @@ code {
 /* table text */
 .table-sm th {
     padding: 0.1rem !important;
-    font-size: 14px;
+    font-size: 10px !important;
+    text-align: left !important;
 }
 
 .table-sm td {
@@ -92,7 +93,8 @@ code {
     padding-right: 0.2rem !important;
     padding-top: 0rem !important;
     padding-bottom: 0rem !important;
-    font-size: 18px;
+    font-size: 10px !important;
+    text-align: left !important;
 }
 
 /* text */
