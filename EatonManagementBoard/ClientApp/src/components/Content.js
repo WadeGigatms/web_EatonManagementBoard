@@ -16,6 +16,8 @@ const Content = ({ children }) => {
     const [searchState, setSearchState] = useState(false)
     const [searchParameter, setSearchParameter] = useState()
     const [searchBtnClass, setSearchBtnClass] = useState("btn btn-app color-w p-0 h-100")
+    const [warehouseBtnClass, setWarehouseBtnClass] = useState("btn btn-app btn-bg-white p-0 h-100")
+    const [terminalBtnClass, setTerminalBtnClass] = useState("btn btn-app color-w p-0 h-100")
 
     useEffect(() => {
         if (searchParameter) {
@@ -30,11 +32,22 @@ const Content = ({ children }) => {
     }, [searchParameter])
 
     useEffect(() => {
+        if (showDashboard === true) {
+            setWarehouseBtnClass("btn btn-app btn-bg-white p-0 h-100")
+            setTerminalBtnClass("btn btn-app color-w p-0 h-100")
+        }
+        else {
+            setWarehouseBtnClass("btn btn-app color-w p-0 h-100")
+            setTerminalBtnClass("btn btn-app btn-bg-white p-0 h-100")
+        }
+    }, [showDashboard])
+
+    useEffect(() => {
         if (searchState === false) {
             setSearchBtnClass("btn btn-app color-w p-0 h-100")
         }
         else {
-            setSearchBtnClass("btn btn-app btn-search p-0 h-100")
+            setSearchBtnClass("btn btn-app btn-bg-white p-0 h-100")
         }
     }, [searchState])
 
@@ -73,13 +86,13 @@ const Content = ({ children }) => {
                     <nav className="navbar navbar-expand h-100 p-0">
                         <ul className="navbar-nav ml-auto h-100">
                             <li className="nav-item nav-link h-100">
-                                <button type="button" className="btn btn-app color-w p-0 h-100" onClick={handleWarehouseClick} >
+                                <button type="button" className={warehouseBtnClass} onClick={handleWarehouseClick} >
                                     <i className="fas fa-box"></i>
                                     <label className="navbar-item-text">{NAV_WAREHOUSE}</label>
                                 </button>
                             </li>
                             <li className="nav-item nav-link h-100">
-                                <button type="button" className="btn btn-app color-w p-0 h-100" onClick={handleTerminalClick} >
+                                <button type="button" className={terminalBtnClass} onClick={handleTerminalClick} >
                                     <i className="fas fa-box"></i>
                                     <label className="navbar-item-text">{NAV_TERMINAL}</label>
                                 </button>

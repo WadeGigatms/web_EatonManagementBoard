@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "admin-lte": "3.1",
+    "admin-lte": "3.2",
     "bootstrap": "~4.6.1",
     "icheck-bootstrap": "^3.0.1",
     "jquery": "~3.6.0",
@@ -20,9 +20,10 @@
   "devDependencies": {
     "ajv": "^6.9.1",
     "cross-env": "^5.2.0",
+    "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "nan": "^2.14.1",
-    "react-scripts": "^5.0.0",
+    "react-scripts": "^5.0.1",
     "typescript": "^3.7.5"
   },
   "eslintConfig": {

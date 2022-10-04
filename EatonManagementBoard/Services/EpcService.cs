@@ -192,7 +192,7 @@ namespace EatonManagementBoard.Services
                     .ToList();
                 if (string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString))
                 {
-                    epcDtos.Add(new EpcDto
+                    epcDtos.Insert(0, (new EpcDto
                     {
                         Epc = eatonEpc.Epc,
                         ReaderId = eatonEpc.ReaderId,
@@ -204,14 +204,14 @@ namespace EatonManagementBoard.Services
                         Barcode = barcode,
                         Error = error,
                         LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                    });
+                    }));
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && wo == woString)
                     {
                         // With wo
-                        epcDtos.Add(new EpcDto
+                        epcDtos.Insert(0, (new EpcDto
                         {
                             Epc = eatonEpc.Epc,
                             ReaderId = eatonEpc.ReaderId,
@@ -223,12 +223,12 @@ namespace EatonManagementBoard.Services
                             Barcode = barcode,
                             Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                        }));
                     }
                     else if (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && pn == pnString)
                     {
                         // With pn
-                        epcDtos.Add(new EpcDto
+                        epcDtos.Insert(0, (new EpcDto
                         {
                             Epc = eatonEpc.Epc,
                             ReaderId = eatonEpc.ReaderId,
@@ -240,12 +240,12 @@ namespace EatonManagementBoard.Services
                             Barcode = barcode,
                             Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                        }));
                     }
                     else if (string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && barcode == palletIdString)
                     {
                         // With pallet
-                        epcDtos.Add(new EpcDto
+                        epcDtos.Insert(0, (new EpcDto
                         {
                             Epc = eatonEpc.Epc,
                             ReaderId = eatonEpc.ReaderId,
@@ -257,12 +257,12 @@ namespace EatonManagementBoard.Services
                             Barcode = barcode,
                             Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                        }));
                     }
                     else if (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && wo == woString && barcode == palletIdString)
                     {
                         // With wo, pallet
-                        epcDtos.Add(new EpcDto
+                        epcDtos.Insert(0, (new EpcDto
                         {
                             Epc = eatonEpc.Epc,
                             ReaderId = eatonEpc.ReaderId,
@@ -274,12 +274,12 @@ namespace EatonManagementBoard.Services
                             Barcode = barcode,
                             Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                        }));
                     }
                     else if (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && wo == woString && pn == pnString)
                     {
                         // With wo, pn
-                        epcDtos.Add(new EpcDto
+                        epcDtos.Insert(0, (new EpcDto
                         {
                             Epc = eatonEpc.Epc,
                             ReaderId = eatonEpc.ReaderId,
@@ -291,12 +291,12 @@ namespace EatonManagementBoard.Services
                             Barcode = barcode,
                             Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                        }));
                     }
                     else if (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && pn == pnString && barcode == palletIdString)
                     {
                         // With pn, pallet
-                        epcDtos.Add(new EpcDto
+                        epcDtos.Insert(0, (new EpcDto
                         {
                             Epc = eatonEpc.Epc,
                             ReaderId = eatonEpc.ReaderId,
@@ -308,12 +308,12 @@ namespace EatonManagementBoard.Services
                             Barcode = barcode,
                             Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                        }));
                     }
                     else if (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && wo == woString && pn == pnString && barcode == palletIdString)
                     {
                         // With wo, pn, pallet
-                        epcDtos.Add(new EpcDto
+                        epcDtos.Insert(0, (new EpcDto
                         {
                             Epc = eatonEpc.Epc,
                             ReaderId = eatonEpc.ReaderId,
@@ -325,7 +325,7 @@ namespace EatonManagementBoard.Services
                             Barcode = barcode,
                             Error = error,
                             LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                        }));
                     }
                 }
             }

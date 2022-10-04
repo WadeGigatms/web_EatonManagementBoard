@@ -10,20 +10,20 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
         const dataTarget = "#timelineModalTarget"
         if (showTransTime === true) {
             return <tr onClick={handleClick} data-toggle="modal" data-target={dataTarget} >
-                <td className="col-sm-1">{epc.line}</td>
-                <td className="col-sm-4">{epc.wo}</td>
-                <td className="col-sm-4">{epc.pn}</td>
-                <td className="col-sm-1">{epc.qty}</td>
-                <td className="col-sm-2">{epc.transTime}</td>
+                <td width="5%">{epc.line}</td>
+                <td width="40%">{epc.wo}</td>
+                <td width="40%">{epc.pn}</td>
+                <td width="5%">{epc.qty}</td>
+                <td width="10%">{epc.transTime}</td>
             </tr>
 
         }
         else {
             return <tr value={epc.epc} onClick={handleClick} data-toggle="modal" data-target={dataTarget}  >
-                <td className="col-sm-1">{epc.line}</td>
-                <td className="col-sm-5">{epc.wo}</td>
-                <td className="col-sm-5">{epc.pn}</td>
-                <td className="col-sm-1">{epc.qty}</td>
+                <td width="5%">{epc.line}</td>
+                <td width="45%">{epc.wo}</td>
+                <td width="45%">{epc.pn}</td>
+                <td width="5%">{epc.qty}</td>
             </tr>
         }
     }
