@@ -15,12 +15,14 @@ const PopUpForm = ({ id, setSearchParameter, selection }) => {
     const [error, setError] = useState("")
 
     useEffect(() => {
-        window.jQuery('#' + id).on('hide.bs.modal', function () {
-            setWo("")
-            setPn("")
-            setPalletId("")
-        })
-    }, [])
+        window.jQuery('#' + id).on('hide.bs.modal', handleInit)
+    }, [id])
+
+    function handleInit() {
+        setWo("")
+        setPn("")
+        setPalletId("")
+    }
 
     function handleChangeWo(e) {
         setWo(e.target.value)

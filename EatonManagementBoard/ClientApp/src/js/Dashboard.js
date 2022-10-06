@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback, useRef } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import Block from './block/Block'
 import LeftBlock from './block/LeftBlock'
 import RightBlock from './block/RightBlock'
@@ -31,41 +31,9 @@ import {
     _timeline_modal_target
 } from './constants'
 
-const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef }) => {
+const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef, idleState }) => {
     const [result, setResult] = useState()
     const [onDashboard, setOnDashboard] = useState({
-        warehouseAEpcDtos: null,
-        warehouseBEpcDtos: null,
-        warehouseCEpcDtos: null,
-        warehouseDEpcDtos: null,
-        warehouseEEpcDtos: null,
-        warehouseFEpcDtos: null,
-        warehouseGEpcDtos: null,
-        warehouseHEpcDtos: null,
-        warehouseIEpcDtos: null,
-        elevatorEpcDtos: null,
-        secondFloorEpcDtos: null,
-        thirdFloorAEpcDtos: null,
-        thirdFloorBEpcDtos: null,
-        terminalEpcDtos: null
-    })
-    const [allDashboard, setAllDashboard] = useState({
-        warehouseAEpcDtos: null,
-        warehouseBEpcDtos: null,
-        warehouseCEpcDtos: null,
-        warehouseDEpcDtos: null,
-        warehouseEEpcDtos: null,
-        warehouseFEpcDtos: null,
-        warehouseGEpcDtos: null,
-        warehouseHEpcDtos: null,
-        warehouseIEpcDtos: null,
-        elevatorEpcDtos: null,
-        secondFloorEpcDtos: null,
-        thirdFloorAEpcDtos: null,
-        thirdFloorBEpcDtos: null,
-        terminalEpcDtos: null
-    })
-    const [searchDashboard, setSearchDashboard] = useState({
         warehouseAEpcDtos: null,
         warehouseBEpcDtos: null,
         warehouseCEpcDtos: null,
@@ -95,11 +63,9 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 if (result === true) {
                     setResult(result)
                     if (searchStateRef.current === false) {
-                        setAllDashboard(dashboardDto)
                         setOnDashboard(dashboardDto)
                     }
                     else {
-                        setSearchDashboard(dashboardDto)
                         setOnDashboard(dashboardDto)
                     }
                     setSelection(selectionDto)
@@ -114,29 +80,39 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }, [searchStateRef])
 
     useEffect(() => {
-        const url = window.location.origin + URL_EPC_ALL
+        const url = getUrl()
         fetchRequest(url)
 
         const interval = setInterval(() => {
-            if (searchStateRef.current === false) {
-                const url = window.location.origin + URL_EPC_ALL
+            if (searchStateRef.current === false && idleState === false) {
+                const url = getUrl()
                 fetchRequest(url)
             }
         }, 3000)
 
         return () => clearInterval(interval)
-    }, [searchStateRef, fetchRequest])
+    }, [searchStateRef, fetchRequest, idleState])
 
     useEffect(() => {
         if (searchParameter) {
             const { wo, pn, palletId } = searchParameter
             if (wo || pn || palletId) {
                 searchStateRef.current = true
-                const url = window.location.origin + URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
+                const url = getSearchUrl(wo, pn, palletId)
                 fetchRequest(url)
             }
         }
-    }, [searchParameter, fetchRequest])
+    }, [searchParameter, searchStateRef, fetchRequest])
+
+    function getUrl() {
+        const url = window.location.origin + URL_EPC_ALL
+        return url
+    }
+
+    function getSearchUrl(wo, pn, palletId) {
+        const url = window.location.origin + URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
+        return url
+    }
 
     function renderDashboard() {
         return <>

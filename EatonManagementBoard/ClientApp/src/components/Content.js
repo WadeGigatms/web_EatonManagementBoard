@@ -5,19 +5,39 @@ import {
     CANCELSEARCH,
     NAV_TERMINAL,
     NAV_WAREHOUSE,
-    _search_modal_target,
 } from '../js/constants'
 import Logo from '../img/eaton_logo.jpg'
 import Dashboard from '../js/Dashboard'
+import CarouselImage from '../js/others/CarouselImage'
 
 const Content = ({ children }) => {
+    const activeBtnClass = "btn btn-app btn-bg-white p-0 h-100"
+    const inactiveBtnClass = "btn btn-app color-w p-0 h-100"
     const [showDashboard, setShowDashboard] = useState(true)
     const searchStateRef = useRef(false)
     const [searchState, setSearchState] = useState(false)
     const [searchParameter, setSearchParameter] = useState()
-    const [searchBtnClass, setSearchBtnClass] = useState("btn btn-app color-w p-0 h-100")
-    const [warehouseBtnClass, setWarehouseBtnClass] = useState("btn btn-app btn-bg-white p-0 h-100")
-    const [terminalBtnClass, setTerminalBtnClass] = useState("btn btn-app color-w p-0 h-100")
+    const [searchBtnClass, setSearchBtnClass] = useState(inactiveBtnClass)
+    const [warehouseBtnClass, setWarehouseBtnClass] = useState(activeBtnClass)
+    const [terminalBtnClass, setTerminalBtnClass] = useState(inactiveBtnClass)
+    const [idleState, setIdleState] = useState(false)
+    const [idleTimer, setIdleTimer] = useState(0)
+    const [idleMinutes, setIdleMinutes] = useState(5)
+
+    useEffect(() => {
+        window.addEventListener('click', handleWindowClick)
+    }, [])
+
+    useEffect(() => {
+        const idleInterval = setInterval(() => {
+            setIdleTimer(idleTimer + 1)
+            if (idleState === false && idleTimer === idleMinutes) {
+                setIdleState(true)
+            }
+        }, 1000)
+
+        return () => clearInterval(idleInterval)
+    }, [idleState, idleTimer, idleMinutes])
 
     useEffect(() => {
         if (searchParameter) {
@@ -33,23 +53,28 @@ const Content = ({ children }) => {
 
     useEffect(() => {
         if (showDashboard === true) {
-            setWarehouseBtnClass("btn btn-app btn-bg-white p-0 h-100")
-            setTerminalBtnClass("btn btn-app color-w p-0 h-100")
+            setWarehouseBtnClass(activeBtnClass)
+            setTerminalBtnClass(inactiveBtnClass)
         }
         else {
-            setWarehouseBtnClass("btn btn-app color-w p-0 h-100")
-            setTerminalBtnClass("btn btn-app btn-bg-white p-0 h-100")
+            setWarehouseBtnClass(inactiveBtnClass)
+            setTerminalBtnClass(activeBtnClass)
         }
     }, [showDashboard])
 
     useEffect(() => {
         if (searchState === false) {
-            setSearchBtnClass("btn btn-app color-w p-0 h-100")
+            setSearchBtnClass(inactiveBtnClass)
         }
         else {
-            setSearchBtnClass("btn btn-app btn-bg-white p-0 h-100")
+            setSearchBtnClass(activeBtnClass)
         }
     }, [searchState])
+
+    function handleWindowClick() {
+        setIdleTimer(0)
+        setIdleState(false)
+    }
 
     function handleWarehouseClick() {
         setShowDashboard(true)
@@ -67,7 +92,7 @@ const Content = ({ children }) => {
     }
 
     function render() {
-        return <div className="bg-eaton-blue">
+        return <div className="bg-eaton-b">
             {renderHeader()}
             {renderBody()}
         </div>
@@ -77,7 +102,7 @@ const Content = ({ children }) => {
         return <section className="content-header content-header-p-2 vh-10">
             <div className="row h-100">
                 <div className="col-sm-4 h-100">
-                    <img src={Logo} className="h-100" />
+                    <img src={Logo} className="h-100" alt="logo"/>
                 </div>
                 <div className="col-sm-4 h-100">
                     <div className="text-title d-none d-sm-block h-100">{NAV_TITLE}</div>
@@ -98,7 +123,7 @@ const Content = ({ children }) => {
                                 </button>
                             </li>
                             <li className="nav-item nav-link h-100">
-                                <button role="button" className={searchBtnClass} data-toggle="modal" data-target="#searchModalTarget" onClick={handleSearchClick}>
+                                <button type="button" className={searchBtnClass} data-toggle="modal" data-target="#searchModalTarget" onClick={handleSearchClick}>
                                     <i className="fas fa-search"></i>
                                     <label className="navbar-item-text">{searchState === false ? SEARCH : CANCELSEARCH}</label>
                                 </button>
@@ -117,12 +142,17 @@ const Content = ({ children }) => {
                     searchParameter={searchParameter}
                     setSearchParameter={setSearchParameter}
                     showDashboard={showDashboard}
-                    searchStateRef={searchStateRef} />
+                    searchStateRef={searchStateRef}
+                    idleState={idleState} />
             </div>
         </section>
     }
 
-    return <>{render()}</>
+    function renderCarousel() {
+        return <CarouselImage />
+    }
+
+    return <>{idleState === false ? render() : renderCarousel()}</>
 }
 
 export default Content
