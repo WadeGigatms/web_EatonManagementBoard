@@ -22,7 +22,7 @@ const Content = ({ children }) => {
     const [terminalBtnClass, setTerminalBtnClass] = useState(inactiveBtnClass)
     const [idleState, setIdleState] = useState(false)
     const [idleTimer, setIdleTimer] = useState(0)
-    const [idleMinutes, setIdleMinutes] = useState(5)
+    const [idleMinutes, setIdleMinutes] = useState(1800)
 
     useEffect(() => {
         window.addEventListener('click', handleWindowClick)
