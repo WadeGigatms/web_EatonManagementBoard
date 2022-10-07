@@ -16,10 +16,12 @@ const PopUpSelection = ({ id, title, limit, setLimit }) => {
     }, [limit])
 
     useEffect(() => {
-        window.jQuery('#' + id).on('hide.bs.modal', function () {
-            setCurrentLimit(limit)
-        })
-    }, [])
+        window.jQuery('#' + id).on('hide.bs.modal', handleHideModal)
+    }, [id])
+
+    function handleHideModal() {
+        setCurrentLimit(limit)
+    }
 
     function handleChange(e) {
         setCurrentLimit(e.target.value)

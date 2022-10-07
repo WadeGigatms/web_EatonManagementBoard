@@ -178,9 +178,13 @@ namespace EatonManagementBoard.Services
                 string epcString = GetHexToAscii(eatonEpcDto.Epc);
                 bool isCorrectStringFormat = true;
                 // Error string format
-                if (epcString.Contains("##") == false || epcString.Split("##").Count() == 0 || epcString.Split("##")[1].Split("&&").Count() != 5)
+                if (epcString.Contains("##") == false || 
+                    epcString.Split("##").Count() == 0 || 
+                    epcString.Split("##")[1].Contains("&&") == false ||
+                    epcString.Split("##")[1].Split("&&").Count() != 5)
                 {
                     isCorrectStringFormat = false;
+                    continue;
                 }
                 // Correct string format
                 string wo = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[0] : "Error: " + eatonEpcDto.Epc;
@@ -249,15 +253,15 @@ namespace EatonManagementBoard.Services
                     if (locationTimeDto == locationTimeDtos.First())
                     {
                         // First
-                        if (locationTimeDto.Location != ReaderIdEnum.ThirdFloorA.ToChineseString() &&
-                            locationTimeDto.Location != ReaderIdEnum.ThirdFloorB.ToChineseString() &&
-                            locationTimeDto.Location != ReaderIdEnum.SecondFloorA.ToChineseString())
+                        if (locationTimeDto.Location == ReaderIdEnum.ThirdFloorA.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.SecondFloorA.ToChineseString())
                         {
-                            return EpcStateEnum.NG.ToString();
+                            gotProduction = true;
                         }
                         else
                         {
-                            gotProduction = true;
+                            return EpcStateEnum.NG.ToString();
                         }
                     }
                     else
@@ -265,21 +269,26 @@ namespace EatonManagementBoard.Services
                         // Others
                         // Production -> Elevator -> Warehouse, correct
                         // Correct sequence
-                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotElevator == false && gotWarehouse == false)
+                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == true && gotElevator == false && gotWarehouse == false)
                         {
+                            // Production -> [Elevator]
                             gotElevator = true;
                         }
-                        else if (locationTimeDto.Location.Contains("1F 成品區") == true && gotElevator == true && gotWarehouse == false)
+                        else if (locationTimeDto.Location.Contains("1F 成品區") == true && gotProduction == true && gotElevator == true && gotWarehouse == false)
                         {
+                            // Production -> Elevator -> [Warehouse]
                             gotWarehouse = true;
                         }
+
                         // Incorrect sequence
-                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotElevator == true && gotWarehouse == true)
+                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == true && gotElevator == true && gotWarehouse == true)
                         {
+                            // Production -> Elevator -> Warehouse -> [Elevator]
                             return EpcStateEnum.Return.ToString();
                         }
-                        else if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == false)
+                        else if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == false && gotElevator == false && gotWarehouse == false)
                         {
+                            // ? -> [Elevator]
                             return EpcStateEnum.NG.ToString();
                         }
                     }
@@ -353,6 +362,9 @@ namespace EatonManagementBoard.Services
             {
                 selectionDto.PalletIds.Add(palletIdEpc.palletId.First());
             }
+            selectionDto.Wos = selectionDto.Wos.OrderBy(wo => wo).ToList();
+            selectionDto.Pns = selectionDto.Pns.OrderBy(pn => pn).ToList();
+            selectionDto.PalletIds = selectionDto.PalletIds.OrderBy(palletId => palletId).ToList();
             return selectionDto;
         }
 

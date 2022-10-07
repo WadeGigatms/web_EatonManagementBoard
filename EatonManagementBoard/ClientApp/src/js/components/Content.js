@@ -1,14 +1,21 @@
 ﻿import React, { useEffect, useState, useRef } from 'react'
 import {
     NAV_TITLE,
-    SEARCH,
-    CANCELSEARCH,
     NAV_TERMINAL,
     NAV_WAREHOUSE,
-} from '../js/constants'
-import Logo from '../img/eaton_logo.jpg'
-import Dashboard from '../js/Dashboard'
-import CarouselImage from '../js/others/CarouselImage'
+    NAV_SETTING,
+    SEARCH,
+    CANCELSEARCH,
+    _3A_modal_target,
+    _2A_modal_target,
+    _3B_modal_target,
+    _search_modal_target,
+    _timeline_modal_target,
+    _setting_modal_target,
+} from '../constants'
+import Logo from '../../img/eaton_logo.jpg'
+import Dashboard from '../Dashboard'
+import CarouselImage from '../others/CarouselImage'
 
 const Content = ({ children }) => {
     const activeBtnClass = "btn btn-app btn-bg-white p-0 h-100"
@@ -22,7 +29,8 @@ const Content = ({ children }) => {
     const [terminalBtnClass, setTerminalBtnClass] = useState(inactiveBtnClass)
     const [idleState, setIdleState] = useState(false)
     const [idleTimer, setIdleTimer] = useState(0)
-    const [idleMinutes, setIdleMinutes] = useState(1800)
+    const [idleSeconds, setIdleSeconds] = useState(300)
+    const [carouselMiniSeconds, setCarouselMiniSeconds] = useState(5000)
 
     useEffect(() => {
         window.addEventListener('click', handleWindowClick)
@@ -30,14 +38,19 @@ const Content = ({ children }) => {
 
     useEffect(() => {
         const idleInterval = setInterval(() => {
+            console.log("idleTimer " + idleTimer)
+            console.log("idleSeconds " + idleSeconds)
+            console.log("idleTimer " + idleTimer)
+            console.log("idleSeconds " + idleSeconds)
             setIdleTimer(idleTimer + 1)
-            if (idleState === false && idleTimer === idleMinutes) {
+            if (idleState === false && idleTimer == idleSeconds) {
+                handleHideModal()
                 setIdleState(true)
             }
         }, 1000)
 
         return () => clearInterval(idleInterval)
-    }, [idleState, idleTimer, idleMinutes])
+    }, [idleState, idleTimer, idleSeconds])
 
     useEffect(() => {
         if (searchParameter) {
@@ -71,6 +84,15 @@ const Content = ({ children }) => {
         }
     }, [searchState])
 
+    function handleHideModal() {
+        window.jQuery('#' + _3A_modal_target).modal('hide')
+        window.jQuery('#' + _3B_modal_target).modal('hide')
+        window.jQuery('#' + _2A_modal_target).modal('hide')
+        window.jQuery('#' + _search_modal_target).modal('hide')
+        window.jQuery('#' + _timeline_modal_target).modal('hide')
+        window.jQuery('#' + _setting_modal_target).modal('hide')
+    }
+
     function handleWindowClick() {
         setIdleTimer(0)
         setIdleState(false)
@@ -89,6 +111,10 @@ const Content = ({ children }) => {
             searchStateRef.current = false
             setSearchState(false)
         }
+    }
+
+    function handleSettingClick() {
+
     }
 
     function render() {
@@ -128,6 +154,12 @@ const Content = ({ children }) => {
                                     <label className="navbar-item-text">{searchState === false ? SEARCH : CANCELSEARCH}</label>
                                 </button>
                             </li>
+                            <li className="nav-item nav-link h-100">
+                                <button type="button" className={inactiveBtnClass} data-toggle="modal" data-target="#settingModalTarget" onClick={handleSettingClick}>
+                                    <i className="fas fa-cog"></i>
+                                    <label className="navbar-item-text">{NAV_SETTING}</label>
+                                </button>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -143,13 +175,17 @@ const Content = ({ children }) => {
                     setSearchParameter={setSearchParameter}
                     showDashboard={showDashboard}
                     searchStateRef={searchStateRef}
-                    idleState={idleState} />
+                    idleState={idleState}
+                    idleSeconds={idleSeconds}
+                    setIdleSeconds={setIdleSeconds}
+                    carouselMiniSeconds={carouselMiniSeconds}
+                    setCarouselMiniSeconds={setCarouselMiniSeconds} />
             </div>
         </section>
     }
 
     function renderCarousel() {
-        return <CarouselImage />
+        return <CarouselImage carouselMiniSeconds={carouselMiniSeconds} />
     }
 
     return <>{idleState === false ? render() : renderCarousel()}</>

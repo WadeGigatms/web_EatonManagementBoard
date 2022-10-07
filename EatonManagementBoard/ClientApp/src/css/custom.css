@@ -142,6 +142,11 @@ code {
     padding: 0.5rem 1rem !important;
 }
 
+/* Modal */
+.modal-content {
+    max-height: 80% !important;
+}
+
 /* card */
 .card {
     margin-bottom: 0rem !important;

@@ -6,6 +6,7 @@ import TerminalBlock from './block/TerminalBlock'
 import PopUpSelection from './popup/PopUpSelection'
 import PopUpForm from './popup/PopUpForm'
 import PopUpTimeline from './popup/PopUpTimeline'
+import PopUpSetting from './popup/PopUpSetting'
 import {
     BLOCK_3F_A,
     BLOCK_3F_B,
@@ -28,10 +29,11 @@ import {
     _2A_modal_target,
     _3B_modal_target,
     _search_modal_target,
-    _timeline_modal_target
+    _timeline_modal_target,
+    _setting_modal_target
 } from './constants'
 
-const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef, idleState }) => {
+const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef, idleState, idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
     const [result, setResult] = useState()
     const [onDashboard, setOnDashboard] = useState({
         warehouseAEpcDtos: null,
@@ -266,6 +268,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
 
     function render() {
         return <div className="row h-100 p-3">
+            <PopUpSetting id={_setting_modal_target} idleSeconds={idleSeconds} setIdleSeconds={setIdleSeconds} carouselMiniSeconds={carouselMiniSeconds} setCarouselMiniSeconds={setCarouselMiniSeconds} />
             <PopUpTimeline id={_timeline_modal_target} epc={timelineEpc} />
             <PopUpForm id={searchStateRef.current === false ? _search_modal_target : ""} setSearchParameter={setSearchParameter} selection={selection} />
             <PopUpSelection id={_3A_modal_target} title={BLOCK_3F_A} limit={_3A_limit} setLimit={set3ALimit} />
