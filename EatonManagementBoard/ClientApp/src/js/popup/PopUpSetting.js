@@ -33,14 +33,8 @@ const PopUpSetting = ({ id, idleSeconds, setIdleSeconds, carouselMiniSeconds, se
     }
 
     function handleSubmit() {
-        console.log("before")
-        console.log("idleInterval " + idleInterval)
-        console.log("carouselInterval " + carouselInterval)
         setIdleSeconds(idleInterval)
         setCarouselMiniSeconds(carouselInterval*1000)
-        console.log("after")
-        console.log("idleInterval " + idleInterval)
-        console.log("carouselInterval " + carouselInterval)
         window.jQuery('#' + id).modal('hide')
     }
 
@@ -66,7 +60,7 @@ const PopUpSetting = ({ id, idleSeconds, setIdleSeconds, carouselMiniSeconds, se
                         <div className="form-group">
                             <div className="form-group">
                                 <label>{FORM_VERSION}</label>
-                                <label className="form-control" readonly>{VERSION}</label>
+                                <label className="form-control" readOnly>{VERSION}</label>
                             </div>
                             <div className="form-group">
                                 <label>{FORM_IDLE}</label>
