@@ -44,8 +44,8 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
                         <td onClick={handleClick} width="5%">{epc.line}</td>
                         <td onClick={handleClick} width="35%">{epc.wo}</td>
                         <td onClick={handleClick} width="35%">{epc.pn}</td>
-                        <td onClick={handleClick} width="20%">{epc.barcode}</td>
                         <td onClick={handleClick} width="5%">{epc.qty}</td>
+                        <td onClick={handleClick} width="20%">{epc.barcode}</td>
                     </tr>
                 }
                 else {

@@ -40,8 +40,8 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
                         <th width="5%">{TH_LINE}</th>
                         <th width="35%">{TH_TASKNO}</th>
                         <th width="35%">{TH_PN}</th>
-                        <th width="20%">{TH_PALLET}</th>
                         <th width="5%">{TH_QTY}</th>
+                        <th width="20%">{TH_PALLET}</th>
                     </tr>
                 </thead>
             }
