@@ -26,6 +26,10 @@ code {
     height: 90vh;
 }
 
+.vh-100 {
+    height: 100vh;
+}
+
 .h-3 {
     height: 32.8% !important;
 }
@@ -38,8 +42,8 @@ code {
     padding: 0.25% !important;
 }
 
-.bg-eaton-blue {
-    background-color: #1861ac;
+.bg-eaton-b {
+    background-color: #0067c6;
 }
 
 .circle-size {
@@ -52,7 +56,7 @@ code {
     min-width: 100px !important;
 }
 
-.btn-search {
+.btn-bg-white {
     background-color: white;
 }
 
@@ -82,17 +86,27 @@ code {
 }
 
 /* table text */
-.table-sm th {
+.table th {
     padding: 0.1rem !important;
-    font-size: 14px;
+    font-size: 10px !important;
+    text-align: left !important;
 }
 
-.table-sm td {
+.table td {
     padding-left: 0.2rem !important;
     padding-right: 0.2rem !important;
     padding-top: 0rem !important;
     padding-bottom: 0rem !important;
-    font-size: 18px;
+    font-size: 10px !important;
+    text-align: left !important;
+}
+
+.tr-bg-r {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+.tr-bg-y {
+    background-color: rgba(255, 240, 0, 0.5);
 }
 
 /* text */
@@ -111,7 +125,7 @@ code {
 .text-title {
     text-align: center !important;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 40px;
+    font-size: 36px;
     font-weight: bold;
     color: white;
 }
@@ -128,11 +142,12 @@ code {
     padding: 0.5rem 1rem !important;
 }
 
-/* card */
-.card:hover {
-    border: solid;
+/* Modal */
+.modal-content {
+    max-height: 80% !important;
 }
 
+/* card */
 .card {
     margin-bottom: 0rem !important;
 }
@@ -221,6 +236,36 @@ code {
     z-index: 1;
     opacity: 0.2;
     pointer-events: none;
+}
+
+.bg-role-5s1f {
+    background-image: url("../img/5S_1F.jpg");
+    background-color: #0067c6;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100%;
+    z-index: 2;
+}
+
+.bg-role-ppe {
+    background-image: url("../img/PPE.jpg");
+    background-color: #0067c6;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100%;
+    z-index: 2;
+}
+
+.bg-role-meter {
+    background-image: url("../img/Meter.jpg");
+    background-color: #0067c6;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100%;
+    z-index: 2;
 }
 
 /* block */

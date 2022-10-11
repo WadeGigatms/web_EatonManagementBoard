@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback, useRef } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import Block from './block/Block'
 import LeftBlock from './block/LeftBlock'
 import RightBlock from './block/RightBlock'
@@ -6,6 +6,7 @@ import TerminalBlock from './block/TerminalBlock'
 import PopUpSelection from './popup/PopUpSelection'
 import PopUpForm from './popup/PopUpForm'
 import PopUpTimeline from './popup/PopUpTimeline'
+import PopUpSetting from './popup/PopUpSetting'
 import {
     BLOCK_3F_A,
     BLOCK_3F_B,
@@ -28,44 +29,13 @@ import {
     _2A_modal_target,
     _3B_modal_target,
     _search_modal_target,
-    _timeline_modal_target
+    _timeline_modal_target,
+    _setting_modal_target
 } from './constants'
 
-const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef }) => {
+const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef, idleState, idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
     const [result, setResult] = useState()
     const [onDashboard, setOnDashboard] = useState({
-        warehouseAEpcDtos: null,
-        warehouseBEpcDtos: null,
-        warehouseCEpcDtos: null,
-        warehouseDEpcDtos: null,
-        warehouseEEpcDtos: null,
-        warehouseFEpcDtos: null,
-        warehouseGEpcDtos: null,
-        warehouseHEpcDtos: null,
-        warehouseIEpcDtos: null,
-        elevatorEpcDtos: null,
-        secondFloorEpcDtos: null,
-        thirdFloorAEpcDtos: null,
-        thirdFloorBEpcDtos: null,
-        terminalEpcDtos: null
-    })
-    const [allDashboard, setAllDashboard] = useState({
-        warehouseAEpcDtos: null,
-        warehouseBEpcDtos: null,
-        warehouseCEpcDtos: null,
-        warehouseDEpcDtos: null,
-        warehouseEEpcDtos: null,
-        warehouseFEpcDtos: null,
-        warehouseGEpcDtos: null,
-        warehouseHEpcDtos: null,
-        warehouseIEpcDtos: null,
-        elevatorEpcDtos: null,
-        secondFloorEpcDtos: null,
-        thirdFloorAEpcDtos: null,
-        thirdFloorBEpcDtos: null,
-        terminalEpcDtos: null
-    })
-    const [searchDashboard, setSearchDashboard] = useState({
         warehouseAEpcDtos: null,
         warehouseBEpcDtos: null,
         warehouseCEpcDtos: null,
@@ -95,11 +65,9 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 if (result === true) {
                     setResult(result)
                     if (searchStateRef.current === false) {
-                        setAllDashboard(dashboardDto)
                         setOnDashboard(dashboardDto)
                     }
                     else {
-                        setSearchDashboard(dashboardDto)
                         setOnDashboard(dashboardDto)
                     }
                     setSelection(selectionDto)
@@ -114,27 +82,39 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }, [searchStateRef])
 
     useEffect(() => {
-        fetchRequest(URL_EPC_ALL)
+        const url = getUrl()
+        fetchRequest(url)
 
         const interval = setInterval(() => {
-            if (searchStateRef.current === false) {
-                fetchRequest(URL_EPC_ALL)
+            if (searchStateRef.current === false && idleState === false) {
+                const url = getUrl()
+                fetchRequest(url)
             }
         }, 3000)
 
         return () => clearInterval(interval)
-    }, [searchStateRef, fetchRequest])
+    }, [searchStateRef, fetchRequest, idleState])
 
     useEffect(() => {
         if (searchParameter) {
             const { wo, pn, palletId } = searchParameter
             if (wo || pn || palletId) {
                 searchStateRef.current = true
-                const url = URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
+                const url = getSearchUrl(wo, pn, palletId)
                 fetchRequest(url)
             }
         }
-    }, [searchParameter, fetchRequest])
+    }, [searchParameter, searchStateRef, fetchRequest])
+
+    function getUrl() {
+        const url = window.location.origin + URL_EPC_ALL
+        return url
+    }
+
+    function getSearchUrl(wo, pn, palletId) {
+        const url = window.location.origin + URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
+        return url
+    }
 
     function renderDashboard() {
         return <>
@@ -269,7 +249,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     function renderTerminal() {
         const { terminalEpcDtos } = onDashboard
         return <>
-            <div className="col-sm h-100">
+            <div className="col-sm h-100 p-025">
                 <div className="row h-100">
                     <div className="h-100 bg-1f"></div>
                     <div className="col-sm h-100">
@@ -288,6 +268,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
 
     function render() {
         return <div className="row h-100 p-3">
+            <PopUpSetting id={_setting_modal_target} idleSeconds={idleSeconds} setIdleSeconds={setIdleSeconds} carouselMiniSeconds={carouselMiniSeconds} setCarouselMiniSeconds={setCarouselMiniSeconds} />
             <PopUpTimeline id={_timeline_modal_target} epc={timelineEpc} />
             <PopUpForm id={searchStateRef.current === false ? _search_modal_target : ""} setSearchParameter={setSearchParameter} selection={selection} />
             <PopUpSelection id={_3A_modal_target} title={BLOCK_3F_A} limit={_3A_limit} setLimit={set3ALimit} />

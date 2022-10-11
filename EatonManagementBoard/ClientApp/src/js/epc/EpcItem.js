@@ -6,45 +6,59 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
         setTimelineEpc(epc)
     }
 
-    function render(epc) {
+    function render(showTransTime, epc) {
         const dataTarget = "#timelineModalTarget"
-        if (epc.error !== null || epc.error !== "") {
-            if (showTransTime === true) {
-                return <tr onClick={handleClick} data-toggle="modal" data-target={dataTarget} >
-                    <td className="col-sm-1">{epc.line}</td>
-                    <td className="col-sm-4">{epc.wo}</td>
-                    <td className="col-sm-4">{epc.pn}</td>
-                    <td className="col-sm-1">{epc.qty}</td>
-                    <td className="col-sm-2">{epc.transTime}</td>
-                </tr>
-
-            }
-            else {
-                return <tr value={epc.epc} onClick={handleClick} data-toggle="modal" data-target={dataTarget}  >
-                    <td className="col-sm-1">{epc.line}</td>
-                    <td className="col-sm-5">{epc.wo}</td>
-                    <td className="col-sm-5">{epc.pn}</td>
-                    <td className="col-sm-1">{epc.qty}</td>
-                </tr>
+        const trClass = (epc) => {
+            switch (epc.epcState) {
+                case "OK":
+                    return ""
+                case "NG":
+                    return "tr-bg-y"
+                case "Return":
+                    return "tr-bg-r"
+                default:
+                    return ""
             }
         }
-        else {
+        const tds = (showTransTime, epc) => {
             if (showTransTime === true) {
-                return <tr onClick={handleClick} data-toggle="modal" data-target={dataTarget} >
-                    <td className="col-sm-10">{epc.error}</td>
-                    <td className="col-sm-2">{epc.transTime}</td>
-                </tr>
-
+                if (epc.error === "") {
+                    return <tr onClick={handleClick} data-toggle="modal" data-target={dataTarget} className={trClass(epc)} >
+                        <td onClick={handleClick} width="5%">{epc.line}</td>
+                        <td onClick={handleClick} width="40%">{epc.wo}</td>
+                        <td onClick={handleClick} width="40%">{epc.pn}</td>
+                        <td onClick={handleClick} width="5%">{epc.qty}</td>
+                        <td onClick={handleClick} width="10%">{epc.transTime}</td>
+                    </tr>
+                }
+                else {
+                    return <tr onClick={handleClick} data-toggle="modal" data-target={dataTarget} className={trClass(epc)}>
+                        <td onClick={handleClick} width="90%" colSpan="4">{epc.error}</td>
+                        <td onClick={handleClick} width="10%">{epc.transTime}</td>
+                    </tr>
+                }
             }
             else {
-                return <tr value={epc.epc} onClick={handleClick} data-toggle="modal" data-target={dataTarget}  >
-                    <td className="col-sm-12">{epc.error}</td>
-                </tr>
+                if (epc.error === "") {
+                    return <tr onClick={handleClick} data-toggle="modal" data-target={dataTarget} className={trClass(epc)} >
+                        <td onClick={handleClick} width="5%">{epc.line}</td>
+                        <td onClick={handleClick} width="45%">{epc.wo}</td>
+                        <td onClick={handleClick} width="45%">{epc.pn}</td>
+                        <td onClick={handleClick} width="5%">{epc.qty}</td>
+                    </tr>
+                }
+                else {
+                    return <tr onClick={handleClick} data-toggle="modal" data-target={dataTarget} className={trClass(epc)}>
+                        <td onClick={handleClick} width="100%" colSpan="4">{epc.error}</td>
+                    </tr>
+                }
             }
         }
+
+        return <>{tds(showTransTime, epc)}</>
     }
 
-    return <>{render(epc)}</>
+    return <>{render(showTransTime, epc)}</>
 }
 
 export default EpcItem

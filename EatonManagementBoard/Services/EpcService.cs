@@ -11,9 +11,9 @@ namespace EatonManagementBoard.Services
 {
     public class EpcService
     {
-        public EpcService(EatonManagementBoardDbContext eatonmanagementboardDbContext)
+        public EpcService(EatonManagementBoardDbContext dbContext)
         {
-            _dbContext = eatonmanagementboardDbContext;
+            _dbContext = dbContext;
         }
 
         private readonly EatonManagementBoardDbContext _dbContext;
@@ -78,25 +78,25 @@ namespace EatonManagementBoard.Services
                 .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
                 , ReaderIdEnum.Terminal.ToString())
                 .ToList();
-            List<EatonEpc> allEatonEpcs = _dbContext.EatonEpcs
+            List<EatonEpc> dbEatonEpcs = _dbContext.EatonEpcs
                 .FromSqlRaw("select * from scannel.dbo.eaton_epc")
                 .ToList();
 
-            List<EpcDto> warehouseAEpcDtos = GetEpcDtos(warehouseAEatonEpcs, wo, pn, palletId);
-            List<EpcDto> warehouseBEpcDtos = GetEpcDtos(warehouseBEatonEpcs, wo, pn, palletId);
-            List<EpcDto> warehouseCEpcDtos = GetEpcDtos(warehouseCEatonEpcs, wo, pn, palletId);
-            List<EpcDto> warehouseDEpcDtos = GetEpcDtos(warehouseDEatonEpcs, wo, pn, palletId);
-            List<EpcDto> warehouseEEpcDtos = GetEpcDtos(warehouseEEatonEpcs, wo, pn, palletId);
-            List<EpcDto> warehouseFEpcDtos = GetEpcDtos(warehouseFEatonEpcs, wo, pn, palletId);
-            List<EpcDto> warehouseGEpcDtos = GetEpcDtos(warehouseGEatonEpcs, wo, pn, palletId);
-            List<EpcDto> warehouseHEpcDtos = GetEpcDtos(warehouseHEatonEpcs, wo, pn, palletId);
-            List<EpcDto> warehouseIEpcDtos = GetEpcDtos(warehouseIEatonEpcs, wo, pn, palletId);
-            List<EpcDto> elevatorEpcDtos   = GetEpcDtos(elevatorEatonEpcs, wo, pn, palletId);
-            List<EpcDto> secondFloorEpcDtos = GetEpcDtos(secondFloorEatonEpcs, wo, pn, palletId);
-            List<EpcDto> thirdFloorAEpcDtos = GetEpcDtos(thirdFloorAEatonEpcs, wo, pn, palletId);
-            List<EpcDto> thirdFloorBEpcDtos = GetEpcDtos(thirdFloorBEatonEpcs, wo, pn, palletId);
-            List<EpcDto> terminalEpcDtos = GetEpcDtos(terminalEatonEpcs, wo, pn, palletId);
-            List<EpcDto> allEpcDtos = GetEpcDtos(allEatonEpcs, null, null, null);
+            List<EpcDto> warehouseAEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseAEatonEpcs, wo, pn, palletId);
+            List<EpcDto> warehouseBEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseBEatonEpcs, wo, pn, palletId);
+            List<EpcDto> warehouseCEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseCEatonEpcs, wo, pn, palletId);
+            List<EpcDto> warehouseDEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseDEatonEpcs, wo, pn, palletId);
+            List<EpcDto> warehouseEEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseEEatonEpcs, wo, pn, palletId);
+            List<EpcDto> warehouseFEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseFEatonEpcs, wo, pn, palletId);
+            List<EpcDto> warehouseGEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseGEatonEpcs, wo, pn, palletId);
+            List<EpcDto> warehouseHEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseHEatonEpcs, wo, pn, palletId);
+            List<EpcDto> warehouseIEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseIEatonEpcs, wo, pn, palletId);
+            List<EpcDto> elevatorEpcDtos   = GetEpcDtos(dbEatonEpcs, elevatorEatonEpcs, wo, pn, palletId);
+            List<EpcDto> secondFloorEpcDtos = GetEpcDtos(dbEatonEpcs, secondFloorEatonEpcs, wo, pn, palletId);
+            List<EpcDto> thirdFloorAEpcDtos = GetEpcDtos(dbEatonEpcs, thirdFloorAEatonEpcs, wo, pn, palletId);
+            List<EpcDto> thirdFloorBEpcDtos = GetEpcDtos(dbEatonEpcs, thirdFloorBEatonEpcs, wo, pn, palletId);
+            List<EpcDto> terminalEpcDtos = GetEpcDtos(dbEatonEpcs, terminalEatonEpcs, wo, pn, palletId);
+            List<EpcDto> allEpcDtos = GetEpcDtos(dbEatonEpcs, dbEatonEpcs, null, null, null);
 
             DashboardDto dashboardDto = GetDashboardDto(
                 warehouseAEpcDtos, 
@@ -122,6 +122,10 @@ namespace EatonManagementBoard.Services
 
         private string GetHexToAscii(string hexString)
         {
+            if (string.IsNullOrEmpty(hexString) == true)
+            {
+                return "";
+            }
             string asciiString = "";
             for(int i = 0; i < hexString.Length; i += 2)
             {
@@ -166,170 +170,131 @@ namespace EatonManagementBoard.Services
             };
         }
 
-        private List<EpcDto> GetEpcDtos(List<EatonEpc> eatonEpcs, string woString, string pnString, string palletIdString)
+        private List<EpcDto> GetEpcDtos(List<EatonEpc> dbEatonEpcs, List<EatonEpc> eatonEpcDtos, string woString, string pnString, string palletIdString)
         {
-            List<EatonEpc> dbEatonEpcs = _dbContext.EatonEpcs.ToList();
             List<EpcDto> epcDtos = new List<EpcDto>();
-            foreach(var eatonEpc in eatonEpcs)
+            foreach(var eatonEpcDto in eatonEpcDtos)
             {
-                string epcString = GetHexToAscii(eatonEpc.Epc);
+                string epcString = GetHexToAscii(eatonEpcDto.Epc);
                 bool isCorrectStringFormat = true;
                 // Error string format
-                if (epcString.Split("##").Count() == 0 || epcString.Split("##")[1].Split("&&").Count() != 5)
+                if (epcString.Contains("##") == false || 
+                    epcString.Split("##").Count() == 0 || 
+                    epcString.Split("##")[1].Contains("&&") == false ||
+                    epcString.Split("##")[1].Split("&&").Count() != 5)
                 {
                     isCorrectStringFormat = false;
+                    continue;
                 }
                 // Correct string format
-                string wo = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[0] : "";
-                string qty = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[1] : "";
-                string pn = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[2] : "";
-                string line = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[3] : "";
-                string barcode = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[4] : "";
-                string error = isCorrectStringFormat == true ? "" : epcString;
+                string wo = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[0] : "Error: " + eatonEpcDto.Epc;
+                string qty = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[1] : "Error: " + eatonEpcDto.Epc;
+                string pn = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[2] : "Error " + eatonEpcDto.Epc;
+                string line = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[3] : "Error: " + eatonEpcDto.Epc;
+                string barcode = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[4] : "Error: " + eatonEpcDto.Epc;
+                string error = isCorrectStringFormat == true ? "" : eatonEpcDto.Epc;
                 List <EatonEpc> dbSameEpcs = dbEatonEpcs
-                    .Where(dbEatonEpc => dbEatonEpc.Epc == eatonEpc.Epc)
+                    .Where(dbEatonEpc => dbEatonEpc.Epc == eatonEpcDto.Epc)
                     .OrderBy(dbEatonEpc => dbEatonEpc.TransTime)
                     .ToList();
-                if (string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString))
+                List<LocationTimeDto> locationTimeDtos = GetLocationTimeDtos(dbSameEpcs);
+                string epcState = GetEpcState(Enumerable.Reverse(locationTimeDtos).ToList());
+                if ((string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString)) ||
+                    (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && wo == woString) ||
+                    (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && pn == pnString) ||
+                    (string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && barcode == palletIdString) ||
+                    (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && wo == woString && barcode == palletIdString) ||
+                    (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && wo == woString && pn == pnString) ||
+                    (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && pn == pnString && barcode == palletIdString) ||
+                    (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && wo == woString && pn == pnString && barcode == palletIdString))
                 {
+                    // Without parameters
+                    // With wo
+                    // With pn
+                    // With barcode
+                    // With wo, barcode
+                    // With wo, pn
+                    // With pn, barcode
+                    // With wo, pn, barcode
                     epcDtos.Add(new EpcDto
                     {
-                        Epc = eatonEpc.Epc,
-                        ReaderId = eatonEpc.ReaderId,
-                        TransTime = GetDateTimeString(eatonEpc.TransTime.Value),
+                        Epc = eatonEpcDto.Epc,
+                        ReaderId = eatonEpcDto.ReaderId,
+                        TransTime = GetDateTimeString(eatonEpcDto.TransTime.Value),
                         Wo = wo,
                         Qty = qty,
                         Pn = pn,
                         Line = line,
                         Barcode = barcode,
                         Error = error,
-                        LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
+                        LocationTimeDtos = locationTimeDtos,
+                        EpcState = epcState,
                     });
                 }
-                else
+            }
+            epcDtos = epcDtos.OrderByDescending(epcDto => DateTime.Parse(epcDto.TransTime)).ToList();
+            return epcDtos;
+        }
+
+        private string GetEpcState(List<LocationTimeDto> locationTimeDtos)
+        {
+            if (locationTimeDtos.Count == 0 ||
+                locationTimeDtos.FirstOrDefault() == null)
+            {
+                return EpcStateEnum.NG.ToString();
+            }
+            else
+            {
+                bool gotProduction = false;
+                bool gotElevator = false;
+                bool gotWarehouse = false;
+                foreach(var locationTimeDto in locationTimeDtos)
                 {
-                    if (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && wo == woString)
+                    if (locationTimeDto == locationTimeDtos.First())
                     {
-                        // With wo
-                        epcDtos.Add(new EpcDto
+                        // First
+                        if (locationTimeDto.Location == ReaderIdEnum.ThirdFloorA.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.SecondFloorA.ToChineseString())
                         {
-                            Epc = eatonEpc.Epc,
-                            ReaderId = eatonEpc.ReaderId,
-                            TransTime = GetDateTimeString(eatonEpc.TransTime.Value),
-                            Wo = wo,
-                            Qty = qty,
-                            Pn = pn,
-                            Line = line,
-                            Barcode = barcode,
-                            Error = error,
-                            LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                            gotProduction = true;
+                        }
+                        else
+                        {
+                            return EpcStateEnum.NG.ToString();
+                        }
                     }
-                    else if (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && pn == pnString)
+                    else
                     {
-                        // With pn
-                        epcDtos.Add(new EpcDto
+                        // Others
+                        // Production -> Elevator -> Warehouse, correct
+                        // Correct sequence
+                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == true && gotElevator == false && gotWarehouse == false)
                         {
-                            Epc = eatonEpc.Epc,
-                            ReaderId = eatonEpc.ReaderId,
-                            TransTime = GetDateTimeString(eatonEpc.TransTime.Value),
-                            Wo = wo,
-                            Qty = qty,
-                            Pn = pn,
-                            Line = line,
-                            Barcode = barcode,
-                            Error = error,
-                            LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
-                    }
-                    else if (string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && barcode == palletIdString)
-                    {
-                        // With pallet
-                        epcDtos.Add(new EpcDto
+                            // Production -> [Elevator]
+                            gotElevator = true;
+                        }
+                        else if (locationTimeDto.Location.Contains("1F 成品區") == true && gotProduction == true && gotElevator == true && gotWarehouse == false)
                         {
-                            Epc = eatonEpc.Epc,
-                            ReaderId = eatonEpc.ReaderId,
-                            TransTime = GetDateTimeString(eatonEpc.TransTime.Value),
-                            Wo = wo,
-                            Qty = qty,
-                            Pn = pn,
-                            Line = line,
-                            Barcode = barcode,
-                            Error = error,
-                            LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
-                    }
-                    else if (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && wo == woString && barcode == palletIdString)
-                    {
-                        // With wo, pallet
-                        epcDtos.Add(new EpcDto
+                            // Production -> Elevator -> [Warehouse]
+                            gotWarehouse = true;
+                        }
+
+                        // Incorrect sequence
+                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == true && gotElevator == true && gotWarehouse == true)
                         {
-                            Epc = eatonEpc.Epc,
-                            ReaderId = eatonEpc.ReaderId,
-                            TransTime = GetDateTimeString(eatonEpc.TransTime.Value),
-                            Wo = wo,
-                            Qty = qty,
-                            Pn = pn,
-                            Line = line,
-                            Barcode = barcode,
-                            Error = error,
-                            LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
-                    }
-                    else if (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && wo == woString && pn == pnString)
-                    {
-                        // With wo, pn
-                        epcDtos.Add(new EpcDto
+                            // Production -> Elevator -> Warehouse -> [Elevator]
+                            return EpcStateEnum.Return.ToString();
+                        }
+                        else if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == false && gotElevator == false && gotWarehouse == false)
                         {
-                            Epc = eatonEpc.Epc,
-                            ReaderId = eatonEpc.ReaderId,
-                            TransTime = GetDateTimeString(eatonEpc.TransTime.Value),
-                            Wo = wo,
-                            Qty = qty,
-                            Pn = pn,
-                            Line = line,
-                            Barcode = barcode,
-                            Error = error,
-                            LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
-                    }
-                    else if (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && pn == pnString && barcode == palletIdString)
-                    {
-                        // With pn, pallet
-                        epcDtos.Add(new EpcDto
-                        {
-                            Epc = eatonEpc.Epc,
-                            ReaderId = eatonEpc.ReaderId,
-                            TransTime = GetDateTimeString(eatonEpc.TransTime.Value),
-                            Wo = wo,
-                            Qty = qty,
-                            Pn = pn,
-                            Line = line,
-                            Barcode = barcode,
-                            Error = error,
-                            LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
-                    }
-                    else if (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && wo == woString && pn == pnString && barcode == palletIdString)
-                    {
-                        // With wo, pn, pallet
-                        epcDtos.Add(new EpcDto
-                        {
-                            Epc = eatonEpc.Epc,
-                            ReaderId = eatonEpc.ReaderId,
-                            TransTime = GetDateTimeString(eatonEpc.TransTime.Value),
-                            Wo = wo,
-                            Qty = qty,
-                            Pn = pn,
-                            Line = line,
-                            Barcode = barcode,
-                            Error = error,
-                            LocationTimeDtos = GetLocationTimeDtos(dbSameEpcs),
-                        });
+                            // ? -> [Elevator]
+                            return EpcStateEnum.NG.ToString();
+                        }
                     }
                 }
+                return EpcStateEnum.OK.ToString();
             }
-            return epcDtos;
         }
 
         private List<LocationTimeDto> GetLocationTimeDtos(List<EatonEpc> dbSameEpcs)
@@ -397,6 +362,9 @@ namespace EatonManagementBoard.Services
             {
                 selectionDto.PalletIds.Add(palletIdEpc.palletId.First());
             }
+            selectionDto.Wos = selectionDto.Wos.OrderBy(wo => wo).ToList();
+            selectionDto.Pns = selectionDto.Pns.OrderBy(pn => pn).ToList();
+            selectionDto.PalletIds = selectionDto.PalletIds.OrderBy(palletId => palletId).ToList();
             return selectionDto;
         }
 

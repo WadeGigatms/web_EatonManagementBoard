@@ -12,7 +12,7 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
 
     function render(result, epcs) {
         if (result === true && epcs) {
-            return <table className="table table-hover table-sm text-nowrap">
+            return <table className="table table-hover text-nowrap">
                 {renderThead(result)}
                 {renderTbody(result, epcs)}
                 {renderTfoot()}
@@ -25,21 +25,21 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
             if (showTransTime === true) {
                 return <thead>
                     <tr>
-                        <th className="col-sm-1">{TH_LINE}</th>
-                        <th className="col-sm-4">{TH_TASKNO}</th>
-                        <th className="col-sm-4">{TH_PN}</th>
-                        <th className="col-sm-1">{TH_QTY}</th>
-                        <th className="col-sm-2">{TH_TIME}</th>
+                        <th width="5%">{TH_LINE}</th>
+                        <th width="40%">{TH_TASKNO}</th>
+                        <th width="40%">{TH_PN}</th>
+                        <th width="5%">{TH_QTY}</th>
+                        <th width="10%">{TH_TIME}</th>
                     </tr>
                 </thead>
             }
             else {
                 return <thead>
                     <tr>
-                        <th className="col-sm-1">{TH_LINE}</th>
-                        <th className="col-sm-5">{TH_TASKNO}</th>
-                        <th className="col-sm-5">{TH_PN}</th>
-                        <th className="col-sm-1">{TH_QTY}</th>
+                        <th width="5%">{TH_LINE}</th>
+                        <th width="45%">{TH_TASKNO}</th>
+                        <th width="45%">{TH_PN}</th>
+                        <th width="5%">{TH_QTY}</th>
                     </tr>
                 </thead>
             }

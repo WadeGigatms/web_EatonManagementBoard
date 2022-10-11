@@ -1,13 +1,9 @@
-﻿export const VERSION = "v0.0.0"
+﻿export const VERSION = "v0.0.3"
 
-//export const URL_HOST = "https://localhost:44391"
-export const URL_HOST = "http://192.168.100.148"
-export const URL_EPC_ALL = `${URL_HOST}/api/epc`
-export const URL_EPC = `${URL_HOST}/api/epc?`
-export const URL_TERMINAL = `${URL_HOST}/api/terminal`
+export const URL_EPC_ALL = `/api/epc`
+export const URL_EPC = `/api/epc?`
+export const URL_TERMINAL = `/api/terminal`
 
-export const BLOCK_BRAND = "SCANNEL"
-export const BLOCK_DASHBOARD = "Dashboard"
 export const BLOCK_3F_A = "A-3F 成品區"
 export const BLOCK_3F_B = "B-3F 成品區"
 export const BLOCK_2F_A = "A-2F 成品區"
@@ -26,6 +22,7 @@ export const NAV_WAREHOUSE = "倉庫"
 export const NAV_TERMINAL = "已出貨"
 export const NAV_HOME = "首頁"
 export const NAV_TITLE = "儲位目視化管理看板"
+export const NAV_SETTING = "設定"
 
 export const LIMIT = "警示棧板數量上限"
 export const CANCEL = "cancel"
@@ -33,6 +30,9 @@ export const SAVE = "SAVE"
 export const SELECT = "選擇"
 export const SEARCH = "查詢"
 export const CANCELSEARCH = "取消查詢"
+export const FORM_IDLE = "閒置時間"
+export const FORM_CAROUSEL = "圖片跳轉"
+export const FORM_VERSION = "版本資訊"
 
 export const ERROR = "查詢錯誤"
 export const CLOSE = "CLOSE"
@@ -50,3 +50,16 @@ export const _2A_modal_target = "twoAModalTarget"
 export const _3B_modal_target = "threeBModalTarget"
 export const _search_modal_target = "searchModalTarget"
 export const _timeline_modal_target = "timelineModalTarget"
+export const _setting_modal_target = "settingModalTarget"
+
+export const SELECT_0 = "永不"
+export const SELECT_5 = "5秒"
+export const SELECT_10 = "10秒"
+export const SELECT_30 = "30秒"
+export const SELECT_60 = "1分鐘"
+export const SELECT_300 = "5分鐘"
+export const SELECT_600 = "10分鐘"
+export const SELECT_900 = "15分鐘"
+export const SELECT_1800 = "30分鐘"
+export const SELECT_3600 = "1小時"
+export const SELECT_7200 = "2小時"

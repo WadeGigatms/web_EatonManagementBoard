@@ -2,13 +2,22 @@
 import Timeline from '../timeline/Timeline'
 import {
     CLOSE,
-    TH_PALLET_TRACE
+    TH_PALLET_TRACE,
 } from '../constants'
 
 const PopUpTimeline = ({ id, epc }) => {
 
+    useEffect(() => {
+        window.jQuery('#' + id).on('hide.bs.modal', handleHideModal)
+    }, [id])
+
+    function handleHideModal() {
+
+    }
+
     function render(id, epc) {
         if (id, epc) {
+            
             return <div className="modal fade" id={id} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
                     <div className="modal-content">
