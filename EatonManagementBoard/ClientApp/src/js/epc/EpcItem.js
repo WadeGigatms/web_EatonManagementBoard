@@ -42,8 +42,9 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
                 if (epc.error === "") {
                     return <tr onClick={handleClick} data-toggle="modal" data-target={dataTarget} className={trClass(epc)} >
                         <td onClick={handleClick} width="5%">{epc.line}</td>
-                        <td onClick={handleClick} width="45%">{epc.wo}</td>
-                        <td onClick={handleClick} width="45%">{epc.pn}</td>
+                        <td onClick={handleClick} width="35%">{epc.wo}</td>
+                        <td onClick={handleClick} width="35%">{epc.pn}</td>
+                        <td onClick={handleClick} width="20%">{epc.barcode}</td>
                         <td onClick={handleClick} width="5%">{epc.qty}</td>
                     </tr>
                 }

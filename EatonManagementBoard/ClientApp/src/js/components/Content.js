@@ -39,7 +39,7 @@ const Content = ({ children }) => {
     useEffect(() => {
         const idleInterval = setInterval(() => {
             setIdleTimer(idleTimer + 1)
-            if (idleState === false && parseInt(idleTimer, 10) === parseInt(idleSeconds, 10)) {
+            if (idleState === false && parseInt(idleTimer, 10) === parseInt(idleSeconds, 10) && parseInt(idleSeconds) !== 0) {
                 handleHideModal()
                 setIdleState(true)
             }

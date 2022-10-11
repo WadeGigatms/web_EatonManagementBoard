@@ -4,7 +4,8 @@ import {
     TH_TASKNO,
     TH_PN,
     TH_QTY,
-    TH_TIME
+    TH_TIME,
+    TH_PALLET
 } from "../constants"
 import EpcItem from './EpcItem'
 
@@ -37,8 +38,9 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
                 return <thead>
                     <tr>
                         <th width="5%">{TH_LINE}</th>
-                        <th width="45%">{TH_TASKNO}</th>
-                        <th width="45%">{TH_PN}</th>
+                        <th width="35%">{TH_TASKNO}</th>
+                        <th width="35%">{TH_PN}</th>
+                        <th width="20%">{TH_PALLET}</th>
                         <th width="5%">{TH_QTY}</th>
                     </tr>
                 </thead>

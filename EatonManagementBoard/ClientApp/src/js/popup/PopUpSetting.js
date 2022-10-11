@@ -81,7 +81,6 @@ const PopUpSetting = ({ id, idleSeconds, setIdleSeconds, carouselMiniSeconds, se
                             <div className="form-group">
                                 <label>{FORM_CAROUSEL}</label>
                                 <select className="form-control" value={carouselInterval} onChange={handleCarouselIntervalChange} >
-                                    <option value={parseInt(0, 10)}>{SELECT_0}</option>
                                     <option value={parseInt(5, 10)}>{SELECT_5}</option>
                                     <option value={parseInt(10, 10)}>{SELECT_10}</option>
                                     <option value={parseInt(30, 10)}>{SELECT_30}</option>
