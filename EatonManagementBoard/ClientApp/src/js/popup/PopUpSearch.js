@@ -10,7 +10,7 @@ import {
     _search_modal_target,
 } from '../constants'
 
-const PopUpSearch = ({ searchStateRef, setSearchParameter, selection }) => {
+const PopUpSearch = ({ searchState, searchStateRef, setSearchParameter, selection }) => {
     const [wo, setWo] = useState("")
     const [pn, setPn] = useState("")
     const [palletId, setPalletId] = useState("")
@@ -24,6 +24,14 @@ const PopUpSearch = ({ searchStateRef, setSearchParameter, selection }) => {
             setPalletId("")
         }
     }, [])
+
+    useEffect(() => {
+        if (searchState === true) {
+            setWo("")
+            setPn("")
+            setPalletId("")
+        }
+    }, [searchState])
 
     function handleChangeWo(e) {
         setWo(e.target.value)
@@ -50,7 +58,7 @@ const PopUpSearch = ({ searchStateRef, setSearchParameter, selection }) => {
     function renderSelectWo(wos) {
         if (wos) {
             var wosRows = []
-            wosRows.push(<option key={0} value={null}>{SELECT}</option>)
+            wosRows.push(<option key={0} value="">{SELECT}</option>)
             for (var i = 0; i < wos.length; i++) {
                 wosRows.push(<option key={wos[i]} value={wos[i]}>{wos[i]}</option>)
             }
@@ -63,7 +71,7 @@ const PopUpSearch = ({ searchStateRef, setSearchParameter, selection }) => {
     function renderSelectPn(pns) {
         if (pns) {
             var pnsRows = []
-            pnsRows.push(<option key={0} value={null}>{SELECT}</option>)
+            pnsRows.push(<option key={0} value="">{SELECT}</option>)
             for (var i = 0; i < pns.length; i++) {
                 pnsRows.push(<option key={pns[i]} value={pns[i]}>{pns[i]}</option>)
             }
@@ -76,7 +84,7 @@ const PopUpSearch = ({ searchStateRef, setSearchParameter, selection }) => {
     function renderSelectPalletId(palletIds) {
         if (palletIds) {
             var palletIdsRows = []
-            palletIdsRows.push(<option key={0} value={null}>{SELECT}</option>)
+            palletIdsRows.push(<option key={0} value="">{SELECT}</option>)
             for (var i = 0; i < palletIds.length; i++) {
                 palletIdsRows.push(<option key={palletIds[i]} value={palletIds[i]}>{palletIds[i]}</option>)
             }

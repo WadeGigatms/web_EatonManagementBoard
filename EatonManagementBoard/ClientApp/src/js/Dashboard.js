@@ -31,7 +31,7 @@ import {
 } from './constants'
 import { LoadLocationCapacity } from './others/Cookie'
 
-const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef, idleState, idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
+const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchState, searchStateRef, idleState, idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
     const [result, setResult] = useState()
     const [onDashboard, setOnDashboard] = useState({
         warehouseAEpcDtos: null,
@@ -283,7 +283,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
         return <div className="row h-100 p-3">
             <PopUpSetting idleSeconds={idleSeconds} setIdleSeconds={setIdleSeconds} carouselMiniSeconds={carouselMiniSeconds} setCarouselMiniSeconds={setCarouselMiniSeconds} />
             <PopUpTimeline epc={timelineEpc} />
-            <PopUpSearch searchStateRef={searchStateRef} setSearchParameter={setSearchParameter} selection={selection} />
+            <PopUpSearch searchState={searchState} searchStateRef={searchStateRef} setSearchParameter={setSearchParameter} selection={selection} />
             <PopUpCapacity id={_3A_modal_target} title={BLOCK_3F_A} capacity={_3A_capacity} setCapacity={set3ACapacity} />
             <PopUpCapacity id={_2A_modal_target} title={BLOCK_2F_A} capacity={_2A_capacity} setCapacity={set2ACapacity} />
             <PopUpCapacity id={_3B_modal_target} title={BLOCK_3F_B} capacity={_3B_capacity} setCapacity={set3BCapacity} />

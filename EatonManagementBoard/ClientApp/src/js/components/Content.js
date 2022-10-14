@@ -173,6 +173,7 @@ const Content = ({ children }) => {
                     searchParameter={searchParameter}
                     setSearchParameter={setSearchParameter}
                     showDashboard={showDashboard}
+                    searchState={searchState}
                     searchStateRef={searchStateRef}
                     idleState={idleState}
                     idleSeconds={idleSeconds}
