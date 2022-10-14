@@ -1,4 +1,4 @@
-﻿export const VERSION = "v0.0.3"
+﻿export const VERSION = "v0.0.4"
 
 export const URL_EPC_ALL = `/api/epc`
 export const URL_EPC = `/api/epc?`

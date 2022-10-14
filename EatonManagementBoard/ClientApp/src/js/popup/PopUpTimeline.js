@@ -1,25 +1,25 @@
 ﻿import React, { useEffect } from 'react'
+import $ from 'jquery'
 import Timeline from '../timeline/Timeline'
 import {
     CLOSE,
     TH_PALLET_TRACE,
+    _timeline_modal_target,
 } from '../constants'
 
-const PopUpTimeline = ({ id, epc }) => {
+const PopUpTimeline = ({ epc }) => {
 
     useEffect(() => {
-        window.jQuery('#' + id).on('hide.bs.modal', handleHideModal)
-    }, [id])
+        $('#timelineModalTarget').on('hide.bs.modal', handleHideModal)
+        function handleHideModal() {
 
-    function handleHideModal() {
+        }
+    }, [])
 
-    }
-
-    function render(id, epc) {
-        if (id, epc) {
-            
-            return <div className="modal fade" id={id} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+    function render(epc) {
+        if (epc) {
+            return <div className="modal fade" id={_timeline_modal_target} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title" id="ModalCenterTitle">{TH_PALLET_TRACE}: {epc.barcode}</h5>
@@ -42,7 +42,7 @@ const PopUpTimeline = ({ id, epc }) => {
         }
     }
 
-    return <>{render(id, epc)}</>
+    return <>{render(epc)}</>
 }
 
 export default PopUpTimeline

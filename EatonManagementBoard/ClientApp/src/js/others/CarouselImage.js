@@ -1,25 +1,34 @@
-﻿import Carousel from 'react-bootstrap/Carousel'
+﻿import React, { useEffect } from 'react'
+import $ from 'jquery'
 
 const CarouselImage = ({ carouselMiniSeconds }) => {
+
+    useEffect(() => {
+        $('.carousel').carousel('cycle')
+    }, [])
+
     function render() {
-        return <Carousel indicators={false} controls={false} fade={false} slide={false} >
-            <Carousel.Item interval={carouselMiniSeconds}>
-                <div className="bg-role-meter">
-                    <img className="vh-100" />
+        return <div id="carouselExampleInterval" className="carousel slide carousel-fade" data-ride="carousel">
+            <div className="carousel-inner">
+                <div className="carousel-item active" data-interval={carouselMiniSeconds} >
+                    <div className="bg-role-meter">
+                        <img className="vh-100 d-block" />
+                    </div>
                 </div>
-            </Carousel.Item>
-            <Carousel.Item interval={carouselMiniSeconds}>
-                <div className="bg-role-5s1f">
-                    <img className="vh-100" />
+                <div className="carousel-item" data-interval={carouselMiniSeconds} >
+                    <div className="bg-role-5s1f">
+                        <img className="vh-100 d-block" />
+                    </div>
                 </div>
-            </Carousel.Item>
-            <Carousel.Item interval={carouselMiniSeconds}>
-                <div className="bg-role-ppe">
-                    <img className="vh-100" />
+                <div className="carousel-item" data-interval={carouselMiniSeconds} >
+                    <div className="bg-role-ppe">
+                        <img className="vh-100 d-block" />
+                    </div>
                 </div>
-            </Carousel.Item>
-        </Carousel>
+            </div>
+        </div>
     }
+
     return <>{render()}</>
 }
 

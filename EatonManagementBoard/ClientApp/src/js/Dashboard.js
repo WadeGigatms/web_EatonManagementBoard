@@ -3,8 +3,8 @@ import Block from './block/Block'
 import LeftBlock from './block/LeftBlock'
 import RightBlock from './block/RightBlock'
 import TerminalBlock from './block/TerminalBlock'
-import PopUpSelection from './popup/PopUpSelection'
-import PopUpForm from './popup/PopUpForm'
+import PopUpCapacity from './popup/PopUpCapacity'
+import PopUpSearch from './popup/PopUpSearch'
 import PopUpTimeline from './popup/PopUpTimeline'
 import PopUpSetting from './popup/PopUpSetting'
 import {
@@ -28,10 +28,8 @@ import {
     _3A_modal_target,
     _2A_modal_target,
     _3B_modal_target,
-    _search_modal_target,
-    _timeline_modal_target,
-    _setting_modal_target
 } from './constants'
+import { LoadLocationCapacity } from './others/Cookie'
 
 const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchStateRef, idleState, idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
     const [result, setResult] = useState()
@@ -52,9 +50,9 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
         terminalEpcDtos: null
     })
     const [selection, setSelection] = useState()
-    const [_3A_limit, set3ALimit] = useState(6)
-    const [_2A_limit, set2ALimit] = useState(6)
-    const [_3B_limit, set3BLimit] = useState(6)
+    const [_3A_capacity, set3ACapacity] = useState(6)
+    const [_2A_capacity, set2ACapacity] = useState(6)
+    const [_3B_capacity, set3BCapacity] = useState(6)
     const [timelineEpc, setTimelineEpc] = useState()
     
     const fetchRequest = useCallback((url) => {
@@ -80,6 +78,21 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
         }
         fetchData()
     }, [searchStateRef])
+
+    useEffect(() => {
+        const cookie3ALocationCapacity = LoadLocationCapacity(_3A_modal_target) === undefined ? 6 : LoadLocationCapacity(_3A_modal_target)
+        set3ACapacity(cookie3ALocationCapacity)
+    }, [_3A_capacity])
+
+    useEffect(() => {
+        const cookie2ALocationCapacity = LoadLocationCapacity(_2A_modal_target) === undefined ? 6 : LoadLocationCapacity(_2A_modal_target)
+        set2ACapacity(cookie2ALocationCapacity)
+    }, [_2A_capacity])
+
+    useEffect(() => {
+        const cookie3BLocationCapacity = LoadLocationCapacity(_3B_modal_target) === undefined ? 6 : LoadLocationCapacity(_3B_modal_target)
+        set3BCapacity(cookie3BLocationCapacity)
+    }, [_3B_capacity])
 
     useEffect(() => {
         const url = getUrl()
@@ -162,7 +175,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                                 isLight={false}
                                 title={BLOCK_1F}
                                 modalId={null}
-                                limit={null}
+                                capacity={null}
                                 result={false}
                                 epcs={null}
                                 setTimelineEpc={setTimelineEpc} />
@@ -198,7 +211,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                             isLight={false}
                             title={BLOCK_1F_TEMP}
                             modalId={null}
-                            limit={null}
+                            capacity={null}
                             result={result}
                             epcs={onDashboard.elevatorEpcDtos}
                             setTimelineEpc={setTimelineEpc} />
@@ -213,7 +226,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                         isLight={true}
                         title={BLOCK_3F_A}
                         modalId={_3A_modal_target}
-                        limit={_3A_limit}
+                        capacity={_3A_capacity}
                         result={result}
                         epcs={onDashboard.thirdFloorAEpcDtos}
                         setTimelineEpc={setTimelineEpc} />
@@ -225,7 +238,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                         isLight={true}
                         title={BLOCK_2F_A}
                         modalId={_2A_modal_target}
-                        limit={_2A_limit}
+                        capacity={_2A_capacity}
                         result={result}
                         epcs={onDashboard.secondFloorEpcDtos}
                         setTimelineEpc={setTimelineEpc} />
@@ -237,7 +250,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                         isLight={true}
                         title={BLOCK_3F_B}
                         modalId={_3B_modal_target}
-                        limit={_3B_limit}
+                        capacity={_3B_capacity}
                         result={result}
                         epcs={onDashboard.thirdFloorBEpcDtos}
                         setTimelineEpc={setTimelineEpc} />
@@ -268,12 +281,12 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
 
     function render() {
         return <div className="row h-100 p-3">
-            <PopUpSetting id={_setting_modal_target} idleSeconds={idleSeconds} setIdleSeconds={setIdleSeconds} carouselMiniSeconds={carouselMiniSeconds} setCarouselMiniSeconds={setCarouselMiniSeconds} />
-            <PopUpTimeline id={_timeline_modal_target} epc={timelineEpc} />
-            <PopUpForm id={searchStateRef.current === false ? _search_modal_target : ""} setSearchParameter={setSearchParameter} selection={selection} />
-            <PopUpSelection id={_3A_modal_target} title={BLOCK_3F_A} limit={_3A_limit} setLimit={set3ALimit} />
-            <PopUpSelection id={_2A_modal_target} title={BLOCK_2F_A} limit={_2A_limit} setLimit={set2ALimit} />
-            <PopUpSelection id={_3B_modal_target} title={BLOCK_3F_B} limit={_3B_limit} setLimit={set3BLimit} />
+            <PopUpSetting idleSeconds={idleSeconds} setIdleSeconds={setIdleSeconds} carouselMiniSeconds={carouselMiniSeconds} setCarouselMiniSeconds={setCarouselMiniSeconds} />
+            <PopUpTimeline epc={timelineEpc} />
+            <PopUpSearch searchStateRef={searchStateRef} setSearchParameter={setSearchParameter} selection={selection} />
+            <PopUpCapacity id={_3A_modal_target} title={BLOCK_3F_A} capacity={_3A_capacity} setCapacity={set3ACapacity} />
+            <PopUpCapacity id={_2A_modal_target} title={BLOCK_2F_A} capacity={_2A_capacity} setCapacity={set2ACapacity} />
+            <PopUpCapacity id={_3B_modal_target} title={BLOCK_3F_B} capacity={_3B_capacity} setCapacity={set3BCapacity} />
             {showDashboard === true ? <>{renderDashboard()}</> : <>{renderTerminal()}</>}
         </div>
     }
