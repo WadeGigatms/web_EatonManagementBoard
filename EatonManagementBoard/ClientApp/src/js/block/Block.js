@@ -2,7 +2,7 @@
 import EpcList from '../epc/EpcList'
 
 
-const Block = ({ height, isLight, title, modalId, limit, result, epcs, setTimelineEpc }) => {
+const Block = ({ height, isLight, title, modalId, capacity, result, epcs, setTimelineEpc }) => {
     
     function render() {
         const cardClass = "card card-secondary card-display " + height
@@ -30,7 +30,7 @@ const Block = ({ height, isLight, title, modalId, limit, result, epcs, setTimeli
     function renderStatusLight(epcs) {
         const dataTarget = "#" + modalId
         if (isLight === true) {
-            if (epcs && limit > 0 && epcs.length < limit) {
+            if (epcs && capacity > 0 && epcs.length < capacity) {
                 return <button type="button" className="btn btn-tool" data-toggle="modal" data-target={dataTarget} >
                     <i className="fa fa-circle color-g circle-size"></i>
                 </button>

@@ -54,10 +54,18 @@ code {
     margin: 0rem !important;
     padding: 0.2rem !important;
     min-width: 100px !important;
+    background-color: #0067c6 !important;
+    border: 0rem !important;
+    color: white !important;
 }
 
-.btn-bg-white {
-    background-color: white;
+.btn-app:hover {
+    border: 1px solid white !important;
+}
+
+.btn-app-active {
+    background-color: white !important;
+    color: black !important;
 }
 
 .footer {
@@ -163,7 +171,7 @@ code {
 }
 
 .card-header {
-    padding: 0.1rem 0.5rem;
+    padding: 0.1rem 0.5rem !important;
     background-color: lightgray !important;
     color: black !important;
     font-weight: bold;

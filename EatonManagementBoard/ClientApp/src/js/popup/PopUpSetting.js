@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react'
+import $ from 'jquery'
 import {
     VERSION,
     FORM_VERSION,
@@ -18,24 +19,32 @@ import {
     SELECT_1800,
     SELECT_3600,
     SELECT_7200,
+    _setting_modal_target,
 } from '../constants'
+import {
+    SaveIdleSeconds,
+    SaveCarouselSeconds,
+} from '../others/Cookie'
 
-const PopUpSetting = ({ id, idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
+const PopUpSetting = ({ idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
     const [idleInterval, setIdleInterval] = useState(idleSeconds)
     const [carouselInterval, setCaoruselInterval] = useState(carouselMiniSeconds/1000)
 
     useEffect(() => {
-        window.jQuery('#' + id).on('hide.bs.modal', handleHideModal)
-    }, [id])
+        $('#settingModalTarget').on('hide.bs.modal', handleHideModal)
+        setIdleInterval(idleSeconds)
+        setCaoruselInterval(carouselMiniSeconds / 1000)
+        function handleHideModal() {
 
-    function handleHideModal() {
-
-    }
+        }
+    }, [idleSeconds, carouselMiniSeconds])
 
     function handleSubmit() {
         setIdleSeconds(idleInterval)
-        setCarouselMiniSeconds(carouselInterval*1000)
-        window.jQuery('#' + id).modal('hide')
+        setCarouselMiniSeconds(carouselInterval * 1000)
+        SaveIdleSeconds(idleInterval)
+        SaveCarouselSeconds(carouselInterval * 1000)
+        $('#settingModalTarget').modal('hide')
     }
 
     function handleIdleIntervalChange(e) {
@@ -47,7 +56,7 @@ const PopUpSetting = ({ id, idleSeconds, setIdleSeconds, carouselMiniSeconds, se
     }
 
     function render() {
-        return <div className="modal fade" id={id} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+        return <div className="modal fade" id={_setting_modal_target} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered" role="document">
                 <div className="modal-content">
                     <div className="modal-header">

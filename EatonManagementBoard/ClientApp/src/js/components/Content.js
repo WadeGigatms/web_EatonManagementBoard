@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState, useRef } from 'react'
+import $ from 'jquery'
 import {
     NAV_TITLE,
     NAV_TERMINAL,
@@ -6,20 +7,18 @@ import {
     NAV_SETTING,
     SEARCH,
     CANCELSEARCH,
-    _3A_modal_target,
-    _2A_modal_target,
-    _3B_modal_target,
-    _search_modal_target,
-    _timeline_modal_target,
-    _setting_modal_target,
 } from '../constants'
 import Logo from '../../img/eaton_logo.jpg'
 import Dashboard from '../Dashboard'
 import CarouselImage from '../others/CarouselImage'
+import {
+    LoadIdleSeconds,
+    LoadCarouselSeconds,
+} from '../others/Cookie'
 
 const Content = ({ children }) => {
-    const activeBtnClass = "btn btn-app btn-bg-white p-0 h-100"
-    const inactiveBtnClass = "btn btn-app color-w p-0 h-100"
+    const activeBtnClass = "btn btn-app p-0 h-100 btn-app-active"
+    const inactiveBtnClass = "btn btn-app p-0 h-100"
     const [showDashboard, setShowDashboard] = useState(true)
     const searchStateRef = useRef(false)
     const [searchState, setSearchState] = useState(false)
@@ -29,17 +28,21 @@ const Content = ({ children }) => {
     const [terminalBtnClass, setTerminalBtnClass] = useState(inactiveBtnClass)
     const [idleState, setIdleState] = useState(false)
     const [idleTimer, setIdleTimer] = useState(0)
-    const [idleSeconds, setIdleSeconds] = useState(300)
+    const [idleSeconds, setIdleSeconds] = useState(0)
     const [carouselMiniSeconds, setCarouselMiniSeconds] = useState(5000)
 
     useEffect(() => {
         window.addEventListener('click', handleWindowClick)
+        const cookieIdleSeconds = LoadIdleSeconds() === undefined ? 0 : LoadIdleSeconds()
+        const cookieCarouselSeconds = LoadCarouselSeconds() === undefined ? 5000 : LoadCarouselSeconds()
+        setIdleSeconds(cookieIdleSeconds)
+        setCarouselMiniSeconds(cookieCarouselSeconds)
     }, [])
 
     useEffect(() => {
         const idleInterval = setInterval(() => {
             setIdleTimer(idleTimer + 1)
-            if (idleState === false && parseInt(idleTimer, 10) === parseInt(idleSeconds, 10) && parseInt(idleSeconds) !== 0) {
+            if (idleState === false && parseInt(idleTimer, 10) === parseInt(idleSeconds, 10) && parseInt(idleSeconds) > 0) {
                 handleHideModal()
                 setIdleState(true)
             }
@@ -81,12 +84,12 @@ const Content = ({ children }) => {
     }, [searchState])
 
     function handleHideModal() {
-        window.jQuery('#' + _3A_modal_target).modal('hide')
-        window.jQuery('#' + _3B_modal_target).modal('hide')
-        window.jQuery('#' + _2A_modal_target).modal('hide')
-        window.jQuery('#' + _search_modal_target).modal('hide')
-        window.jQuery('#' + _timeline_modal_target).modal('hide')
-        window.jQuery('#' + _setting_modal_target).modal('hide')
+        $('#threeAModalTarget').modal('hide')
+        $('#threeBModalTarget').modal('hide')
+        $('#twoAModalTarget').modal('hide')
+        $('#searchModalTarget').modal('hide')
+        $('#timelineModalTarget').modal('hide')
+        $('#settingModalTarget').modal('hide')
     }
 
     function handleWindowClick() {

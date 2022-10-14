@@ -10,7 +10,7 @@
     "merge": "^2.1.1",
     "oidc-client": "~1.11.5",
     "react": "~16.14.0",
-    "react-bootstrap": "^2.5.0",
+    "react-cookies": "^0.1.1",
     "react-dom": "~16.14.0",
     "react-router": "~5.2.1",
     "react-router-bootstrap": "^0.25.0",
@@ -21,10 +21,10 @@
   "devDependencies": {
     "ajv": "^6.9.1",
     "cross-env": "^5.2.0",
-    "eslint-config-react-app": "^7.0.1",
+    "eslint-config-react-app": "^5.2.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "nan": "^2.14.1",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "^5.0.0",
     "typescript": "^3.7.5"
   },
   "eslintConfig": {
