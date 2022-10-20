@@ -170,17 +170,8 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                     </div>
                     <div className="col-sm-4 h-100 p-025">
                         <div className="h-100">
-                            <Block
-                                height={"h-5"}
-                                isLight={false}
-                                title={BLOCK_1F}
-                                modalId={null}
-                                capacity={null}
-                                result={false}
-                                epcs={null}
-                                setTimelineEpc={setTimelineEpc} />
                             <RightBlock
-                                height={"h-5 card-margin-top"}
+                                height={"h-5"}
                                 title={BLOCK_I}
                                 result={result}
                                 epcs={onDashboard.warehouseIEpcDtos}
@@ -202,6 +193,15 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                                 title={BLOCK_F}
                                 result={result}
                                 epcs={onDashboard.warehouseFEpcDtos}
+                                setTimelineEpc={setTimelineEpc} />
+                            <Block
+                                height={"h-5 card-margin-top"}
+                                isLight={false}
+                                title={BLOCK_1F}
+                                modalId={null}
+                                capacity={null}
+                                result={false}
+                                epcs={null}
                                 setTimelineEpc={setTimelineEpc} />
                         </div>
                     </div>
