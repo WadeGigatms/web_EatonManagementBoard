@@ -35,7 +35,7 @@ export const FORM_CAROUSEL = "圖片跳轉"
 export const FORM_VERSION = "版本資訊"
 
 export const ERROR = "查詢錯誤"
-export const CLOSE = "CLOSE"
+export const CLOSE = "關閉"
 
 export const TH_LINE = "線別"
 export const TH_TASKNO = "工單"
