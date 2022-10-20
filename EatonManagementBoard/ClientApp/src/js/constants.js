@@ -1,4 +1,4 @@
-﻿export const VERSION = "v0.0.4"
+﻿export const VERSION = "v1.0.0"
 
 export const URL_EPC_ALL = `/api/epc`
 export const URL_EPC = `/api/epc?`
@@ -8,7 +8,7 @@ export const BLOCK_3F_A = "A-3F 成品區"
 export const BLOCK_3F_B = "B-3F 成品區"
 export const BLOCK_2F_A = "A-2F 成品區"
 export const BLOCK_1F_TEMP = "A-1F 暫存區"
-export const BLOCK_1F = "A-1F 成品區"
+export const BLOCK_1F = "1F 緩衝區"
 export const BLOCK_A = "A"
 export const BLOCK_B = "B"
 export const BLOCK_C = "C"

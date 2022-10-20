@@ -121,6 +121,13 @@ code {
     background-color: rgba(255, 240, 0, 0.5);
 }
 
+.table-sticky thead th {
+    background-color: white;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
 /* text */
 .text-align-r {
     text-align: right;
@@ -213,7 +220,7 @@ code {
     bottom: 0px;
     left: 0px;
     right: 0px;
-    z-index: 1;
+    z-index: 3;
     opacity: 0.2;
     pointer-events: none;
 }
@@ -226,7 +233,7 @@ code {
     position: absolute;
     left: 0px;
     right: 0px;
-    z-index: 1;
+    z-index: 3;
     opacity: 0.2;
     pointer-events: none;
 }
@@ -239,7 +246,7 @@ code {
     position: absolute;
     left: 0px;
     right: 0px;
-    z-index: 1;
+    z-index: 3;
     opacity: 0.2;
     pointer-events: none;
 }
@@ -252,7 +259,7 @@ code {
     position: absolute;
     left: 0px;
     right: 0px;
-    z-index: 1;
+    z-index: 3;
     opacity: 0.2;
     pointer-events: none;
 }
@@ -264,7 +271,7 @@ code {
     background-repeat: no-repeat;
     background-position: center;
     height: 100%;
-    z-index: 2;
+    z-index: 4;
 }
 
 .bg-role-ppe {
@@ -274,7 +281,7 @@ code {
     background-repeat: no-repeat;
     background-position: center;
     height: 100%;
-    z-index: 2;
+    z-index: 4;
 }
 
 .bg-role-meter {
@@ -284,7 +291,7 @@ code {
     background-repeat: no-repeat;
     background-position: center;
     height: 100%;
-    z-index: 2;
+    z-index: 4;
 }
 
 /* block */
