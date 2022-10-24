@@ -20,66 +20,58 @@ namespace EatonManagementBoard.Services
 
         public EpcGetResultDto Get(string wo = null, string pn = null, string palletId = null)
         {
-            // Without parameters
-            // Valid
-            List<EatonEpc> warehouseAEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseA.ToString())
-                .ToList();
-            List<EatonEpc> warehouseBEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseB.ToString())
-                .ToList();
-            List<EatonEpc> warehouseCEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseC.ToString())
-                .ToList();
-            List<EatonEpc> warehouseDEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseD.ToString())
-                .ToList();
-            List<EatonEpc> warehouseEEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseE.ToString())
-                .ToList();
-            List<EatonEpc> warehouseFEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseF.ToString())
-                .ToList();
-            List<EatonEpc> warehouseGEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseG.ToString())
-                .ToList();
-            List<EatonEpc> warehouseHEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseH.ToString())
-                .ToList();
-            List<EatonEpc> warehouseIEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.WareHouseI.ToString())
-                .ToList();
-            List<EatonEpc> elevatorEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.Elevator.ToString())
-                .ToList();
-            List<EatonEpc> secondFloorEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.SecondFloorA.ToString())
-                .ToList();
-            List<EatonEpc> thirdFloorAEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.ThirdFloorA.ToString())
-                .ToList();
-            List<EatonEpc> thirdFloorBEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.ThirdFloorB.ToString())
-                .ToList();
-            List<EatonEpc> terminalEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select Sid, epc, readerId, transTime from scannel.dbo.eaton_epc table1 where transTime=(select Max(table2.transTime) from scannel.dbo.eaton_epc table2 where table1.epc=table2.epc) and readerId={0}"
-                , ReaderIdEnum.Terminal.ToString())
-                .ToList();
+            string allSqlCommand = "select * from scannel.dbo.eaton_epc;";
+            string realTimeSqlCommand = "select * from scannel.dbo.eaton_epc allepc " +
+                "where transTime=(select Max(transTime) from scannel.dbo.eaton_epc maxtime where allepc.epc=maxtime.epc) " +
+                "and Sid=(select Max(Sid) from scannel.dbo.eaton_epc maxsid where allepc.epc=maxsid.epc) " +
+                "order by allepc.transTime;";
             List<EatonEpc> dbEatonEpcs = _dbContext.EatonEpcs
-                .FromSqlRaw("select * from scannel.dbo.eaton_epc")
+                .FromSqlRaw(allSqlCommand)
+                .ToList();
+            List<EatonEpc> realTimeEatonEpcs = _dbContext.EatonEpcs
+                .FromSqlRaw(realTimeSqlCommand)
+                .ToList();
+            List<EatonEpc> warehouseAEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseA.ToString())
+                .ToList();
+            List<EatonEpc> warehouseBEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseB.ToString())
+                .ToList();
+            List<EatonEpc> warehouseCEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseC.ToString())
+                .ToList();
+            List<EatonEpc> warehouseDEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseD.ToString())
+                .ToList();
+            List<EatonEpc> warehouseEEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseE.ToString())
+                .ToList();
+            List<EatonEpc> warehouseFEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseF.ToString())
+                .ToList();
+            List<EatonEpc> warehouseGEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseG.ToString())
+                .ToList();
+            List<EatonEpc> warehouseHEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseH.ToString())
+                .ToList();
+            List<EatonEpc> warehouseIEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseI.ToString())
+                .ToList();
+            List<EatonEpc> elevatorEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.Elevator.ToString())
+                .ToList();
+            List<EatonEpc> secondFloorEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.SecondFloorA.ToString())
+                .ToList();
+            List<EatonEpc> thirdFloorAEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.ThirdFloorA.ToString())
+                .ToList();
+            List<EatonEpc> thirdFloorBEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.ThirdFloorB.ToString())
+                .ToList();
+            List<EatonEpc> terminalEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.Terminal.ToString())
                 .ToList();
 
             List<EpcDto> warehouseAEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseAEatonEpcs, wo, pn, palletId);
@@ -281,7 +273,11 @@ namespace EatonManagementBoard.Services
                         }
 
                         // Incorrect sequence
-                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == true && gotElevator == true && gotWarehouse == true)
+                        if ((locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorA.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.SecondFloorA.ToChineseString())
+                            && gotProduction == true && gotElevator == true && gotWarehouse == true)
                         {
                             // Production -> Elevator -> Warehouse -> [Elevator]
                             return EpcStateEnum.Return.ToString();

@@ -1,4 +1,4 @@
-﻿export const VERSION = "v1.0.0"
+﻿export const VERSION = "v1.1.0"
 
 export const URL_EPC_ALL = `/api/epc`
 export const URL_EPC = `/api/epc?`
@@ -44,6 +44,7 @@ export const TH_QTY = "數量"
 export const TH_PALLET = "棧板ID"
 export const TH_TIME = "時間"
 export const TH_PALLET_TRACE = "單板移動軌跡追蹤"
+export const NOW = "現在"
 
 export const _3A_modal_target = "threeAModalTarget"
 export const _2A_modal_target = "twoAModalTarget"

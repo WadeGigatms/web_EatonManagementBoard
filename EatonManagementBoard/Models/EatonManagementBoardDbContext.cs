@@ -18,7 +18,6 @@ namespace EatonManagementBoard.Models
         }
 
         public virtual DbSet<EatonEpc> EatonEpcs { get; set; }
-
         /*
         public virtual DbSet<MonthlyVisualize> MonthlyVisualizes { get; set; }
         public virtual DbSet<PreparedTag> PreparedTags { get; set; }

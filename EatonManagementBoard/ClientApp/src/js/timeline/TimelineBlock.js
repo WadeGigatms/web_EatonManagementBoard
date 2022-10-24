@@ -1,4 +1,5 @@
 ﻿import React from 'react'
+import { NOW } from '../constants'
 
 const TimelineBlock = ({ palletId, locationTimeDto }) => {
     function render(palletId, locationTimeDto) {
@@ -9,10 +10,12 @@ const TimelineBlock = ({ palletId, locationTimeDto }) => {
                     <i className="fas fa-clock bg-blue"></i>
                     <div className="timeline-item">
                         <span className="time">
-                            {durationTime !== "" ? <><i className="fas fa-clock"></i> {durationTime}</> : <></> }
+                            {durationTime !== "" ? <label className="timeline-text"><i className="fas fa-clock"></i> {durationTime}</label> : <label className="timeline-text">{NOW}</label>}
                         </span>
-                        <h3 className="timeline-header">{transTime}</h3>
-                        <div className="timeline-body">{location}</div>
+                        <h4 className="timeline-header">{transTime}</h4>
+                        <div className="timeline-body">
+                            <label className="timeline-text">{location}</label>
+                        </div>
                     </div>
                 </div>
             </div>
