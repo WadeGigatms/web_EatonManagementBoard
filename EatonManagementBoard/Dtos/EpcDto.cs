@@ -16,6 +16,7 @@ namespace EatonManagementBoard.Dtos
         public string Epc { get; set; }
         public string ReaderId { get; set; }
         public string TransTime { get; set; }
+        public bool Manual { get; set; }
         public string Error { get; set; }
         public string EpcState { get; set; }
         public List<LocationTimeDto> LocationTimeDtos { get; set; }

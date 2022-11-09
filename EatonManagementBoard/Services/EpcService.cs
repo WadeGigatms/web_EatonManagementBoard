@@ -18,13 +18,13 @@ namespace EatonManagementBoard.Services
 
         private readonly EatonManagementBoardDbContext _dbContext;
 
-        public EpcGetResultDto Get(string wo = null, string pn = null, string palletId = null)
+        public GetEpcResultDto Get(string wo = null, string pn = null, string palletId = null)
         {
             string allSqlCommand = "select * from scannel.dbo.eaton_epc;";
-            string realTimeSqlCommand = "select * from scannel.dbo.eaton_epc allepc " +
-                "where transTime=(select Max(transTime) from scannel.dbo.eaton_epc maxtime where allepc.epc=maxtime.epc) " +
-                "and Sid=(select Max(Sid) from scannel.dbo.eaton_epc maxsid where allepc.epc=maxsid.epc) " +
-                "order by allepc.transTime;";
+            string realTimeSqlCommand = "select * from eaton_epc result where " +
+                "readerId = (select readerId from eaton_epc location where location.epc = result.epc and transTime = (select MAX(transTime) from eaton_epc maxtime where maxtime.epc = location.epc)) and " +
+                "transTime = (select MIN(transTime) from eaton_epc mintime where mintime.epc = result.epc and mintime.readerId = result.readerId) " +
+                "order by result.transTime;";
             List<EatonEpc> dbEatonEpcs = _dbContext.EatonEpcs
                 .FromSqlRaw(allSqlCommand)
                 .ToList();
@@ -83,7 +83,7 @@ namespace EatonManagementBoard.Services
             List<EpcDto> warehouseGEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseGEatonEpcs, wo, pn, palletId);
             List<EpcDto> warehouseHEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseHEatonEpcs, wo, pn, palletId);
             List<EpcDto> warehouseIEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseIEatonEpcs, wo, pn, palletId);
-            List<EpcDto> elevatorEpcDtos   = GetEpcDtos(dbEatonEpcs, elevatorEatonEpcs, wo, pn, palletId);
+            List<EpcDto> elevatorEpcDtos = GetEpcDtos(dbEatonEpcs, elevatorEatonEpcs, wo, pn, palletId);
             List<EpcDto> secondFloorEpcDtos = GetEpcDtos(dbEatonEpcs, secondFloorEatonEpcs, wo, pn, palletId);
             List<EpcDto> thirdFloorAEpcDtos = GetEpcDtos(dbEatonEpcs, thirdFloorAEatonEpcs, wo, pn, palletId);
             List<EpcDto> thirdFloorBEpcDtos = GetEpcDtos(dbEatonEpcs, thirdFloorBEatonEpcs, wo, pn, palletId);
@@ -91,8 +91,8 @@ namespace EatonManagementBoard.Services
             List<EpcDto> allEpcDtos = GetEpcDtos(dbEatonEpcs, dbEatonEpcs, null, null, null);
 
             DashboardDto dashboardDto = GetDashboardDto(
-                warehouseAEpcDtos, 
-                warehouseBEpcDtos, 
+                warehouseAEpcDtos,
+                warehouseBEpcDtos,
                 warehouseCEpcDtos,
                 warehouseDEpcDtos,
                 warehouseEEpcDtos,
@@ -114,12 +114,23 @@ namespace EatonManagementBoard.Services
 
         private string GetHexToAscii(string hexString)
         {
+            // Return if hexString is null or hexString is not double
             if (string.IsNullOrEmpty(hexString) == true)
             {
                 return "";
             }
+            // Return if hexString is ascii string already
+            if (hexString.Contains("#") == true || hexString.Contains("&") == true)
+            {
+                return hexString;
+            }
+            // Return if hexString is not double characters
+            if (hexString.Count() % 2 != 0)
+            {
+                return "";
+            }
             string asciiString = "";
-            for(int i = 0; i < hexString.Length; i += 2)
+            for (int i = 0; i < hexString.Length; i += 2)
             {
                 string tempString = hexString.Substring(i, 2);
                 asciiString += Convert.ToChar(Convert.ToUInt32(tempString, 16));
@@ -136,7 +147,7 @@ namespace EatonManagementBoard.Services
             List<EpcDto> warehouseGEpcDtos,
             List<EpcDto> warehouseHEpcDtos,
             List<EpcDto> warehouseIEpcDtos,
-            List<EpcDto> elevatorEpcDtos, 
+            List<EpcDto> elevatorEpcDtos,
             List<EpcDto> secondFloorEpcDtos,
             List<EpcDto> thirdFloorAEpcDtos,
             List<EpcDto> thirdFloorBEpcDtos,
@@ -165,27 +176,57 @@ namespace EatonManagementBoard.Services
         private List<EpcDto> GetEpcDtos(List<EatonEpc> dbEatonEpcs, List<EatonEpc> eatonEpcDtos, string woString, string pnString, string palletIdString)
         {
             List<EpcDto> epcDtos = new List<EpcDto>();
-            foreach(var eatonEpcDto in eatonEpcDtos)
+            foreach (var eatonEpcDto in eatonEpcDtos)
             {
+                string wo = "";
+                string qty = "";
+                string pn = "";
+                string line = "";
+                string barcode = "";
+                string error = "";
                 string epcString = GetHexToAscii(eatonEpcDto.Epc);
-                bool isCorrectStringFormat = true;
-                // Error string format
-                if (epcString.Contains("##") == false || 
-                    epcString.Split("##").Count() == 0 || 
-                    epcString.Split("##")[1].Contains("&&") == false ||
-                    epcString.Split("##")[1].Split("&&").Count() != 5)
+                bool isNewEpcStringFormat = false;
+                // Detect epc string format is new or old
+                isNewEpcStringFormat = epcString.Contains("##") == false && epcString.Contains("&&") == false ? true : false;
+                if (isNewEpcStringFormat == false)
                 {
-                    isCorrectStringFormat = false;
-                    continue;
+                    // Old epc string format
+                    // Error string format
+                    if (epcString.Contains("##") == false ||
+                        epcString.Split("##").Count() == 0 ||
+                        epcString.Split("##")[1].Contains("&&") == false ||
+                        epcString.Split("##")[1].Split("&&").Count() != 5)
+                    {
+                        continue;
+                    }
+                    // Correct string format
+                    wo = epcString.Split("##")[1].Split("&&")[0];
+                    qty = epcString.Split("##")[1].Split("&&")[1];
+                    pn = epcString.Split("##")[1].Split("&&")[2];
+                    line = epcString.Split("##")[1].Split("&&")[3];
+                    barcode = epcString.Split("##")[1].Split("&&")[4];
+                    error = "";
                 }
-                // Correct string format
-                string wo = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[0] : "Error: " + eatonEpcDto.Epc;
-                string qty = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[1] : "Error: " + eatonEpcDto.Epc;
-                string pn = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[2] : "Error " + eatonEpcDto.Epc;
-                string line = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[3] : "Error: " + eatonEpcDto.Epc;
-                string barcode = isCorrectStringFormat == true ? epcString.Split("##")[1].Split("&&")[4] : "Error: " + eatonEpcDto.Epc;
-                string error = isCorrectStringFormat == true ? "" : eatonEpcDto.Epc;
-                List <EatonEpc> dbSameEpcs = dbEatonEpcs
+                else
+                {
+                    // New epc string format
+                    // Error string format
+                    if (epcString.Contains("#") == false ||
+                        epcString.Split("#").Count() == 0 ||
+                        epcString.Split("#")[1].Contains("&") == false ||
+                        epcString.Split("#")[1].Split("&").Count() != 5)
+                    {
+                        continue;
+                    }
+                    // Correct string format
+                    wo = epcString.Split("#")[1].Split("&")[0];
+                    qty = epcString.Split("#")[1].Split("&")[1];
+                    pn = epcString.Split("#")[1].Split("&")[2];
+                    line = epcString.Split("#")[1].Split("&")[3];
+                    barcode = epcString.Split("#")[1].Split("&")[4];
+                    error = "";
+                }
+                List<EatonEpc> dbSameEpcs = dbEatonEpcs
                     .Where(dbEatonEpc => dbEatonEpc.Epc == eatonEpcDto.Epc)
                     .OrderBy(dbEatonEpc => dbEatonEpc.TransTime)
                     .ToList();
@@ -213,6 +254,7 @@ namespace EatonManagementBoard.Services
                         Epc = eatonEpcDto.Epc,
                         ReaderId = eatonEpcDto.ReaderId,
                         TransTime = GetDateTimeString(eatonEpcDto.TransTime.Value),
+                        Manual = eatonEpcDto.Manual == 1 ? true : false,
                         Wo = wo,
                         Qty = qty,
                         Pn = pn,
@@ -237,59 +279,54 @@ namespace EatonManagementBoard.Services
             }
             else
             {
-                bool gotProduction = false;
-                bool gotElevator = false;
-                bool gotWarehouse = false;
-                foreach(var locationTimeDto in locationTimeDtos)
+                bool gotFirstStep = false;
+                bool gotSecondStep = false;
+                bool gotThirdStep = false;
+                EpcStateEnum state = EpcStateEnum.OK;
+                foreach (var locationTimeDto in locationTimeDtos)
                 {
                     if (locationTimeDto == locationTimeDtos.First())
                     {
-                        // First
+                        // First step is 3A/3B/2A or not
+                        // If not, NG
                         if (locationTimeDto.Location == ReaderIdEnum.ThirdFloorA.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.SecondFloorA.ToChineseString())
+                            locationTimeDto.Location == ReaderIdEnum.SecondFloorA.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString())
                         {
-                            gotProduction = true;
+                            gotFirstStep = true;
                         }
                         else
                         {
-                            return EpcStateEnum.NG.ToString();
+                            state = EpcStateEnum.NG;
                         }
                     }
                     else
                     {
-                        // Others
-                        // Production -> Elevator -> Warehouse, correct
-                        // Correct sequence
-                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == true && gotElevator == false && gotWarehouse == false)
+                        // Other steps
+                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() &&
+                            gotFirstStep == true &&
+                            gotThirdStep == false)
                         {
-                            // Production -> [Elevator]
-                            gotElevator = true;
+                            // Second step is elevator and has been arrived at first step
+                            gotSecondStep = true;
                         }
-                        else if (locationTimeDto.Location.Contains("1F 成品區") == true && gotProduction == true && gotElevator == true && gotWarehouse == false)
+                        else if (locationTimeDto.Location.Contains("1F 成品區") == true &&
+                            gotFirstStep == true &&
+                            gotSecondStep == true)
                         {
-                            // Production -> Elevator -> [Warehouse]
-                            gotWarehouse = true;
+                            // Third step is warehouse and has been arrived at first and second steps
+                            gotThirdStep = true;
                         }
-
-                        // Incorrect sequence
-                        if ((locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorA.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.SecondFloorA.ToChineseString())
-                            && gotProduction == true && gotElevator == true && gotWarehouse == true)
+                        else if (locationTimeDto.Location != ReaderIdEnum.Terminal.ToChineseString() &&
+                            locationTimeDto.Location.Contains("1F 成品區") == false &&
+                            gotThirdStep == true)
                         {
-                            // Production -> Elevator -> Warehouse -> [Elevator]
+                            // This step is reproduct which means it had been arrived at warehouse but now it is at second or first step
                             return EpcStateEnum.Return.ToString();
-                        }
-                        else if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() && gotProduction == false && gotElevator == false && gotWarehouse == false)
-                        {
-                            // ? -> [Elevator]
-                            return EpcStateEnum.NG.ToString();
                         }
                     }
                 }
-                return EpcStateEnum.OK.ToString();
+                return state.ToString();
             }
         }
 
@@ -364,9 +401,9 @@ namespace EatonManagementBoard.Services
             return selectionDto;
         }
 
-        private EpcGetResultDto GetEpcGetResultDto(ResultEnum result, ErrorEnum error, DashboardDto dashboardDto, SelectionDto selectionDto)
+        private GetEpcResultDto GetEpcGetResultDto(ResultEnum result, ErrorEnum error, DashboardDto dashboardDto, SelectionDto selectionDto)
         {
-            return new EpcGetResultDto
+            return new GetEpcResultDto
             {
                 Result = result.ToBoolean(),
                 Error = error.ToString(),
@@ -437,6 +474,71 @@ namespace EatonManagementBoard.Services
                     return "";
 
             }
+        }
+
+        public EpcResultDto Post(string epc)
+        {
+            if (string.IsNullOrEmpty(epc) == true)
+            {
+                return GetEpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            EatonEpc eatonEpc = _dbContext.EatonEpcs
+                .Where(eatonEpc => eatonEpc.Epc == epc)
+                .FirstOrDefault();
+
+            if (eatonEpc == null)
+            {
+                return GetEpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            EatonEpc insertEatonEpc = GetEatonEpc(epc);
+            _dbContext.EatonEpcs.Add(insertEatonEpc);
+            _dbContext.SaveChanges();
+
+            return GetEpcResultDto(ResultEnum.True, ErrorEnum.None);
+        }
+
+        private EpcResultDto GetEpcResultDto(ResultEnum result, ErrorEnum error)
+        {
+            return new EpcResultDto
+            {
+                Result = result.ToBoolean(),
+                Error = error.ToString()
+            };
+        }
+
+        private EatonEpc GetEatonEpc(string epc)
+        {
+            return new EatonEpc
+            {
+                Epc = epc,
+                ReaderId = ReaderIdEnum.Terminal.ToString(),
+                TransTime = DateTime.Now,
+                Manual = 1,
+            };
+        }
+
+        public EpcResultDto Delete(string epc)
+        {
+            if (string.IsNullOrEmpty(epc) == true)
+            {
+                return GetEpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            EatonEpc eatonEpc = _dbContext.EatonEpcs
+                .Where(eatonEpc => eatonEpc.Epc == epc && eatonEpc.Manual == 1)
+                .FirstOrDefault();
+
+            if (eatonEpc == null)
+            {
+                return GetEpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            _dbContext.EatonEpcs.Remove(eatonEpc);
+            _dbContext.SaveChanges();
+
+            return GetEpcResultDto(ResultEnum.True, ErrorEnum.None);
         }
     }
 }

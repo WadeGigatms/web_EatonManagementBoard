@@ -18,7 +18,6 @@ namespace EatonManagementBoard.Models
         }
 
         public virtual DbSet<EatonEpc> EatonEpcs { get; set; }
-        /*
         public virtual DbSet<MonthlyVisualize> MonthlyVisualizes { get; set; }
         public virtual DbSet<PreparedTag> PreparedTags { get; set; }
         public virtual DbSet<RfidRssi> RfidRssis { get; set; }
@@ -28,11 +27,10 @@ namespace EatonManagementBoard.Models
         public virtual DbSet<TextileProduct> TextileProducts { get; set; }
         public virtual DbSet<TextileWorkStatus> TextileWorkStatuses { get; set; }
         public virtual DbSet<VWorkStatus> VWorkStatuses { get; set; }
-        */
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -50,6 +48,8 @@ namespace EatonManagementBoard.Models
                     .IsUnicode(false)
                     .HasColumnName("epc");
 
+                entity.Property(e => e.Manual).HasColumnName("manual");
+
                 entity.Property(e => e.ReaderId)
                     .HasMaxLength(20)
                     .IsUnicode(false)
@@ -60,7 +60,6 @@ namespace EatonManagementBoard.Models
                     .HasColumnName("transTime");
             });
 
-            /*
             modelBuilder.Entity<MonthlyVisualize>(entity =>
             {
                 entity.HasNoKey();
@@ -326,7 +325,6 @@ namespace EatonManagementBoard.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
             });
-            */
 
             OnModelCreatingPartial(modelBuilder);
         }

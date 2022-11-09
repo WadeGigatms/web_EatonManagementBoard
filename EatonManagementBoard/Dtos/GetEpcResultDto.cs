@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace EatonManagementBoard.Dtos
 {
-    public class EpcGetResultDto
+    public class GetEpcResultDto: EpcResultDto
     {
-        public bool Result { get; set; }
-        public string Error { get; set; }
         public DashboardDto DashboardDto { get; set; }
         public SelectionDto SelectionDto { get; set; }
     }

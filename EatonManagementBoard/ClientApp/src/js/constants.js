@@ -1,4 +1,4 @@
-﻿export const VERSION = "v1.1.0"
+﻿export const VERSION = "v1.2.0"
 
 export const URL_EPC_ALL = `/api/epc`
 export const URL_EPC = `/api/epc?`
@@ -36,6 +36,9 @@ export const FORM_VERSION = "版本資訊"
 
 export const ERROR = "查詢錯誤"
 export const CLOSE = "關閉"
+export const MOVE = "移至已出貨"
+export const RECOVER = "返回原位置"
+export const CONFIRM = "確定"
 
 export const TH_LINE = "線別"
 export const TH_TASKNO = "工單"
@@ -52,6 +55,8 @@ export const _3B_modal_target = "threeBModalTarget"
 export const _search_modal_target = "searchModalTarget"
 export const _timeline_modal_target = "timelineModalTarget"
 export const _setting_modal_target = "settingModalTarget"
+export const _move_modal_target = "moveModalTarget"
+export const _recover_modal_target = "recoverModalTarget"
 
 export const SELECT_0 = "永不"
 export const SELECT_5 = "5秒"

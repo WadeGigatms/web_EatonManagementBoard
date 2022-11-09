@@ -90,6 +90,8 @@ const Content = ({ children }) => {
         $('#searchModalTarget').modal('hide')
         $('#timelineModalTarget').modal('hide')
         $('#settingModalTarget').modal('hide')
+        $('#moveModalTarget').modal('hide')
+        $('#recoverModalTarget').modal('hide')
     }
 
     function handleWindowClick() {
@@ -112,10 +114,6 @@ const Content = ({ children }) => {
         }
     }
 
-    function handleSettingClick() {
-
-    }
-
     function render() {
         return <div className="bg-eaton-b">
             {renderHeader()}
@@ -127,7 +125,7 @@ const Content = ({ children }) => {
         return <section className="content-header content-header-p-2 vh-10">
             <div className="row h-100">
                 <div className="col-sm-4 h-100">
-                    <img src={Logo} className="h-100" alt="logo"/>
+                    <img src={Logo} className="h-100" alt="logo" />
                 </div>
                 <div className="col-sm-4 h-100">
                     <div className="text-title d-none d-sm-block h-100">{NAV_TITLE}</div>
@@ -154,7 +152,7 @@ const Content = ({ children }) => {
                                 </button>
                             </li>
                             <li className="nav-item nav-link h-100">
-                                <button type="button" className={inactiveBtnClass} data-toggle="modal" data-target="#settingModalTarget" onClick={handleSettingClick}>
+                                <button type="button" className={inactiveBtnClass} data-toggle="modal" data-target="#settingModalTarget">
                                     <i className="fas fa-cog"></i>
                                     <label className="navbar-item-text">{NAV_SETTING}</label>
                                 </button>

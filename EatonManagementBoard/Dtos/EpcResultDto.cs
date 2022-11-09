@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace EatonManagementBoard.Dtos
 {
-    public class EpcPostResultDto
+    public class EpcResultDto
     {
         public bool Result { get; set; }
         public string Error { get; set; }

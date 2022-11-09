@@ -26,8 +26,24 @@ namespace EatonManagementBoard.Controllers
         [HttpGet]
         public IActionResult Get([FromQuery] string wo, string pn, string palletId)
         {
-            EpcGetResultDto epcGetResultDto = _service.Get(wo, pn, palletId);
-            return epcGetResultDto.Result == true ? Ok(epcGetResultDto) : BadRequest(epcGetResultDto);
+            GetEpcResultDto getEpcResultDto = _service.Get(wo, pn, palletId);
+            return getEpcResultDto.Result == true ? Ok(getEpcResultDto) : BadRequest(getEpcResultDto);
+        }
+
+        // POST api/<EpcController>
+        [HttpPost]
+        public IActionResult Post([FromQuery] string epc)
+        {
+            EpcResultDto epcResultDto = _service.Post(epc);
+            return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
+        }
+
+        // DELETE api/<EpcController>
+        [HttpDelete]
+        public IActionResult Delete([FromQuery] string epc)
+        {
+            EpcResultDto epcResultDto = _service.Delete(epc);
+            return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
         }
     }
 }

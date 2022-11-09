@@ -6,6 +6,8 @@ import TerminalBlock from './block/TerminalBlock'
 import PopUpCapacity from './popup/PopUpCapacity'
 import PopUpSearch from './popup/PopUpSearch'
 import PopUpTimeline from './popup/PopUpTimeline'
+import PopUpMoveConfirm from './popup/PopUpMoveConfirm'
+import PopUpRecoverConfirm from './popup/PopUpRecoverConfirm'
 import PopUpSetting from './popup/PopUpSetting'
 import {
     BLOCK_3F_A,
@@ -28,6 +30,7 @@ import {
     _3A_modal_target,
     _2A_modal_target,
     _3B_modal_target,
+    _search_modal_target,
 } from './constants'
 import { LoadLocationCapacity } from './others/Cookie'
 
@@ -79,6 +82,28 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
         fetchData()
     }, [searchStateRef])
 
+    const postRequest = useCallback((url, requestOptions) => {
+        const postData = async () => {
+            try {
+                const response = await fetch(url, requestOptions)
+                await response.json()
+            } catch (error) {
+            }
+        }
+        postData()
+    }, [])
+
+    const delRequest = useCallback((url, requestOptions) => {
+        const delData = async () => {
+            try {
+                const response = await fetch(url, requestOptions)
+                await response.json()
+            } catch (error) {
+            }
+        }
+        delData()
+    }, [])
+
     useEffect(() => {
         const cookie3ALocationCapacity = LoadLocationCapacity(_3A_modal_target) === undefined ? 6 : LoadLocationCapacity(_3A_modal_target)
         set3ACapacity(cookie3ALocationCapacity)
@@ -127,6 +152,35 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     function getSearchUrl(wo, pn, palletId) {
         const url = window.location.origin + URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
         return url
+    }
+
+    function getEpcUrl(epc) {
+        const url = window.location.origin + URL_EPC + "epc=" + epc
+        return url
+    }
+
+    function post() {
+        const url = getEpcUrl(timelineEpc.epc)
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        }
+        postRequest(url, requestOptions)
+    }
+
+    function del() {
+        const url = getEpcUrl(timelineEpc.epc)
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        }
+        delRequest(url, requestOptions)
     }
 
     function renderDashboard() {
@@ -283,6 +337,8 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
         return <div className="row h-100 p-3">
             <PopUpSetting idleSeconds={idleSeconds} setIdleSeconds={setIdleSeconds} carouselMiniSeconds={carouselMiniSeconds} setCarouselMiniSeconds={setCarouselMiniSeconds} />
             <PopUpTimeline epc={timelineEpc} />
+            <PopUpMoveConfirm post={post} />
+            <PopUpRecoverConfirm del={del} />
             <PopUpSearch searchState={searchState} searchStateRef={searchStateRef} setSearchParameter={setSearchParameter} selection={selection} />
             <PopUpCapacity id={_3A_modal_target} title={BLOCK_3F_A} capacity={_3A_capacity} setCapacity={set3ACapacity} />
             <PopUpCapacity id={_2A_modal_target} title={BLOCK_2F_A} capacity={_2A_capacity} setCapacity={set2ACapacity} />
