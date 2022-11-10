@@ -11,6 +11,5 @@ namespace EatonManagementBoard.Models
         public string Epc { get; set; }
         public string ReaderId { get; set; }
         public DateTime? TransTime { get; set; }
-        public byte Manual { get; set; }
     }
 }

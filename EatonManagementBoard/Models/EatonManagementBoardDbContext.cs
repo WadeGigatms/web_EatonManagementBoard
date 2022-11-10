@@ -30,7 +30,7 @@ namespace EatonManagementBoard.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -47,8 +47,6 @@ namespace EatonManagementBoard.Models
                     .HasMaxLength(150)
                     .IsUnicode(false)
                     .HasColumnName("epc");
-
-                entity.Property(e => e.Manual).HasColumnName("manual");
 
                 entity.Property(e => e.ReaderId)
                     .HasMaxLength(20)

@@ -21,13 +21,13 @@ const PopUpTimeline = ({ epc }) => {
         const moveDataTarget = "#" + _move_modal_target
         const recoverDataTarget = "#" + _recover_modal_target
         const modalFooter = () => {
-            if (epc.readerId !== "Terminal") {
+            if (epc.readerId !== "Terminal" && epc.readerId !== "ManualTerminal") {
                 return <div className="modal-footer justify-content-between">
                     <button type="button" className="btn btn-default" data-toggle="modal" data-target={moveDataTarget} onClick={handleClick}>{MOVE}</button>
                     <button type="button" className="btn btn-secondary" data-dismiss="modal">{CLOSE}</button>
                 </div>
             }
-            else if (epc.readerId === "Terminal" && epc.manual === true) {
+            else if (epc.readerId === "ManualTerminal") {
                 return <div className="modal-footer justify-content-between">
                     <button type="button" className="btn btn-default" data-toggle="modal" data-target={recoverDataTarget} onClick={handleClick}>{RECOVER}</button>
                     <button type="button" className="btn btn-secondary" data-dismiss="modal">{CLOSE}</button>

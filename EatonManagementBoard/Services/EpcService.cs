@@ -71,7 +71,7 @@ namespace EatonManagementBoard.Services
                 .Where(epc => epc.ReaderId == ReaderIdEnum.ThirdFloorB.ToString())
                 .ToList();
             List<EatonEpc> terminalEatonEpcs = realTimeEatonEpcs
-                .Where(epc => epc.ReaderId == ReaderIdEnum.Terminal.ToString())
+                .Where(epc => epc.ReaderId == ReaderIdEnum.Terminal.ToString() || epc.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
                 .ToList();
 
             List<EpcDto> warehouseAEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseAEatonEpcs, wo, pn, palletId);
@@ -89,6 +89,15 @@ namespace EatonManagementBoard.Services
             List<EpcDto> thirdFloorBEpcDtos = GetEpcDtos(dbEatonEpcs, thirdFloorBEatonEpcs, wo, pn, palletId);
             List<EpcDto> terminalEpcDtos = GetEpcDtos(dbEatonEpcs, terminalEatonEpcs, wo, pn, palletId);
             List<EpcDto> allEpcDtos = GetEpcDtos(dbEatonEpcs, dbEatonEpcs, null, null, null);
+
+            // Mark out manual terminal on transTime
+            foreach (var terminalEpcDto in terminalEpcDtos)
+            {
+                if (terminalEpcDto.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
+                {
+                    terminalEpcDto.TransTime += " M";
+                }
+            }
 
             DashboardDto dashboardDto = GetDashboardDto(
                 warehouseAEpcDtos,
@@ -249,12 +258,12 @@ namespace EatonManagementBoard.Services
                     // With wo, pn
                     // With pn, barcode
                     // With wo, pn, barcode
+                    string transTime = GetDateTimeString(eatonEpcDto.TransTime.Value);
                     epcDtos.Add(new EpcDto
                     {
                         Epc = eatonEpcDto.Epc,
                         ReaderId = eatonEpcDto.ReaderId,
-                        TransTime = GetDateTimeString(eatonEpcDto.TransTime.Value),
-                        Manual = eatonEpcDto.Manual == 1 ? true : false,
+                        TransTime = transTime,
                         Wo = wo,
                         Qty = qty,
                         Pn = pn,
@@ -470,6 +479,8 @@ namespace EatonManagementBoard.Services
                     return ReaderIdEnum.WareHouseI.ToChineseString();
                 case "Terminal":
                     return ReaderIdEnum.Terminal.ToChineseString();
+                case "ManualTerminal":
+                    return ReaderIdEnum.ManualTerminal.ToChineseString();
                 default:
                     return "";
 
@@ -513,9 +524,8 @@ namespace EatonManagementBoard.Services
             return new EatonEpc
             {
                 Epc = epc,
-                ReaderId = ReaderIdEnum.Terminal.ToString(),
+                ReaderId = ReaderIdEnum.ManualTerminal.ToString(),
                 TransTime = DateTime.Now,
-                Manual = 1,
             };
         }
 
@@ -527,7 +537,7 @@ namespace EatonManagementBoard.Services
             }
 
             EatonEpc eatonEpc = _dbContext.EatonEpcs
-                .Where(eatonEpc => eatonEpc.Epc == epc && eatonEpc.Manual == 1)
+                .Where(eatonEpc => eatonEpc.Epc == epc && eatonEpc.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
                 .FirstOrDefault();
 
             if (eatonEpc == null)
