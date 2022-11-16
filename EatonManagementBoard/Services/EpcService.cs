@@ -22,8 +22,9 @@ namespace EatonManagementBoard.Services
         {
             string allSqlCommand = "select * from scannel.dbo.eaton_epc;";
             string realTimeSqlCommand = "select * from eaton_epc result where " +
-                "readerId = (select readerId from eaton_epc location where location.epc = result.epc and transTime = (select MAX(transTime) from eaton_epc maxtime where maxtime.epc = location.epc)) and " +
-                "transTime = (select MIN(transTime) from eaton_epc mintime where mintime.epc = result.epc and mintime.readerId = result.readerId) " +
+                "readerId = (select TOP(1) readerId from eaton_epc location where location.epc = result.epc and transTime = (select MAX(transTime) from eaton_epc maxtime where maxtime.epc = location.epc)) and " +
+                "transTime = (select MIN(transTime) from eaton_epc mintime where mintime.epc = result.epc and mintime.readerId = result.readerId) and " +
+                "Sid=(select MAX(Sid) from eaton_epc maxsid where maxsid.epc=result.epc and maxsid.readerId=result.readerId and maxsid.transTime=result.transTime) " +
                 "order by result.transTime;";
             List<EatonEpc> dbEatonEpcs = _dbContext.EatonEpcs
                 .FromSqlRaw(allSqlCommand)
