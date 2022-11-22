@@ -13,12 +13,12 @@ namespace EatonManagementBoard.Enums
 
     public static class ErrorEnumExtensions
     {
-        public static string ToString(this ErrorEnum error)
+        public static string ToDescription(this ErrorEnum error)
         {
             switch (error)
             {
                 case ErrorEnum.None:
-                    return "None";
+                    return "";
                 case ErrorEnum.InvalidParameters:
                     return "InvalidParameters";
                 default:

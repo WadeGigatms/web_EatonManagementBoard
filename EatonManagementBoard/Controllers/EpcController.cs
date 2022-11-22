@@ -26,15 +26,23 @@ namespace EatonManagementBoard.Controllers
         [HttpGet]
         public IActionResult Get([FromQuery] string wo, string pn, string palletId)
         {
-            GetEpcResultDto getEpcResultDto = _service.Get(wo, pn, palletId);
+            EpcResultDto getEpcResultDto = _service.Get(wo, pn, palletId);
             return getEpcResultDto.Result == true ? Ok(getEpcResultDto) : BadRequest(getEpcResultDto);
+        }
+
+        // GET api/<EpcController>/rtc
+        [HttpGet("rtc")]
+        public IActionResult GetRtc()
+        {
+            RtcResultDto getRtcResultDto = _service.GetRtc();
+            return getRtcResultDto.Result == true ? Ok(getRtcResultDto) : BadRequest(getRtcResultDto);
         }
 
         // POST api/<EpcController>
         [HttpPost]
         public IActionResult Post([FromQuery] string epc)
         {
-            EpcResultDto epcResultDto = _service.Post(epc);
+            ResultDto epcResultDto = _service.Post(epc);
             return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
         }
 
@@ -42,7 +50,7 @@ namespace EatonManagementBoard.Controllers
         [HttpDelete]
         public IActionResult Delete([FromQuery] string epc)
         {
-            EpcResultDto epcResultDto = _service.Delete(epc);
+            ResultDto epcResultDto = _service.Delete(epc);
             return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
         }
     }

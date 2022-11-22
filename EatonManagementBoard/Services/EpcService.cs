@@ -18,7 +18,7 @@ namespace EatonManagementBoard.Services
 
         private readonly EatonManagementBoardDbContext _dbContext;
 
-        public GetEpcResultDto Get(string wo = null, string pn = null, string palletId = null)
+        public EpcResultDto Get(string wo = null, string pn = null, string palletId = null)
         {
             string allSqlCommand = "select * from scannel.dbo.eaton_epc;";
             string realTimeSqlCommand = "select * from eaton_epc result where " +
@@ -411,12 +411,12 @@ namespace EatonManagementBoard.Services
             return selectionDto;
         }
 
-        private GetEpcResultDto GetEpcGetResultDto(ResultEnum result, ErrorEnum error, DashboardDto dashboardDto, SelectionDto selectionDto)
+        private EpcResultDto GetEpcGetResultDto(ResultEnum result, ErrorEnum error, DashboardDto dashboardDto, SelectionDto selectionDto)
         {
-            return new GetEpcResultDto
+            return new EpcResultDto
             {
                 Result = result.ToBoolean(),
-                Error = error.ToString(),
+                Error = error.ToDescription(),
                 DashboardDto = dashboardDto,
                 SelectionDto = selectionDto
             };
@@ -488,11 +488,28 @@ namespace EatonManagementBoard.Services
             }
         }
 
-        public EpcResultDto Post(string epc)
+        public RtcResultDto GetRtc()
+        {
+            return GetRtcResultDto(ResultEnum.True, ErrorEnum.None, DateTime.Now);
+        }
+
+        private RtcResultDto GetRtcResultDto(ResultEnum result, ErrorEnum error, DateTime timestamp)
+        {
+            return new RtcResultDto
+            {
+                Result = result.ToBoolean(),
+                Error = error.ToDescription(),
+                Timestamp = timestamp.ToString("yyyy/MM/dd HH:mm:ss"),
+            };
+        }
+
+        #region Post
+
+        public ResultDto Post(string epc)
         {
             if (string.IsNullOrEmpty(epc) == true)
             {
-                return GetEpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
             EatonEpc eatonEpc = _dbContext.EatonEpcs
@@ -501,22 +518,22 @@ namespace EatonManagementBoard.Services
 
             if (eatonEpc == null)
             {
-                return GetEpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
             EatonEpc insertEatonEpc = GetEatonEpc(epc);
             _dbContext.EatonEpcs.Add(insertEatonEpc);
             _dbContext.SaveChanges();
 
-            return GetEpcResultDto(ResultEnum.True, ErrorEnum.None);
+            return EpcResultDto(ResultEnum.True, ErrorEnum.None);
         }
 
-        private EpcResultDto GetEpcResultDto(ResultEnum result, ErrorEnum error)
+        private ResultDto EpcResultDto(ResultEnum result, ErrorEnum error)
         {
-            return new EpcResultDto
+            return new ResultDto
             {
                 Result = result.ToBoolean(),
-                Error = error.ToString()
+                Error = error.ToDescription()
             };
         }
 
@@ -530,11 +547,15 @@ namespace EatonManagementBoard.Services
             };
         }
 
-        public EpcResultDto Delete(string epc)
+        #endregion
+
+        #region Delete
+
+        public ResultDto Delete(string epc)
         {
             if (string.IsNullOrEmpty(epc) == true)
             {
-                return GetEpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
             EatonEpc eatonEpc = _dbContext.EatonEpcs
@@ -543,13 +564,15 @@ namespace EatonManagementBoard.Services
 
             if (eatonEpc == null)
             {
-                return GetEpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
             _dbContext.EatonEpcs.Remove(eatonEpc);
             _dbContext.SaveChanges();
 
-            return GetEpcResultDto(ResultEnum.True, ErrorEnum.None);
+            return EpcResultDto(ResultEnum.True, ErrorEnum.None);
         }
+
+        #endregion
     }
 }
