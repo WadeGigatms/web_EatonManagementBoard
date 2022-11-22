@@ -21,5 +21,6 @@ namespace EatonManagementBoard.Dtos
         public List<EpcDto> ThirdFloorAEpcDtos { get; set; }
         public List<EpcDto> ThirdFloorBEpcDtos { get; set; }
         public List<EpcDto> TerminalEpcDtos { get; set; }
+        public List<EpcDto> HandheldEpcDtos { get; set; }
     }
 }

@@ -254,8 +254,8 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                                 title={BLOCK_1F}
                                 modalId={null}
                                 capacity={null}
-                                result={false}
-                                epcs={null}
+                                result={result}
+                                epcs={onDashboard.handheldEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
                         </div>
                     </div>

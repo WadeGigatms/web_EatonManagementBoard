@@ -8,7 +8,8 @@ namespace EatonManagementBoard.Enums
     public enum ErrorEnum
     {
         None,
-        InvalidParameters
+        InvalidParameters,
+        InvalidEpcFormat,
     }
 
     public static class ErrorEnumExtensions
@@ -21,6 +22,9 @@ namespace EatonManagementBoard.Enums
                     return "";
                 case ErrorEnum.InvalidParameters:
                     return "InvalidParameters";
+                    return "";
+                case ErrorEnum.InvalidEpcFormat:
+                    return "InvalidEpcFormat";
                 default:
                     return "Unknown";
             }

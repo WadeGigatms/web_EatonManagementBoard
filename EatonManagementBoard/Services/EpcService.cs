@@ -2,6 +2,7 @@
 using EatonManagementBoard.Enums;
 using EatonManagementBoard.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +75,9 @@ namespace EatonManagementBoard.Services
             List<EatonEpc> terminalEatonEpcs = realTimeEatonEpcs
                 .Where(epc => epc.ReaderId == ReaderIdEnum.Terminal.ToString() || epc.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
                 .ToList();
+            List<EatonEpc> handheldEatonEpcs = realTimeEatonEpcs
+                .Where(epc => epc.ReaderId == ReaderIdEnum.Handheld.ToString())
+                .ToList();
 
             List<EpcDto> warehouseAEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseAEatonEpcs, wo, pn, palletId);
             List<EpcDto> warehouseBEpcDtos = GetEpcDtos(dbEatonEpcs, warehouseBEatonEpcs, wo, pn, palletId);
@@ -89,6 +93,7 @@ namespace EatonManagementBoard.Services
             List<EpcDto> thirdFloorAEpcDtos = GetEpcDtos(dbEatonEpcs, thirdFloorAEatonEpcs, wo, pn, palletId);
             List<EpcDto> thirdFloorBEpcDtos = GetEpcDtos(dbEatonEpcs, thirdFloorBEatonEpcs, wo, pn, palletId);
             List<EpcDto> terminalEpcDtos = GetEpcDtos(dbEatonEpcs, terminalEatonEpcs, wo, pn, palletId);
+            List<EpcDto> handheldEpcDtos = GetEpcDtos(dbEatonEpcs, handheldEatonEpcs, wo, pn, palletId);
             List<EpcDto> allEpcDtos = GetEpcDtos(dbEatonEpcs, dbEatonEpcs, null, null, null);
 
             // Mark out manual terminal on transTime
@@ -114,7 +119,8 @@ namespace EatonManagementBoard.Services
                 secondFloorEpcDtos,
                 thirdFloorAEpcDtos,
                 thirdFloorBEpcDtos,
-                terminalEpcDtos
+                terminalEpcDtos,
+                handheldEpcDtos
                 );
 
             SelectionDto selectionDto = GetSelectionDtos(allEpcDtos);
@@ -161,7 +167,8 @@ namespace EatonManagementBoard.Services
             List<EpcDto> secondFloorEpcDtos,
             List<EpcDto> thirdFloorAEpcDtos,
             List<EpcDto> thirdFloorBEpcDtos,
-            List<EpcDto> terminalEpcDtos
+            List<EpcDto> terminalEpcDtos,
+            List<EpcDto> handheldEpcDtos
             )
         {
             return new DashboardDto
@@ -179,7 +186,8 @@ namespace EatonManagementBoard.Services
                 SecondFloorEpcDtos = secondFloorEpcDtos,
                 ThirdFloorAEpcDtos = thirdFloorAEpcDtos,
                 ThirdFloorBEpcDtos = thirdFloorBEpcDtos,
-                TerminalEpcDtos = terminalEpcDtos
+                TerminalEpcDtos = terminalEpcDtos,
+                HandheldEpcDtos = handheldEpcDtos
             };
         }
 
@@ -482,6 +490,8 @@ namespace EatonManagementBoard.Services
                     return ReaderIdEnum.Terminal.ToChineseString();
                 case "ManualTerminal":
                     return ReaderIdEnum.ManualTerminal.ToChineseString();
+                case "Handheld":
+                    return ReaderIdEnum.Handheld.ToChineseString();
                 default:
                     return "";
 
@@ -521,7 +531,7 @@ namespace EatonManagementBoard.Services
                 return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
-            EatonEpc insertEatonEpc = GetEatonEpc(epc);
+            EatonEpc insertEatonEpc = GetEatonEpc(epc, ReaderIdEnum.ManualTerminal, DateTime.Now);
             _dbContext.EatonEpcs.Add(insertEatonEpc);
             _dbContext.SaveChanges();
 
@@ -537,13 +547,82 @@ namespace EatonManagementBoard.Services
             };
         }
 
-        private EatonEpc GetEatonEpc(string epc)
+        private EatonEpc GetEatonEpc(string epc, ReaderIdEnum readerId, DateTime transTime)
         {
             return new EatonEpc
             {
                 Epc = epc,
-                ReaderId = ReaderIdEnum.ManualTerminal.ToString(),
-                TransTime = DateTime.Now,
+                ReaderId = readerId.ToString(),
+                TransTime = transTime,
+            };
+        }
+
+        public ResultDto PostUpload(dynamic value)
+        {
+            EpcPostDto epcPostDto;
+
+            // Check value
+            try
+            {
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Include,
+                    MissingMemberHandling = MissingMemberHandling.Error
+                };
+                epcPostDto = JsonConvert.DeserializeObject<EpcPostDto>(value.ToString(), settings);
+            }
+            catch
+            {
+                return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            // Check epc is valid format
+            string decodedEpc = GetHexToAscii(epcPostDto.Epc);
+            bool isNewEpcStringFormat = decodedEpc.Contains("##") == false && decodedEpc.Contains("&&") == false ? true : false;
+            if (isNewEpcStringFormat == false)
+            {
+                // Old epc string format
+                // Error string format
+                if (decodedEpc.Contains("##") == false ||
+                    decodedEpc.Split("##").Count() == 0 ||
+                    decodedEpc.Split("##")[1].Contains("&&") == false ||
+                    decodedEpc.Split("##")[1].Split("&&").Count() != 5)
+                {
+                    return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
+                }
+            }
+            else
+            {
+                // New epc string format
+                // Error string format
+                if (decodedEpc.Contains("#") == false ||
+                    decodedEpc.Split("#").Count() == 0 ||
+                    decodedEpc.Split("#")[1].Contains("&") == false ||
+                    decodedEpc.Split("#")[1].Split("&").Count() != 5)
+                {
+                    return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
+                }
+            }
+
+            // Check readerId is valid
+            if (epcPostDto.ReaderId != ReaderIdEnum.Handheld.ToString())
+            {
+                return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            EatonEpc insertEatonEpc = GetEatonEpc(epcPostDto.Epc, ReaderIdEnum.Handheld, DateTime.Parse(epcPostDto.TransTime));
+            _dbContext.EatonEpcs.Add(insertEatonEpc);
+            _dbContext.SaveChanges();
+
+            return GetUploadResultDto(ResultEnum.True, ErrorEnum.None); 
+        }
+
+        private ResultDto GetUploadResultDto(ResultEnum result, ErrorEnum error)
+        {
+            return new ResultDto
+            {
+                Result = result.ToBoolean(),
+                Error = error.ToDescription()
             };
         }
 

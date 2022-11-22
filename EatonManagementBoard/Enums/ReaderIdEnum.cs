@@ -21,7 +21,8 @@ namespace EatonManagementBoard.Enums
         WareHouseH,
         WareHouseI,
         Terminal,
-        ManualTerminal
+        ManualTerminal,
+        Handheld,
     }
 
     public static class ReaderIdEnumExtenstion
@@ -60,6 +61,8 @@ namespace EatonManagementBoard.Enums
                     return "Terminal";
                 case ReaderIdEnum.ManualTerminal:
                     return "ManualTerminal";
+                case ReaderIdEnum.Handheld:
+                    return "Handheld";
                 default:
                     return "Unknown readerId";
             }
@@ -99,6 +102,8 @@ namespace EatonManagementBoard.Enums
                     return "已出貨";
                 case ReaderIdEnum.ManualTerminal:
                     return "已出貨";
+                case ReaderIdEnum.Handheld:
+                    return "1F 緩衝區";
                 default: 
                     return "Unknown readerId";
             }
