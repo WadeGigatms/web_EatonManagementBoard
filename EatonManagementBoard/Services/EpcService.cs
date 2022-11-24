@@ -260,6 +260,7 @@ namespace EatonManagementBoard.Services
                 List<EatonEpc> dbSameEpcs = dbEatonEpcs
                     .Where(dbEatonEpc => dbEatonEpc.Epc == eatonEpcDto.Epc)
                     .OrderBy(dbEatonEpc => dbEatonEpc.TransTime)
+                    .OrderBy(dbEatonEpc => dbEatonEpc.Sid)
                     .ToList();
                 List<LocationTimeDto> locationTimeDtos = GetLocationTimeDtos(dbSameEpcs);
                 string epcState = GetEpcState(Enumerable.Reverse(locationTimeDtos).ToList());
@@ -379,6 +380,10 @@ namespace EatonManagementBoard.Services
                 else
                 {
                     LocationTimeDto lastLocationTimeDto = locationTimeDtos.First();
+                    if (dbSameEpc.TransTime == DateTime.Parse(lastLocationTimeDto.TransTime))
+                    {
+                        continue;
+                    }
                     if (GetLocationString(dbSameEpc.ReaderId) != lastLocationTimeDto.Location)
                     {
                         DateTime lastTransTime = DateTime.Parse(lastLocationTimeDto.TransTime);
