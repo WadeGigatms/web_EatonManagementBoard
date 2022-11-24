@@ -18,6 +18,10 @@ namespace EatonManagementBoard.Services
         }
 
         private readonly EatonManagementBoardDbContext _dbContext;
+        private readonly string doubleHash = "##";
+        private readonly string doubleAnd = "&&";
+        private readonly string singleHash = "#";
+        private readonly string singleAnd = "&";
 
         public EpcResultDto Get(string wo = null, string pn = null, string palletId = null)
         {
@@ -146,10 +150,17 @@ namespace EatonManagementBoard.Services
                 return "";
             }
             string asciiString = "";
-            for (int i = 0; i < hexString.Length; i += 2)
+            try 
             {
-                string tempString = hexString.Substring(i, 2);
-                asciiString += Convert.ToChar(Convert.ToUInt32(tempString, 16));
+                for (int i = 0; i < hexString.Length; i += 2)
+                {
+                    string tempString = hexString.Substring(i, 2);
+                    asciiString += Convert.ToChar(Convert.ToUInt32(tempString, 16));
+                }
+            }
+            catch
+            {
+                return "";
             }
             return asciiString;
         }
@@ -205,43 +216,45 @@ namespace EatonManagementBoard.Services
                 string epcString = GetHexToAscii(eatonEpcDto.Epc);
                 bool isNewEpcStringFormat = false;
                 // Detect epc string format is new or old
-                isNewEpcStringFormat = epcString.Contains("##") == false && epcString.Contains("&&") == false ? true : false;
+                isNewEpcStringFormat = epcString.Contains(doubleHash) == false && epcString.Contains(doubleAnd) == false ? true : false;
                 if (isNewEpcStringFormat == false)
                 {
                     // Old epc string format
                     // Error string format
-                    if (epcString.Contains("##") == false ||
-                        epcString.Split("##").Count() == 0 ||
-                        epcString.Split("##")[1].Contains("&&") == false ||
-                        epcString.Split("##")[1].Split("&&").Count() != 5)
+                    if (epcString.Contains(doubleHash) == false ||
+                        epcString.Split(doubleHash).Count() == 0 ||
+                        epcString.Split(doubleHash)[1].Contains(doubleAnd) == false ||
+                        epcString.Split(doubleHash)[1].Split(doubleAnd).Count() != 5)
                     {
                         continue;
                     }
                     // Correct string format
-                    wo = epcString.Split("##")[1].Split("&&")[0];
-                    qty = epcString.Split("##")[1].Split("&&")[1];
-                    pn = epcString.Split("##")[1].Split("&&")[2];
-                    line = epcString.Split("##")[1].Split("&&")[3];
-                    barcode = epcString.Split("##")[1].Split("&&")[4];
+                    var epcDatas = epcString.Split(doubleHash)[1].Split(doubleAnd);
+                    wo = epcDatas[0];
+                    qty = epcDatas[1];
+                    pn = epcDatas[2];
+                    line = epcDatas[3];
+                    barcode = epcDatas[4];
                     error = "";
                 }
                 else
                 {
                     // New epc string format
                     // Error string format
-                    if (epcString.Contains("#") == false ||
-                        epcString.Split("#").Count() == 0 ||
-                        epcString.Split("#")[1].Contains("&") == false ||
-                        epcString.Split("#")[1].Split("&").Count() != 5)
+                    if (epcString.Contains(singleHash) == false ||
+                        epcString.Split(singleHash).Count() == 0 ||
+                        epcString.Split(singleHash)[1].Contains(singleAnd) == false ||
+                        epcString.Split(singleHash)[1].Split(singleAnd).Count() != 5)
                     {
                         continue;
                     }
                     // Correct string format
-                    wo = epcString.Split("#")[1].Split("&")[0];
-                    qty = epcString.Split("#")[1].Split("&")[1];
-                    pn = epcString.Split("#")[1].Split("&")[2];
-                    line = epcString.Split("#")[1].Split("&")[3];
-                    barcode = epcString.Split("#")[1].Split("&")[4];
+                    var epcDatas = epcString.Split(singleHash)[1].Split(singleAnd);
+                    wo = epcDatas[0];
+                    qty = epcDatas[1];
+                    pn = epcDatas[2];
+                    line = epcDatas[3];
+                    barcode = epcDatas[4];
                     error = "";
                 }
                 List<EatonEpc> dbSameEpcs = dbEatonEpcs
@@ -309,7 +322,8 @@ namespace EatonManagementBoard.Services
                         // If not, NG
                         if (locationTimeDto.Location == ReaderIdEnum.ThirdFloorA.ToChineseString() ||
                             locationTimeDto.Location == ReaderIdEnum.SecondFloorA.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString())
+                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString() ||
+                            locationTimeDto.Location == ReaderIdEnum.Handheld.ToChineseString())
                         {
                             gotFirstStep = true;
                         }
@@ -578,15 +592,15 @@ namespace EatonManagementBoard.Services
 
             // Check epc is valid format
             string decodedEpc = GetHexToAscii(epcPostDto.Epc);
-            bool isNewEpcStringFormat = decodedEpc.Contains("##") == false && decodedEpc.Contains("&&") == false ? true : false;
+            bool isNewEpcStringFormat = decodedEpc.Contains(doubleHash) == false && decodedEpc.Contains(doubleAnd) == false ? true : false;
             if (isNewEpcStringFormat == false)
             {
                 // Old epc string format
                 // Error string format
-                if (decodedEpc.Contains("##") == false ||
-                    decodedEpc.Split("##").Count() == 0 ||
-                    decodedEpc.Split("##")[1].Contains("&&") == false ||
-                    decodedEpc.Split("##")[1].Split("&&").Count() != 5)
+                if (decodedEpc.Contains(doubleHash) == false ||
+                    decodedEpc.Split(doubleHash).Count() == 0 ||
+                    decodedEpc.Split(doubleHash)[1].Contains(doubleAnd) == false ||
+                    decodedEpc.Split(doubleHash)[1].Split(doubleAnd).Count() != 5)
                 {
                     return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
                 }
@@ -595,10 +609,10 @@ namespace EatonManagementBoard.Services
             {
                 // New epc string format
                 // Error string format
-                if (decodedEpc.Contains("#") == false ||
-                    decodedEpc.Split("#").Count() == 0 ||
-                    decodedEpc.Split("#")[1].Contains("&") == false ||
-                    decodedEpc.Split("#")[1].Split("&").Count() != 5)
+                if (decodedEpc.Contains(singleHash) == false ||
+                    decodedEpc.Split(singleHash).Count() == 0 ||
+                    decodedEpc.Split(singleHash)[1].Contains(singleAnd) == false ||
+                    decodedEpc.Split(singleHash)[1].Split(singleAnd).Count() != 5)
                 {
                     return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
                 }

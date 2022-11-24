@@ -12,8 +12,10 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
     function render() {
         const modalTarget = "#" + _timeline_modal_target
         const trClass = () => {
-            return ""
-            /*switch (epc.epcState) {
+            if (epc.readerId === "Handheld") {
+                return "";
+            }
+            switch (epc.epcState) {
                 case "OK":
                     return ""
                 case "NG":
@@ -22,7 +24,7 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
                     return "tr-bg-r"
                 default:
                     return ""
-            }*/
+            }
         }
         if (showTransTime === true) {
             if (epc.error === "") {
