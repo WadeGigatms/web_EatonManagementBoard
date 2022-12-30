@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-
-#nullable disable
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EatonManagementBoard.Models
 {
-    public partial class TaipeiLogistic
+    public class EatonEpcContext
     {
         public int Sid { get; set; }
         public string Epc { get; set; }
         public string ReaderId { get; set; }
         public DateTime? TransTime { get; set; }
+        public int RowId { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using EatonManagementBoard.Database;
 using EatonManagementBoard.Models;
 using EatonManagementBoard.Services;
 using Microsoft.AspNetCore.Builder;
@@ -33,9 +34,18 @@ namespace EatonManagementBoard
                 configuration.RootPath = "ClientApp/build";
             });
 
+            // Database: for EFCore
             services.AddDbContext<EatonManagementBoardDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            // Database: for Dapper
+            services.AddScoped<ConnectionRepositoryManager>(serviceProvider =>
+            {
+                var msSqlConnection = new MsSqlConnectionRepository(Configuration.GetConnectionString("DefaultConnection"));
+                var manager = new ConnectionRepositoryManager(msSqlConnection);
+                return manager;
             });
             services.AddScoped<EpcService>();
         }

@@ -87,7 +87,7 @@ const Content = ({ children }) => {
         $('#threeAModalTarget').modal('hide')
         $('#threeBModalTarget').modal('hide')
         $('#twoAModalTarget').modal('hide')
-        $('#searchModalTarget').modal('hide')
+        $('#searchFormModalTarget').modal('hide')
         $('#timelineModalTarget').modal('hide')
         $('#settingModalTarget').modal('hide')
         $('#moveModalTarget').modal('hide')
@@ -146,7 +146,7 @@ const Content = ({ children }) => {
                                 </button>
                             </li>
                             <li className="nav-item nav-link h-100">
-                                <button type="button" className={searchBtnClass} data-toggle="modal" data-target="#searchModalTarget" onClick={handleSearchClick}>
+                                <button type="button" className={searchBtnClass} data-toggle="modal" data-target="#searchFormModalTarget" onClick={handleSearchClick}>
                                     <i className="fas fa-search"></i>
                                     <label className="navbar-item-text">{searchState === false ? SEARCH : CANCELSEARCH}</label>
                                 </button>

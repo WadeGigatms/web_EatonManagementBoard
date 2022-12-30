@@ -1,4 +1,4 @@
-﻿export const VERSION = "v1.4.3"
+﻿export const VERSION = "v1.5.0"
 
 export const URL_EPC_ALL = `/api/epc`
 export const URL_EPC = `/api/epc?`
@@ -52,7 +52,7 @@ export const NOW = "現在"
 export const _3A_modal_target = "threeAModalTarget"
 export const _2A_modal_target = "twoAModalTarget"
 export const _3B_modal_target = "threeBModalTarget"
-export const _search_modal_target = "searchModalTarget"
+export const _search_form_modal_target = "searchFormModalTarget"
 export const _timeline_modal_target = "timelineModalTarget"
 export const _setting_modal_target = "settingModalTarget"
 export const _move_modal_target = "moveModalTarget"

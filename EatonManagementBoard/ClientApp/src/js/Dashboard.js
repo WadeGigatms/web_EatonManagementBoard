@@ -4,7 +4,7 @@ import LeftBlock from './block/LeftBlock'
 import RightBlock from './block/RightBlock'
 import TerminalBlock from './block/TerminalBlock'
 import PopUpCapacity from './popup/PopUpCapacity'
-import PopUpSearch from './popup/PopUpSearch'
+import PopUpSearchForm from './popup/PopUpSearchForm'
 import PopUpTimeline from './popup/PopUpTimeline'
 import PopUpMoveConfirm from './popup/PopUpMoveConfirm'
 import PopUpRecoverConfirm from './popup/PopUpRecoverConfirm'
@@ -30,7 +30,7 @@ import {
     _3A_modal_target,
     _2A_modal_target,
     _3B_modal_target,
-    _search_modal_target,
+    _search_form_modal_target,
 } from './constants'
 import { LoadLocationCapacity } from './others/Cookie'
 
@@ -52,7 +52,6 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
         thirdFloorBEpcDtos: null,
         terminalEpcDtos: null
     })
-    const [selection, setSelection] = useState()
     const [_3A_capacity, set3ACapacity] = useState(6)
     const [_2A_capacity, set2ACapacity] = useState(6)
     const [_3B_capacity, set3BCapacity] = useState(6)
@@ -62,7 +61,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
         const fetchData = async () => {
             try {
                 const response = await fetch(url)
-                const { result, dashboardDto, selectionDto } = await response.json()
+                const { result, dashboardDto } = await response.json()
                 if (result === true) {
                     setResult(result)
                     if (searchStateRef.current === false) {
@@ -71,7 +70,6 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                     else {
                         setOnDashboard(dashboardDto)
                     }
-                    setSelection(selectionDto)
                 }
                 else {
 
@@ -128,7 +126,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 const url = getUrl()
                 fetchRequest(url)
             }
-        }, 3000)
+        }, 5000)
 
         return () => clearInterval(interval)
     }, [searchStateRef, fetchRequest, idleState])
@@ -339,7 +337,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             <PopUpTimeline epc={timelineEpc} />
             <PopUpMoveConfirm post={post} />
             <PopUpRecoverConfirm del={del} />
-            <PopUpSearch searchState={searchState} searchStateRef={searchStateRef} setSearchParameter={setSearchParameter} selection={selection} />
+            <PopUpSearchForm searchState={searchState} searchStateRef={searchStateRef} setSearchParameter={setSearchParameter} />
             <PopUpCapacity id={_3A_modal_target} title={BLOCK_3F_A} capacity={_3A_capacity} setCapacity={set3ACapacity} />
             <PopUpCapacity id={_2A_modal_target} title={BLOCK_2F_A} capacity={_2A_capacity} setCapacity={set2ACapacity} />
             <PopUpCapacity id={_3B_modal_target} title={BLOCK_3F_B} capacity={_3B_capacity} setCapacity={set3BCapacity} />
