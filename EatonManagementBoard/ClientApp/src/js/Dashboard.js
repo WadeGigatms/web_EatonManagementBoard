@@ -25,7 +25,6 @@ import {
     BLOCK_H,
     BLOCK_I,
     NAV_TERMINAL,
-    URL_EPC_ALL,
     URL_EPC,
     _3A_modal_target,
     _2A_modal_target,
@@ -122,6 +121,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
         fetchRequest(url)
 
         const interval = setInterval(() => {
+            // if front-end goes to idle state or searching state, web stops requesting api
             if (searchStateRef.current === false && idleState === false) {
                 const url = getUrl()
                 fetchRequest(url)
@@ -143,34 +143,47 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }, [searchParameter, searchStateRef, fetchRequest])
 
     function getUrl() {
-        const url = window.location.origin + URL_EPC_ALL
+        const url = window.location.origin + URL_EPC
+        return url
+    }
+
+    function getDelUrl(epc) {
+        const url = window.location.origin + URL_EPC + "?epc=" + epc
         return url
     }
 
     function getSearchUrl(wo, pn, palletId) {
-        const url = window.location.origin + URL_EPC + "wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
+        const url = window.location.origin + URL_EPC + "?wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
         return url
     }
 
-    function getEpcUrl(epc) {
-        const url = window.location.origin + URL_EPC + "epc=" + epc
-        return url
+    function getJson(epc) {
+        console.log(epc.epc)
+        console.log(epc.readerId)
+        console.log(epc.transTime)
+        return JSON.stringify({
+            Epc: String(epc.epc),
+            ReaderId: "ManualTerminal",
+            TransTime: epc.transTime
+        })
     }
 
     function post() {
-        const url = getEpcUrl(timelineEpc.epc)
+        const url = getUrl()
         const requestOptions = {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
+            body: getJson(timelineEpc)
         }
+        console.log(getJson(timelineEpc))
         postRequest(url, requestOptions)
     }
 
     function del() {
-        const url = getEpcUrl(timelineEpc.epc)
+        const url = getDelUrl(timelineEpc.epc)
         const requestOptions = {
             method: 'DELETE',
             headers: {

@@ -22,6 +22,9 @@ namespace EatonManagementBoard.Database
         public List<EatonEpcContext> QueryTraceEpc()
             => MsSqlConnectionRepository.QueryTraceEpc();
 
+        public int QueryDataCount() 
+            => MsSqlConnectionRepository.QueryDataCount();
+
         #endregion
     }
 }

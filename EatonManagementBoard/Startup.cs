@@ -28,6 +28,9 @@ namespace EatonManagementBoard
 
             services.AddControllersWithViews();
 
+            // MemoryCache
+            services.AddMemoryCache();
+
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -47,6 +50,7 @@ namespace EatonManagementBoard
                 var manager = new ConnectionRepositoryManager(msSqlConnection);
                 return manager;
             });
+
             services.AddScoped<EpcService>();
         }
 

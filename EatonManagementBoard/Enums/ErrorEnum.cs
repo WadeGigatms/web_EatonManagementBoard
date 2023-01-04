@@ -10,6 +10,8 @@ namespace EatonManagementBoard.Enums
         None,
         InvalidParameters,
         InvalidEpcFormat,
+        InvalidReaderId,
+        NoEffectiveData
     }
 
     public static class ErrorEnumExtensions
@@ -22,9 +24,12 @@ namespace EatonManagementBoard.Enums
                     return "";
                 case ErrorEnum.InvalidParameters:
                     return "InvalidParameters";
-                    return "";
                 case ErrorEnum.InvalidEpcFormat:
                     return "InvalidEpcFormat";
+                case ErrorEnum.InvalidReaderId:
+                    return "InvalidReaderId";
+                case ErrorEnum.NoEffectiveData:
+                    return "NoEffectiveData";
                 default:
                     return "Unknown";
             }

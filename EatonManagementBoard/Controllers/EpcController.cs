@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -40,18 +39,9 @@ namespace EatonManagementBoard.Controllers
         }
 
         // POST api/<EpcController>
-        [HttpPost]
-        public IActionResult Post([FromQuery] string epc)
-        {
-            ResultDto epcResultDto = _service.Post(epc);
-            return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
-        }
-
-        // POST api/<EpcController>
-        [HttpPost("upload")]
         public IActionResult Post([FromBody] dynamic value)
         {
-            ResultDto epcResultDto = _service.PostUpload(value);
+            ResultDto epcResultDto = _service.Post(value);
             return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
         }
 

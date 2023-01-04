@@ -1,7 +1,6 @@
-﻿export const VERSION = "v1.5.0"
+﻿export const VERSION = "v1.5.1"
 
-export const URL_EPC_ALL = `/api/epc`
-export const URL_EPC = `/api/epc?`
+export const URL_EPC = `/api/epc`
 export const URL_TERMINAL = `/api/terminal`
 
 export const BLOCK_3F_A = "A-3F 成品區"

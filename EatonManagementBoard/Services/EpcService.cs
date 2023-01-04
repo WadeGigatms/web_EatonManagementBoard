@@ -3,34 +3,64 @@ using EatonManagementBoard.Dtos;
 using EatonManagementBoard.Enums;
 using EatonManagementBoard.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using LocalMemoryCache = EatonManagementBoard.Database.LocalMemoryCache;
 
 namespace EatonManagementBoard.Services
 {
     public class EpcService
     {
-        public EpcService(EatonManagementBoardDbContext dbContext, ConnectionRepositoryManager connection)
+        public EpcService(EatonManagementBoardDbContext dbContext, ConnectionRepositoryManager connection, IMemoryCache memoryCache)
         {
             _dbContext = dbContext;
             _connection = connection;
+            _localMemoryCache = new LocalMemoryCache(memoryCache);
         }
 
-        private ConnectionRepositoryManager _connection;
+        private readonly LocalMemoryCache _localMemoryCache;
+        private readonly ConnectionRepositoryManager _connection;
         private readonly EatonManagementBoardDbContext _dbContext;
         private readonly string doubleHash = "##";
         private readonly string doubleAnd = "&&";
         private readonly string singleHash = "#";
         private readonly string singleAnd = "&";
 
+        #region Get
+
         public EpcResultDto Get(string wo = null, string pn = null, string palletId = null)
         {
+            var isSearchState = false;
+            if (string.IsNullOrEmpty(wo) &&
+                string.IsNullOrEmpty(pn) &&
+                string.IsNullOrEmpty(palletId))
+            {
+                isSearchState = false;
+            }
+            else
+            {
+                isSearchState = true;
+            }
+
+            // Check there were new data inserted in database
+            var dataCount = _connection.QueryDataCount();
+            var cacheDataCount = _localMemoryCache.ReadDataCount();
+            var cacheSearchState = _localMemoryCache.ReadSearchState();
+           if (cacheDataCount == dataCount && cacheSearchState == isSearchState)
+            {
+                // Same data count in database so return local memory cache
+                var dashboard = _localMemoryCache.ReadDashboardDto();
+                return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None, dashboard);
+            }
+
+            // Connect to database
             List<EatonEpcContext> realTimeEpcContext = _connection.QueryRealTimeEpc();
             List<EatonEpcContext> traceEpcContext = _connection.QueryTraceEpc();
 
+            // Get epc context in each location
             List<EatonEpcContext> warehouseAEpcContext = realTimeEpcContext
                 .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseA.ToString())
                 .ToList();
@@ -110,6 +140,12 @@ namespace EatonManagementBoard.Services
                 TerminalEpcDtos = terminalEpcDtos,
                 HandheldEpcDtos = handheldEpcDtos
             };
+
+            _localMemoryCache.SaveSearchState(isSearchState);
+            _localMemoryCache.SaveDataCount(dataCount);
+            _localMemoryCache.SaveRealTimeEpcContext(realTimeEpcContext);
+            _localMemoryCache.SaveTraceEpcContext(traceEpcContext);
+            _localMemoryCache.SaveDashboardDto(dashboardDto);
 
             return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None, dashboardDto);
         }
@@ -432,51 +468,11 @@ namespace EatonManagementBoard.Services
             };
         }
 
+        #endregion
+
         #region Post
 
-        public ResultDto Post(string epc)
-        {
-            if (string.IsNullOrEmpty(epc) == true)
-            {
-                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
-            }
-
-            EatonEpc eatonEpc = _dbContext.EatonEpcs
-                .Where(eatonEpc => eatonEpc.Epc == epc)
-                .FirstOrDefault();
-
-            if (eatonEpc == null)
-            {
-                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
-            }
-
-            EatonEpc insertEatonEpc = GetEatonEpc(epc, ReaderIdEnum.ManualTerminal, DateTime.Now);
-            _dbContext.EatonEpcs.Add(insertEatonEpc);
-            _dbContext.SaveChanges();
-
-            return EpcResultDto(ResultEnum.True, ErrorEnum.None);
-        }
-
-        private ResultDto EpcResultDto(ResultEnum result, ErrorEnum error)
-        {
-            return new ResultDto
-            {
-                Result = result.ToBoolean(),
-                Error = error.ToDescription()
-            };
-        }
-
-        private EatonEpc GetEatonEpc(string epc, ReaderIdEnum readerId, DateTime transTime)
-        {
-            return new EatonEpc
-            {
-                Epc = epc,
-                ReaderId = readerId.ToString(),
-                TransTime = transTime,
-            };
-        }
-
-        public ResultDto PostUpload(dynamic value)
+        public ResultDto Post(dynamic value)
         {
             EpcPostDto epcPostDto;
 
@@ -492,56 +488,105 @@ namespace EatonManagementBoard.Services
             }
             catch
             {
-                return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
             // Check epc is valid format
             string decodedEpc = GetHexToAscii(epcPostDto.Epc);
             bool isNewEpcStringFormat = decodedEpc.Contains(doubleHash) == false && decodedEpc.Contains(doubleAnd) == false ? true : false;
-            if (isNewEpcStringFormat == false)
+            try
             {
-                // Old epc string format
-                // Error string format
-                if (decodedEpc.Contains(doubleHash) == false ||
-                    decodedEpc.Split(doubleHash).Count() == 0 ||
-                    decodedEpc.Split(doubleHash)[1].Contains(doubleAnd) == false ||
-                    decodedEpc.Split(doubleHash)[1].Split(doubleAnd).Count() != 5)
+                if (isNewEpcStringFormat == false)
                 {
-                    return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
+                    // Old epc string format
+                    // Error string format
+                    if (decodedEpc.Split(doubleHash)[1].Split(doubleAnd).Count() != 5)
+                    {
+                        throw null;
+                    }
+                }
+                else
+                {
+                    // New epc string format
+                    // Error string format
+                    if (decodedEpc.Split(singleHash)[1].Split(singleAnd).Count() != 5)
+                    {
+                        throw null;
+                    }
                 }
             }
-            else
+            catch
             {
-                // New epc string format
-                // Error string format
-                if (decodedEpc.Contains(singleHash) == false ||
-                    decodedEpc.Split(singleHash).Count() == 0 ||
-                    decodedEpc.Split(singleHash)[1].Contains(singleAnd) == false ||
-                    decodedEpc.Split(singleHash)[1].Split(singleAnd).Count() != 5)
-                {
-                    return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
-                }
+                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
             }
 
-            // Check readerId is valid
-            if (epcPostDto.ReaderId != ReaderIdEnum.Handheld.ToString())
+            if (IsValidReaderId(epcPostDto.ReaderId) == false)
             {
-                return GetUploadResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidReaderId);
             }
 
-            EatonEpc insertEatonEpc = GetEatonEpc(epcPostDto.Epc, ReaderIdEnum.Handheld, DateTime.Parse(epcPostDto.TransTime));
+            // Check epc is effective data
+            var realTimeEpcContext = _localMemoryCache.ReadRealTimeEpcContext();
+            var sameRealTimeEpc = realTimeEpcContext.FirstOrDefault(epc => epc.Epc == epcPostDto.Epc && epc.ReaderId == epcPostDto.ReaderId);
+            if (sameRealTimeEpc != null)
+            {
+                return GetPostResultDto(ResultEnum.True, ErrorEnum.NoEffectiveData);
+            }
+
+            // Insert into database
+            if (epcPostDto.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
+            {
+                epcPostDto.TransTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+            }
+            EatonEpc insertEatonEpc = GetEatonEpc(epcPostDto.Epc, epcPostDto.ReaderId, DateTime.Parse(epcPostDto.TransTime));
             _dbContext.EatonEpcs.Add(insertEatonEpc);
             _dbContext.SaveChanges();
 
-            return GetUploadResultDto(ResultEnum.True, ErrorEnum.None); 
+            return GetPostResultDto(ResultEnum.True, ErrorEnum.None); 
         }
 
-        private ResultDto GetUploadResultDto(ResultEnum result, ErrorEnum error)
+        private ResultDto GetPostResultDto(ResultEnum result, ErrorEnum error)
         {
             return new ResultDto
             {
                 Result = result.ToBoolean(),
                 Error = error.ToDescription()
+            };
+        }
+
+        private bool IsValidReaderId(string readerId)
+        {
+            if (ReaderIdEnum.WareHouseA.ToString() == readerId ||
+                ReaderIdEnum.WareHouseB.ToString() == readerId ||
+                ReaderIdEnum.WareHouseC.ToString() == readerId ||
+                ReaderIdEnum.WareHouseD.ToString() == readerId ||
+                ReaderIdEnum.WareHouseE.ToString() == readerId ||
+                ReaderIdEnum.WareHouseF.ToString() == readerId ||
+                ReaderIdEnum.WareHouseG.ToString() == readerId ||
+                ReaderIdEnum.WareHouseH.ToString() == readerId ||
+                ReaderIdEnum.WareHouseI.ToString() == readerId ||
+                ReaderIdEnum.SecondFloorA.ToString() == readerId ||
+                ReaderIdEnum.ThirdFloorA.ToString() == readerId ||
+                ReaderIdEnum.ThirdFloorB.ToString() == readerId ||
+                ReaderIdEnum.Terminal.ToString() == readerId ||
+                ReaderIdEnum.ManualTerminal.ToString() == readerId ||
+                ReaderIdEnum.Handheld.ToString() == readerId)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private EatonEpc GetEatonEpc(string epc, string readerId, DateTime transTime)
+        {
+            return new EatonEpc
+            {
+                Epc = epc,
+                ReaderId = readerId,
+                TransTime = transTime,
             };
         }
 
@@ -569,6 +614,15 @@ namespace EatonManagementBoard.Services
             _dbContext.SaveChanges();
 
             return EpcResultDto(ResultEnum.True, ErrorEnum.None);
+        }
+
+        private ResultDto EpcResultDto(ResultEnum result, ErrorEnum error)
+        {
+            return new ResultDto
+            {
+                Result = result.ToBoolean(),
+                Error = error.ToDescription()
+            };
         }
 
         #endregion

@@ -33,7 +33,7 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
                     <td onClick={handleClick} width="40%">{epc.wo}</td>
                     <td onClick={handleClick} width="40%">{epc.pn}</td>
                     <td onClick={handleClick} width="5%">{epc.qty}</td>
-                    <td onClick={handleClick} width="10%">{epc.transTime} {epc.manual === true ? "m" : ""}</td>
+                    <td onClick={handleClick} width="10%">{epc.transTime} {epc.readerId === "ManualTerminal" ? "m" : ""}</td>
                 </tr>
             }
             else {
