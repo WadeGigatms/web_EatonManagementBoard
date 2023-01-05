@@ -30,9 +30,9 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
             if (epc.error === "") {
                 return <tr onClick={handleClick} data-toggle="modal" data-target={modalTarget} className={trClass(epc)} >
                     <td onClick={handleClick} width="5%">{epc.line}</td>
-                    <td onClick={handleClick} width="40%">{epc.wo}</td>
-                    <td onClick={handleClick} width="40%">{epc.pn}</td>
-                    <td onClick={handleClick} width="5%">{epc.qty}</td>
+                    <td onClick={handleClick} width="35%">{epc.wo}</td>
+                    <td onClick={handleClick} width="35%">{epc.pn}</td>
+                    <td onClick={handleClick} width="15%">{epc.qty}</td>
                     <td onClick={handleClick} width="10%">{epc.transTime} {epc.readerId === "ManualTerminal" ? "m" : ""}</td>
                 </tr>
             }

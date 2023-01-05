@@ -47,6 +47,14 @@ namespace EatonManagementBoard.Services
 
             // Check there were new data inserted in database
             var dataCount = _connection.QueryDataCount();
+
+            // Check database were throw timeout
+            if (dataCount == 0)
+            {
+                return GetEpcGetResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout, new DashboardDto());
+            }
+
+            // Determine to query data from database
             var cacheDataCount = _localMemoryCache.ReadDataCount();
             var cacheSearchState = _localMemoryCache.ReadSearchState();
            if (cacheDataCount == dataCount && cacheSearchState == isSearchState)
@@ -59,6 +67,12 @@ namespace EatonManagementBoard.Services
             // Connect to database
             List<EatonEpcContext> realTimeEpcContext = _connection.QueryRealTimeEpc();
             List<EatonEpcContext> traceEpcContext = _connection.QueryTraceEpc();
+
+            // Check database were throw timeout
+            if (realTimeEpcContext == null || traceEpcContext == null)
+            {
+                return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.MsSqlTimeout, new DashboardDto());
+            }
 
             // Get epc context in each location
             List<EatonEpcContext> warehouseAEpcContext = realTimeEpcContext
@@ -565,6 +579,7 @@ namespace EatonManagementBoard.Services
                 ReaderIdEnum.WareHouseG.ToString() == readerId ||
                 ReaderIdEnum.WareHouseH.ToString() == readerId ||
                 ReaderIdEnum.WareHouseI.ToString() == readerId ||
+                ReaderIdEnum.Elevator.ToString() == readerId ||
                 ReaderIdEnum.SecondFloorA.ToString() == readerId ||
                 ReaderIdEnum.ThirdFloorA.ToString() == readerId ||
                 ReaderIdEnum.ThirdFloorB.ToString() == readerId ||

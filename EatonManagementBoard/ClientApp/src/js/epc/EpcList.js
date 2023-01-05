@@ -27,9 +27,9 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
                 return <thead>
                     <tr>
                         <th width="5%">{TH_LINE}</th>
-                        <th width="40%">{TH_TASKNO}</th>
-                        <th width="40%">{TH_PN}</th>
-                        <th width="5%">{TH_QTY}</th>
+                        <th width="35%">{TH_TASKNO}</th>
+                        <th width="35%">{TH_PN}</th>
+                        <th width="15%">{TH_QTY}</th>
                         <th width="10%">{TH_TIME}</th>
                     </tr>
                 </thead>

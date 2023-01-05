@@ -22,7 +22,7 @@ namespace EatonManagementBoard.Controllers
         private readonly EpcService _service;
 
 
-        // GET api/<EpcController>?taskNo=..&pn=..&pallet=..
+        // GET api/<EpcController>?wo=..&pn=..&pallet=..
         [HttpGet]
         public IActionResult Get([FromQuery] string wo, string pn, string palletId)
         {
@@ -39,13 +39,14 @@ namespace EatonManagementBoard.Controllers
         }
 
         // POST api/<EpcController>
+        [HttpPost]
         public IActionResult Post([FromBody] dynamic value)
         {
             ResultDto epcResultDto = _service.Post(value);
             return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
         }
 
-        // DELETE api/<EpcController>
+        // DELETE api/<EpcController>?epc=..
         [HttpDelete]
         public IActionResult Delete([FromQuery] string epc)
         {

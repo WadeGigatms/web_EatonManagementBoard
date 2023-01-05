@@ -11,7 +11,8 @@ namespace EatonManagementBoard.Enums
         InvalidParameters,
         InvalidEpcFormat,
         InvalidReaderId,
-        NoEffectiveData
+        NoEffectiveData,
+        MsSqlTimeout,
     }
 
     public static class ErrorEnumExtensions
@@ -30,6 +31,8 @@ namespace EatonManagementBoard.Enums
                     return "InvalidReaderId";
                 case ErrorEnum.NoEffectiveData:
                     return "NoEffectiveData";
+                case ErrorEnum.MsSqlTimeout:
+                    return "MsSqlTimeout";
                 default:
                     return "Unknown";
             }

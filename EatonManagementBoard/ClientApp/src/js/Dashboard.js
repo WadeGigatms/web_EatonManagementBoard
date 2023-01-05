@@ -117,13 +117,13 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }, [_3B_capacity])
 
     useEffect(() => {
-        const url = getUrl()
+        const url = getApiUrl()
         fetchRequest(url)
 
         const interval = setInterval(() => {
             // if front-end goes to idle state or searching state, web stops requesting api
             if (searchStateRef.current === false && idleState === false) {
-                const url = getUrl()
+                const url = getApiUrl()
                 fetchRequest(url)
             }
         }, 5000)
@@ -136,31 +136,18 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             const { wo, pn, palletId } = searchParameter
             if (wo || pn || palletId) {
                 searchStateRef.current = true
-                const url = getSearchUrl(wo, pn, palletId)
+                const url = getApiUrl() + "?wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
                 fetchRequest(url)
             }
         }
     }, [searchParameter, searchStateRef, fetchRequest])
 
-    function getUrl() {
+    function getApiUrl() {
         const url = window.location.origin + URL_EPC
         return url
     }
 
-    function getDelUrl(epc) {
-        const url = window.location.origin + URL_EPC + "?epc=" + epc
-        return url
-    }
-
-    function getSearchUrl(wo, pn, palletId) {
-        const url = window.location.origin + URL_EPC + "?wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
-        return url
-    }
-
     function getJson(epc) {
-        console.log(epc.epc)
-        console.log(epc.readerId)
-        console.log(epc.transTime)
         return JSON.stringify({
             Epc: String(epc.epc),
             ReaderId: "ManualTerminal",
@@ -169,7 +156,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }
 
     function post() {
-        const url = getUrl()
+        const url = getApiUrl()
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -178,12 +165,12 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             },
             body: getJson(timelineEpc)
         }
-        console.log(getJson(timelineEpc))
         postRequest(url, requestOptions)
     }
 
     function del() {
-        const url = getDelUrl(timelineEpc.epc)
+        const url = getApiUrl() + "?epc=" + timelineEpc.epc
+        console.log(url)
         const requestOptions = {
             method: 'DELETE',
             headers: {
