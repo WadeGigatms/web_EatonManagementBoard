@@ -48,9 +48,9 @@ namespace EatonManagementBoard.Controllers
 
         // DELETE api/<EpcController>?epc=..
         [HttpDelete]
-        public IActionResult Delete([FromQuery] string epc)
+        public IActionResult Delete([FromQuery] string id)
         {
-            ResultDto epcResultDto = _service.Delete(epc);
+            ResultDto epcResultDto = _service.Delete(id);
             return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
         }
     }

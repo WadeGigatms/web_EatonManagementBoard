@@ -8,6 +8,7 @@ namespace EatonManagementBoard.Dtos
 {
     public class EpcDto
     {
+        public int Id { get; set; }
         public string Wo { get; set; }
         public string Qty { get; set; }
         public string Pn { get; set; }

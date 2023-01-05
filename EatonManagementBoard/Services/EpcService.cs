@@ -274,6 +274,7 @@ namespace EatonManagementBoard.Services
                     string transTime = GetDateTimeString(epc.TransTime.Value);
                     epcDtos.Add(new EpcDto
                     {
+                        Id = epc.Sid,
                         Epc = epc.Epc,
                         ReaderId = epc.ReaderId,
                         TransTime = transTime,
@@ -609,15 +610,20 @@ namespace EatonManagementBoard.Services
 
         #region Delete
 
-        public ResultDto Delete(string epc)
+        public ResultDto Delete(string id)
         {
-            if (string.IsNullOrEmpty(epc) == true)
+            if (string.IsNullOrEmpty(id) == true)
+            {
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            if (int.TryParse(id, out int Sid) == false)
             {
                 return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
             EatonEpc eatonEpc = _dbContext.EatonEpcs
-                .Where(eatonEpc => eatonEpc.Epc == epc && eatonEpc.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
+                .Where(eatonEpc => eatonEpc.Sid == Sid)
                 .FirstOrDefault();
 
             if (eatonEpc == null)

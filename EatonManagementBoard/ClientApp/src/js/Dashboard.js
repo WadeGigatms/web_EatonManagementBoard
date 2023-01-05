@@ -169,7 +169,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }
 
     function del() {
-        const url = getApiUrl() + "?epc=" + timelineEpc.epc
+        const url = getApiUrl() + "?id=" + timelineEpc.id
         console.log(url)
         const requestOptions = {
             method: 'DELETE',
