@@ -294,63 +294,72 @@ namespace EatonManagementBoard.Services
 
         private string GetEpcState(List<LocationTimeDto> locationTimeDtos)
         {
-            if (locationTimeDtos.Count == 0 ||
-                locationTimeDtos.FirstOrDefault() == null)
+            bool isArrivedProduction = false;
+            bool isArrivedElevator = false;
+            bool isArrivedWareHouse = false;
+            bool isArrivedTerminal = false;
+            EpcStateEnum state = EpcStateEnum.OK;
+            if (locationTimeDtos.Count() == 0) { return ""; }
+
+            for(var i = 0; i < locationTimeDtos.Count(); i++)
             {
-                return EpcStateEnum.NG.ToString();
-            }
-            else
-            {
-                bool gotFirstStep = false;
-                bool gotSecondStep = false;
-                bool gotThirdStep = false;
-                EpcStateEnum state = EpcStateEnum.OK;
-                foreach (var locationTimeDto in locationTimeDtos)
+                if (locationTimeDtos[i].Location == ReaderIdEnum.ThirdFloorA.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.ThirdFloorB.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.SecondFloorA.ToChineseString())
                 {
-                    if (locationTimeDto == locationTimeDtos.First())
+                    isArrivedProduction = true;
+
+                    // Arrived at production after arriving at elevator or warehouse or terminal
+                    if (i > 0 && (isArrivedElevator == true || isArrivedWareHouse == true || isArrivedTerminal == true)) 
                     {
-                        // First step is 3A/3B/2A or not
-                        // If not, NG
-                        if (locationTimeDto.Location == ReaderIdEnum.ThirdFloorA.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.SecondFloorA.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.ThirdFloorB.ToChineseString() ||
-                            locationTimeDto.Location == ReaderIdEnum.Handheld.ToChineseString())
-                        {
-                            gotFirstStep = true;
-                        }
-                        else
-                        {
-                            state = EpcStateEnum.NG;
-                        }
-                    }
-                    else
-                    {
-                        // Other steps
-                        if (locationTimeDto.Location == ReaderIdEnum.Elevator.ToChineseString() &&
-                            gotFirstStep == true &&
-                            gotThirdStep == false)
-                        {
-                            // Second step is elevator and has been arrived at first step
-                            gotSecondStep = true;
-                        }
-                        else if (locationTimeDto.Location.Contains("1F 成品區") == true &&
-                            gotFirstStep == true &&
-                            gotSecondStep == true)
-                        {
-                            // Third step is warehouse and has been arrived at first and second steps
-                            gotThirdStep = true;
-                        }
-                        else if (locationTimeDto.Location != ReaderIdEnum.Terminal.ToChineseString() &&
-                            locationTimeDto.Location.Contains("1F 成品區") == false &&
-                            gotThirdStep == true)
-                        {
-                            // This step is reproduct which means it had been arrived at warehouse but now it is at second or first step
-                            return EpcStateEnum.Return.ToString();
-                        }
+                        state = EpcStateEnum.Return;
                     }
                 }
-                return state.ToString();
+                else if (locationTimeDtos[i].Location == ReaderIdEnum.Elevator.ToChineseString())
+                {
+                    isArrivedElevator = true;
+
+                    // Arrived at elevator without arriving at production
+                    if (i == 0 && isArrivedProduction == false) 
+                    { 
+                        state = EpcStateEnum.NG;
+                    }
+                }
+                else if (locationTimeDtos[i].Location == ReaderIdEnum.WareHouseA.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.WareHouseB.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.WareHouseC.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.WareHouseD.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.WareHouseE.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.WareHouseF.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.WareHouseG.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.WareHouseH.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.WareHouseI.ToChineseString())
+                {
+                    isArrivedWareHouse = true;
+
+                    // Arrived at warehouse without arriving at production
+                    if (isArrivedProduction == false)
+                    {
+                        state = EpcStateEnum.NG;
+                    }
+
+                    // Arrived at warehouse after arriving at terminal
+                    if (isArrivedTerminal == true)
+                    {
+                        state = EpcStateEnum.Return;
+                    }
+                }
+                else if (locationTimeDtos[i].Location == ReaderIdEnum.Terminal.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.ManualTerminal.ToChineseString())
+                {
+                    isArrivedTerminal = true;
+                }
+                else if (locationTimeDtos[i].Location == ReaderIdEnum.Handheld.ToChineseString())
+                {
+                    return EpcStateEnum.OK.ToString();
+                }
             }
+            return state.ToString();
         }
 
         private List<LocationTimeDto> GetLocationTimeDtos(List<EatonEpcContext> epcContext)
