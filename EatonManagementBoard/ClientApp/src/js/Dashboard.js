@@ -276,7 +276,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                     <Block
                         height={"h-100"}
                         isLight={true}
-                        title={BLOCK_3F_A}
+                        title={BLOCK_3F_B}
                         modalId={_3A_modal_target}
                         capacity={_3A_capacity}
                         result={result}
@@ -300,7 +300,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                     <Block
                         height={"h-100 card-margin-top"}
                         isLight={true}
-                        title={BLOCK_3F_B}
+                        title={BLOCK_3F_A}
                         modalId={_3B_modal_target}
                         capacity={_3B_capacity}
                         result={result}
