@@ -27,37 +27,22 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
             }
         }
         if (showTransTime === true) {
-            if (epc.error === "") {
-                return <tr onClick={handleClick} data-toggle="modal" data-target={modalTarget} className={trClass(epc)} >
-                    <td onClick={handleClick} width="5%">{epc.line}</td>
-                    <td onClick={handleClick} width="35%">{epc.wo}</td>
-                    <td onClick={handleClick} width="35%">{epc.pn}</td>
-                    <td onClick={handleClick} width="15%">{epc.qty}</td>
-                    <td onClick={handleClick} width="10%">{epc.transTime} {epc.readerId === "ManualTerminal" ? "m" : ""}</td>
-                </tr>
-            }
-            else {
-                return <tr onClick={handleClick} data-toggle="modal" data-target={modalTarget} className={trClass(epc)}>
-                    <td onClick={handleClick} width="90%" colSpan="4">{epc.error}</td>
-                    <td onClick={handleClick} width="10%">{epc.transTime}</td>
-                </tr>
-            }
+            return <tr onClick={handleClick} data-toggle="modal" data-target={modalTarget} className={trClass(epc)} >
+                <td onClick={handleClick} className="th-width-5">{epc.epcDataDto.line}</td>
+                <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.wo}</td>
+                <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.pn}</td>
+                <td onClick={handleClick} className="th-width-15">{epc.epcDataDto.qty}</td>
+                <td onClick={handleClick} className="th-width-10">{epc.epcContext.transTime} {epc.epcContext.readerId === "ManualTerminal" ? "m" : ""}</td>
+            </tr>
         }
         else {
-            if (epc.error === "") {
-                return <tr onClick={handleClick} data-toggle="modal" data-target={modalTarget} className={trClass(epc)} >
-                    <td onClick={handleClick} width="5%">{epc.line}</td>
-                    <td onClick={handleClick} width="20%">{epc.wo}</td>
-                    <td onClick={handleClick} width="35%">{epc.pn}</td>
-                    <td onClick={handleClick} width="5%">{epc.qty}</td>
-                    <td onClick={handleClick} width="35%">{epc.barcode}</td>
-                </tr>
-            }
-            else {
-                return <tr onClick={handleClick} data-toggle="modal" data-target={modalTarget} className={trClass(epc)}>
-                    <td onClick={handleClick} width="100%" colSpan="4">{epc.error}</td>
-                </tr>
-            }
+            return <tr onClick={handleClick} data-toggle="modal" data-target={modalTarget} className={trClass(epc)} >
+                <td onClick={handleClick} className="th-width-5">{epc.epcDataDto.line}</td>
+                <td onClick={handleClick} className="th-width-20">{epc.epcDataDto.wo}</td>
+                <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.pn}</td>
+                <td onClick={handleClick} className="th-width-5">{epc.epcDataDto.qty}</td>
+                <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.palletId}</td>
+            </tr>
         }
     }
 

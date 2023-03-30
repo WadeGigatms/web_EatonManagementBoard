@@ -26,22 +26,22 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
             if (showTransTime === true) {
                 return <thead>
                     <tr>
-                        <th width="5%">{TH_LINE}</th>
-                        <th width="35%">{TH_TASKNO}</th>
-                        <th width="35%">{TH_PN}</th>
-                        <th width="15%">{TH_QTY}</th>
-                        <th width="10%">{TH_TIME}</th>
+                        <th className="th-width-5">{TH_LINE}</th>
+                        <th className="th-width-35">{TH_TASKNO}</th>
+                        <th className="th-width-35">{TH_PN}</th>
+                        <th className="th-width-15">{TH_QTY}</th>
+                        <th className="th-width-10">{TH_TIME}</th>
                     </tr>
                 </thead>
             }
             else {
                 return <thead>
                     <tr>
-                        <th width="5%">{TH_LINE}</th>
-                        <th width="20%">{TH_TASKNO}</th>
-                        <th width="35%">{TH_PN}</th>
-                        <th width="5%">{TH_QTY}</th>
-                        <th width="35%">{TH_PALLET}</th>
+                        <th className="th-width-5">{TH_LINE}</th>
+                        <th className="th-width-20">{TH_TASKNO}</th>
+                        <th className="th-width-35">{TH_PN}</th>
+                        <th className="th-width-5">{TH_QTY}</th>
+                        <th className="th-width-35">{TH_PALLET}</th>
                     </tr>
                 </thead>
             }

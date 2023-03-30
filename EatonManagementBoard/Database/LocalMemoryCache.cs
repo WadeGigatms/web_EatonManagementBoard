@@ -27,27 +27,27 @@ namespace EatonManagementBoard.Database
             return cacheEntry;
         }
 
-        public int ReadDataCount()
+        public int ReadEpcCount()
         {
-            if (!_cache.TryGetValue(LocalMemoryCacheKey.DataCount, out int cacheEntry))
+            if (!_cache.TryGetValue(LocalMemoryCacheKey.EpcCount, out int cacheEntry))
             {
                 cacheEntry = -1;
             }
             return cacheEntry;
         }
 
-        public List<EatonEpcContext> ReadRealTimeEpcContext()
+        public List<EpcContext> ReadRealTimeEpcContext()
         {
-            if (!_cache.TryGetValue(LocalMemoryCacheKey.RealTimeEpcContext, out List<EatonEpcContext> cacheEntry)) 
+            if (!_cache.TryGetValue(LocalMemoryCacheKey.RealTimeEpcContext, out List<EpcContext> cacheEntry)) 
             {
                 cacheEntry = null;
             }
             return cacheEntry;
         }
 
-        public List<EatonEpcContext> ReadTraceEpcContext()
+        public List<EpcContext> ReadHistoryEpcContext()
         {
-            if (!_cache.TryGetValue(LocalMemoryCacheKey.TraceEpcContext, out List<EatonEpcContext> cacheEntry))
+            if (!_cache.TryGetValue(LocalMemoryCacheKey.HistoryEpcContext, out List<EpcContext> cacheEntry))
             {
                 cacheEntry = null;
             }
@@ -68,19 +68,19 @@ namespace EatonManagementBoard.Database
             _cache.Set(LocalMemoryCacheKey.SearchState, state, TimeSpan.FromHours(1));
         }
 
-        public void SaveDataCount(int dataCount)
+        public void SaveEpcCount(int dataCount)
         {
-            _cache.Set(LocalMemoryCacheKey.DataCount, dataCount, TimeSpan.FromHours(1));
+            _cache.Set(LocalMemoryCacheKey.EpcCount, dataCount, TimeSpan.FromHours(1));
         }
 
-        public void SaveRealTimeEpcContext(List<EatonEpcContext> context)
+        public void SaveRealTimeEpcContext(List<EpcContext> context)
         {
             _cache.Set(LocalMemoryCacheKey.RealTimeEpcContext, context, TimeSpan.FromHours(1));
         }
 
-        public void SaveTraceEpcContext(List<EatonEpcContext> context)
+        public void SaveHistoryEpcContext(List<EpcContext> context)
         {
-            _cache.Set(LocalMemoryCacheKey.TraceEpcContext, context, TimeSpan.FromHours(1));
+            _cache.Set(LocalMemoryCacheKey.HistoryEpcContext, context, TimeSpan.FromHours(1));
         }
 
         public void SaveDashboardDto(DashboardDto dashboardDto)
@@ -92,9 +92,9 @@ namespace EatonManagementBoard.Database
     public static class LocalMemoryCacheKey
     {
         public static readonly string SearchState = "SearchState";
-        public static readonly string DataCount = "DataCount";
+        public static readonly string EpcCount = "EpcCount";
         public static readonly string RealTimeEpcContext = "RealTimeEpcContext";
-        public static readonly string TraceEpcContext = "TraceEpcContext";
+        public static readonly string HistoryEpcContext = "HistoryEpcContext";
         public static readonly string DashboardDto = "DashboardDto";
     }
 }

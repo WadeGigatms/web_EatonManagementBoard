@@ -1,4 +1,5 @@
-﻿using EatonManagementBoard.Models;
+﻿using EatonManagementBoard.Dtos;
+using EatonManagementBoard.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,23 @@ namespace EatonManagementBoard.Database
 
         #region MSSql Connection
 
-        public List<EatonEpcContext> QueryRealTimeEpc()
-            => MsSqlConnectionRepository.QueryRealTimeEpc();
+        public List<EpcContext> QueryRealTimeEpcContext()
+            => MsSqlConnectionRepository.QueryRealTimeEpcContext();
 
-        public List<EatonEpcContext> QueryTraceEpc()
-            => MsSqlConnectionRepository.QueryTraceEpc();
+        public List<EpcContext> QueryHistoryEpcContext()
+            => MsSqlConnectionRepository.QueryHistoryEpcContext();
 
-        public int QueryDataCount() 
-            => MsSqlConnectionRepository.QueryDataCount();
+        public List<EpcContext> QueryEpcContext(string epc, string readerId)
+            => MsSqlConnectionRepository.QueryEpcContext(epc, readerId);
+
+        public int QueryEpcCount()
+            => MsSqlConnectionRepository.QueryEpcCount();
+
+        public bool InsertEpc(string epc, string readerId, string transTime)
+            => MsSqlConnectionRepository.InsertEpc(epc, readerId, transTime);
+
+        public bool DeleteEpc(int Sid)
+            => MsSqlConnectionRepository.DeleteEpc(Sid);
 
         #endregion
     }

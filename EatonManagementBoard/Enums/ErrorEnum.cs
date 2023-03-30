@@ -10,9 +10,11 @@ namespace EatonManagementBoard.Enums
         None,
         InvalidParameters,
         InvalidEpcFormat,
+        InvalidEpcContextFormat,
         InvalidReaderId,
         NoEffectiveData,
         MsSqlTimeout,
+        DidMoveToTerminal,
     }
 
     public static class ErrorEnumExtensions
@@ -27,12 +29,16 @@ namespace EatonManagementBoard.Enums
                     return "InvalidParameters";
                 case ErrorEnum.InvalidEpcFormat:
                     return "InvalidEpcFormat";
+                case ErrorEnum.InvalidEpcContextFormat:
+                    return "InvalidEpcContextFormat";
                 case ErrorEnum.InvalidReaderId:
                     return "InvalidReaderId";
                 case ErrorEnum.NoEffectiveData:
                     return "NoEffectiveData";
                 case ErrorEnum.MsSqlTimeout:
                     return "MsSqlTimeout";
+                case ErrorEnum.DidMoveToTerminal:
+                    return "DidMoveToTerminal";
                 default:
                     return "Unknown";
             }

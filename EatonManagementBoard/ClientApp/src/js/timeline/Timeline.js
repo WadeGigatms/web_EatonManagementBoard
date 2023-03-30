@@ -6,9 +6,8 @@ const Timeline = ({ epc }) => {
     function render(epc) {
         if (epc) {
             var timelines = []
-            const { barcode, locationTimeDtos } = epc
-            for (var i = 0; i < locationTimeDtos.length; i++) {
-                timelines.push(<TimelineBlock key={i} palletId={barcode} locationTimeDto={locationTimeDtos[i]} />)
+            for (var i = 0; i < epc.locationTimeDtos.length; i++) {
+                timelines.push(<TimelineBlock key={i} palletId={epc.epcDataDto.palletId} locationTimeDto={epc.locationTimeDtos[i]} />)
             }
             return <>
                 {timelines}
