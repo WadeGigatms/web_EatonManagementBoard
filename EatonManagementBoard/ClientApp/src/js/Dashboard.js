@@ -148,10 +148,11 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }
 
     function getJson(epc) {
+        console.log(epc)
         return JSON.stringify({
-            Epc: String(epc.epc),
+            Epc: String(epc.epcContext.epc),
             ReaderId: "ManualTerminal",
-            TransTime: epc.transTime
+            TransTime: epc.epcContext.transTime
         })
     }
 
@@ -169,8 +170,8 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }
 
     function del() {
-        const url = getApiUrl() + "?id=" + timelineEpc.id
-        console.log(url)
+        console.log(timelineEpc)
+        const url = getApiUrl() + "?id=" + timelineEpc.epcContext.sid
         const requestOptions = {
             method: 'DELETE',
             headers: {
@@ -344,7 +345,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             {showDashboard === true ? <>{renderDashboard()}</> : <>{renderTerminal()}</>}
         </div>
     }
-
+     
     return <>{render()}</>
 }
 

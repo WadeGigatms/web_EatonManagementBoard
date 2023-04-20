@@ -12,7 +12,7 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
     function render() {
         const modalTarget = "#" + _timeline_modal_target
         const trClass = () => {
-            if (epc.readerId === "Handheld") {
+            if (epc.epcContext.readerId === "Handheld") {
                 return "";
             }
             switch (epc.epcState) {
