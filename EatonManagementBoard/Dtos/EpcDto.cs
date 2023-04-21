@@ -1,5 +1,5 @@
-﻿using EatonManagementBoard.Enums;
-using EatonManagementBoard.Models;
+﻿using EatonManagementBoard.Database;
+using EatonManagementBoard.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

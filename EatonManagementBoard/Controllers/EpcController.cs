@@ -1,5 +1,4 @@
 ﻿using EatonManagementBoard.Dtos;
-using EatonManagementBoard.Models;
 using EatonManagementBoard.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;

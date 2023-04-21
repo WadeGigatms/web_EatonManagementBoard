@@ -1,5 +1,4 @@
 using EatonManagementBoard.Database;
-using EatonManagementBoard.Models;
 using EatonManagementBoard.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,12 +34,6 @@ namespace EatonManagementBoard
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/build";
-            });
-
-            // Database: for EFCore
-            services.AddDbContext<EatonManagementBoardDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
             // Database: for Dapper

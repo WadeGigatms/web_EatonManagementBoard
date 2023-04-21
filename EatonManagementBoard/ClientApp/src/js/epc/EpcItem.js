@@ -12,7 +12,7 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
     function render() {
         const modalTarget = "#" + _timeline_modal_target
         const trClass = () => {
-            if (epc.epcContext.readerId === "Handheld") {
+            if (epc.epcContext.reader_id === "Handheld") {
                 return "";
             }
             switch (epc.epcState) {
@@ -32,7 +32,7 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
                 <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.wo}</td>
                 <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.pn}</td>
                 <td onClick={handleClick} className="th-width-15">{epc.epcDataDto.qty}</td>
-                <td onClick={handleClick} className="th-width-10">{epc.epcContext.transTime} {epc.epcContext.readerId === "ManualTerminal" ? "m" : ""}</td>
+                <td onClick={handleClick} className="th-width-10">{epc.epcContext.timestamp} {epc.epcContext.reader_id === "ManualTerminal" ? "m" : ""}</td>
             </tr>
         }
         else {
@@ -41,7 +41,7 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
                 <td onClick={handleClick} className="th-width-20">{epc.epcDataDto.wo}</td>
                 <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.pn}</td>
                 <td onClick={handleClick} className="th-width-5">{epc.epcDataDto.qty}</td>
-                <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.palletId}</td>
+                <td onClick={handleClick} className="th-width-35">{epc.epcDataDto.pallet_id}</td>
             </tr>
         }
     }

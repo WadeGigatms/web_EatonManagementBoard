@@ -1,7 +1,6 @@
 ﻿using EatonManagementBoard.Database;
 using EatonManagementBoard.Dtos;
 using EatonManagementBoard.Enums;
-using EatonManagementBoard.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
@@ -14,16 +13,14 @@ namespace EatonManagementBoard.Services
 {
     public class EpcService
     {
-        public EpcService(EatonManagementBoardDbContext dbContext, ConnectionRepositoryManager connection, IMemoryCache memoryCache)
+        public EpcService(ConnectionRepositoryManager connection, IMemoryCache memoryCache)
         {
-            _dbContext = dbContext;
             _connection = connection;
             _localMemoryCache = new LocalMemoryCache(memoryCache);
         }
 
         private readonly LocalMemoryCache _localMemoryCache;
         private readonly ConnectionRepositoryManager _connection;
-        private readonly EatonManagementBoardDbContext _dbContext;
         private readonly string doubleHash = "##";
         private readonly string doubleAnd = "&&";
         private readonly string singleHash = "#";
@@ -49,7 +46,7 @@ namespace EatonManagementBoard.Services
             var epcCount = _connection.QueryEpcCount();
             if (epcCount == 0)
             {
-                return GetEpcGetResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout, null);
+                return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None, new DashboardDto());
             }
 
             // Determine to query data from database
@@ -74,49 +71,49 @@ namespace EatonManagementBoard.Services
 
             // Get epc context in each location
             List<EpcContext> warehouseAEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseA.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseA.ToString())
                 .ToList();
             List<EpcContext> warehouseBEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseB.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseB.ToString())
                 .ToList();
             List<EpcContext> warehouseCEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseC.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseC.ToString())
                 .ToList();
             List<EpcContext> warehouseDEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseD.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseD.ToString())
                 .ToList();
             List<EpcContext> warehouseEEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseE.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseE.ToString())
                 .ToList();
             List<EpcContext> warehouseFEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseF.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseF.ToString())
                 .ToList();
             List<EpcContext> warehouseGEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseG.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseG.ToString())
                 .ToList();
             List<EpcContext> warehouseHEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseH.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseH.ToString())
                 .ToList();
             List<EpcContext> warehouseIEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.WareHouseI.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.WareHouseI.ToString())
                 .ToList();
             List<EpcContext> elevatorEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.Elevator.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.Elevator.ToString())
                 .ToList();
             List<EpcContext> secondFloorEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.SecondFloorA.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.SecondFloorA.ToString())
                 .ToList();
             List<EpcContext> thirdFloorAEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.ThirdFloorA.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.ThirdFloorA.ToString())
                 .ToList();
             List<EpcContext> thirdFloorBEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.ThirdFloorB.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.ThirdFloorB.ToString())
                 .ToList();
             List<EpcContext> terminalEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.Terminal.ToString() || epc.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.Terminal.ToString() || epc.reader_id == ReaderIdEnum.ManualTerminal.ToString())
                 .ToList();
             List<EpcContext> handheldEpcContext = realTimeEpcContext
-                .Where(epc => epc.ReaderId == ReaderIdEnum.Handheld.ToString())
+                .Where(epc => epc.reader_id == ReaderIdEnum.Handheld.ToString())
                 .ToList();
 
             List<EpcDto> warehouseAEpcDtos = GetEpcDtos(ref historyEpcContext, ref warehouseAEpcContext, wo, pn, palletId);
@@ -228,11 +225,11 @@ namespace EatonManagementBoard.Services
 
                     return new EpcDataDto
                     {
-                        Wo = properties[0],
-                        Qty = properties[1],
-                        Pn = properties[2],
-                        Line = properties[3],
-                        PalletId = properties[4],
+                        wo = properties[0],
+                        qty = properties[1],
+                        pn = properties[2],
+                        line = properties[3],
+                        pallet_id = properties[4],
                     };
                 }
                 else if (isNewEpcFormat == false && isOldEpcFormat == true)
@@ -259,11 +256,11 @@ namespace EatonManagementBoard.Services
 
                     return new EpcDataDto
                     {
-                        Wo = properties[0],
-                        Qty = properties[1],
-                        Pn = properties[2],
-                        Line = properties[3],
-                        PalletId = properties[4],
+                        wo = properties[0],
+                        qty = properties[1],
+                        pn = properties[2],
+                        line = properties[3],
+                        pallet_id = properties[4],
                     };
                 }
                 else
@@ -283,30 +280,35 @@ namespace EatonManagementBoard.Services
             List<EpcDto> epcDtos = new List<EpcDto>();
             foreach (var realTimeEpc in realTimeEpcContext)
             {
-                string asciiEpcString = GetHexToAscii(realTimeEpc.Epc);
+                string asciiEpcString = GetHexToAscii(realTimeEpc.epc);
                 if (string.IsNullOrEmpty(asciiEpcString) == true)
                 {
                     continue;
                 }
+
                 EpcDataDto epcDataDto = GetEpcDataDto(asciiEpcString);
                 if (epcDataDto == null)
                 {
                     continue;
                 }
 
+                EpcContext epcContext = GetEpcContext(realTimeEpc);
+
                 List<EpcContext> tracedEpcContext = historyEpcContext
-                    .Where(tracedEpc => tracedEpc.Epc == realTimeEpc.Epc)
+                    .Where(tracedEpc => tracedEpc.epc == realTimeEpc.epc)
                     .ToList();
                 List<LocationTimeDto> locationTimeDtos = GetLocationTimeDtos(tracedEpcContext);
+
                 string epcState = GetEpcState(Enumerable.Reverse(locationTimeDtos).ToList());
+
                 if ((string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString)) ||
-                    (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && epcDataDto.Wo.Contains(woString)) ||
-                    (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && epcDataDto.Pn.Contains(pnString)) ||
-                    (string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && epcDataDto.PalletId.Contains(palletIdString)) ||
-                    (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && epcDataDto.Wo.Contains(woString) && epcDataDto.PalletId.Contains(palletIdString)) ||
-                    (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && epcDataDto.Wo.Contains(woString) && epcDataDto.Pn.Contains(pnString)) ||
-                    (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && epcDataDto.Pn.Contains(pnString) && epcDataDto.PalletId.Contains(palletIdString)) ||
-                    (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && epcDataDto.Wo.Contains(woString) && epcDataDto.Pn.Contains(pnString) && epcDataDto.PalletId.Contains(palletIdString)))
+                    (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && epcDataDto.wo.Contains(woString)) ||
+                    (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && epcDataDto.pn.Contains(pnString)) ||
+                    (string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && epcDataDto.pallet_id.Contains(palletIdString)) ||
+                    (!string.IsNullOrEmpty(woString) && string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && epcDataDto.wo.Contains(woString) && epcDataDto.pallet_id.Contains(palletIdString)) ||
+                    (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && string.IsNullOrEmpty(palletIdString) && epcDataDto.wo.Contains(woString) && epcDataDto.pn.Contains(pnString)) ||
+                    (string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && epcDataDto.pn.Contains(pnString) && epcDataDto.pallet_id.Contains(palletIdString)) ||
+                    (!string.IsNullOrEmpty(woString) && !string.IsNullOrEmpty(pnString) && !string.IsNullOrEmpty(palletIdString) && epcDataDto.wo.Contains(woString) && epcDataDto.pn.Contains(pnString) && epcDataDto.pallet_id.Contains(palletIdString)))
                 {
                     // Without parameters
                     // With wo
@@ -316,10 +318,9 @@ namespace EatonManagementBoard.Services
                     // With wo, pn
                     // With pn, barcode
                     // With wo, pn, barcode
-                    //string transTime = GetDateTimeString(realTimeEpc.TransTime.Value);
                     epcDtos.Add(new EpcDto
                     {
-                        EpcContext = realTimeEpc,
+                        EpcContext = epcContext,
                         EpcDataDto = epcDataDto,
                         LocationTimeDtos = locationTimeDtos,
                         EpcState = epcState,
@@ -327,6 +328,12 @@ namespace EatonManagementBoard.Services
                 }
             }
             return epcDtos;
+        }
+
+        private EpcContext GetEpcContext(EpcContext context)
+        {
+            context.timestamp = GetDateTimeString(context.timestamp);
+            return context;
         }
 
         private string GetEpcState(List<LocationTimeDto> locationTimeDtos)
@@ -408,26 +415,26 @@ namespace EatonManagementBoard.Services
                 {
                     locationTimeDtos.Insert(0, new LocationTimeDto()
                     {
-                        Location = GetLocationString(epc.ReaderId),
-                        TransTime = GetDateTimeString(epc.TransTime),
+                        Location = GetLocationString(epc.reader_id),
+                        TransTime = GetDateTimeString(epc.timestamp),
                         DurationTime = "",
                     });
                 }
                 else
                 {
                     LocationTimeDto lastLocationTimeDto = locationTimeDtos.First();
-                    if (epc.TransTime == DateTime.Parse(lastLocationTimeDto.TransTime))
+                    if (DateTime.Parse(epc.timestamp) == DateTime.Parse(lastLocationTimeDto.TransTime))
                     {
                         continue;
                     }
-                    if (GetLocationString(epc.ReaderId) != lastLocationTimeDto.Location)
+                    if (GetLocationString(epc.reader_id) != lastLocationTimeDto.Location)
                     {
                         DateTime lastTransTime = DateTime.Parse(lastLocationTimeDto.TransTime);
-                        lastLocationTimeDto.DurationTime = GetTimeSpanString(epc.TransTime.Subtract(lastTransTime));
+                        lastLocationTimeDto.DurationTime = GetTimeSpanString(DateTime.Parse(epc.timestamp).Subtract(lastTransTime));
                         locationTimeDtos.Insert(0, new LocationTimeDto
                         {
-                            Location = GetLocationString(epc.ReaderId),
-                            TransTime = GetDateTimeString(epc.TransTime),
+                            Location = GetLocationString(epc.reader_id),
+                            TransTime = GetDateTimeString(epc.timestamp),
                             DurationTime = "",
                         });
                     }
@@ -446,9 +453,9 @@ namespace EatonManagementBoard.Services
             };
         }
 
-        private string GetDateTimeString(DateTime dateTime)
+        private string GetDateTimeString(string dateTime)
         {
-            return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
+            return DateTime.Parse(dateTime).ToString("yyyy/MM/dd HH:mm:ss");
         }
 
         private string GetTimeSpanString(TimeSpan time)
@@ -558,6 +565,8 @@ namespace EatonManagementBoard.Services
                 return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidReaderId);
             }
 
+
+            EpcDataDto epcDataDto;
             // Check epc format is valid
             try
             {
@@ -567,7 +576,7 @@ namespace EatonManagementBoard.Services
                     return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
                 }
 
-                EpcDataDto epcDataDto = GetEpcDataDto(asciiEpcString);
+                epcDataDto = GetEpcDataDto(asciiEpcString);
                 if (epcDataDto == null)
                 {
                     return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcContextFormat);
@@ -582,7 +591,7 @@ namespace EatonManagementBoard.Services
             var realTimeEpcContext = _localMemoryCache.ReadRealTimeEpcContext();
             if (realTimeEpcContext != null)
             {
-                var sameRealTimeEpc = realTimeEpcContext.FirstOrDefault(epc => epc.Epc == epcPostDto.Epc && epc.ReaderId == epcPostDto.ReaderId);
+                var sameRealTimeEpc = realTimeEpcContext.FirstOrDefault(epc => epc.epc == epcPostDto.Epc && epc.reader_id == epcPostDto.ReaderId);
                 if (sameRealTimeEpc != null)
                 {
                     return GetPostResultDto(ResultEnum.False, ErrorEnum.NoEffectiveData);
@@ -590,21 +599,29 @@ namespace EatonManagementBoard.Services
             }
 
             // Check epc hasnt manually moved to terminal
-            bool hasMovedToTerminal = _connection.QueryEpcContext(epcPostDto.Epc, ReaderIdEnum.ManualTerminal.ToString()).Count() > 0;
+            bool hasMovedToTerminal = _connection.QueryEpcContexts(epcPostDto.Epc, ReaderIdEnum.ManualTerminal.ToString()).Count() > 0;
             if (hasMovedToTerminal == true)
             {
                 return GetPostResultDto(ResultEnum.False, ErrorEnum.DidMoveToTerminal);
             }
 
-            // Insert into database
+            // Insert into database in eaton_epc
             if (epcPostDto.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
             {
                 epcPostDto.TransTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             }
-            bool result = _connection.InsertEpc(epcPostDto.Epc, epcPostDto.ReaderId, epcPostDto.TransTime);
+            bool result = _connection.InsertEpcContext(epcPostDto.Epc, epcPostDto.ReaderId, epcPostDto.TransTime);
             if (result == false)
             {
                 return GetPostResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout);
+            }
+
+            // Insert into database in eaton_epc_data 
+            EpcContext epcContext = _connection.QueryEpcContext(epcPostDto.Epc, epcPostDto.ReaderId, epcPostDto.TransTime);
+            EpcDataContext epcDataContext = _connection.QueryEpcDataContext(epcDataDto.pallet_id);
+            if (epcDataContext == null)
+            {
+                result = _connection.InsertEpcDataContext(epcContext.id, epcDataDto);
             }
 
             return GetPostResultDto(ResultEnum.True, ErrorEnum.None);
@@ -657,12 +674,12 @@ namespace EatonManagementBoard.Services
                 return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
-            if (int.TryParse(id, out int Sid) == false)
+            if (int.TryParse(id, out int sid) == false)
             {
                 return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
             }
 
-            var result = _connection.DeleteEpc(Sid);
+            var result = _connection.DeleteEpcContext(sid);
             if (result == false)
             {
                 return EpcResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout);

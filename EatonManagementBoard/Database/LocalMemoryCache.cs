@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
-using EatonManagementBoard.Models;
 using EatonManagementBoard.Dtos;
 
 namespace EatonManagementBoard.Database

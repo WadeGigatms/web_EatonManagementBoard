@@ -7,7 +7,7 @@ const Timeline = ({ epc }) => {
         if (epc) {
             var timelines = []
             for (var i = 0; i < epc.locationTimeDtos.length; i++) {
-                timelines.push(<TimelineBlock key={i} palletId={epc.epcDataDto.palletId} locationTimeDto={epc.locationTimeDtos[i]} />)
+                timelines.push(<TimelineBlock key={i} palletId={epc.epcDataDto.pallet_id} locationTimeDto={epc.locationTimeDtos[i]} />)
             }
             return <>
                 {timelines}
