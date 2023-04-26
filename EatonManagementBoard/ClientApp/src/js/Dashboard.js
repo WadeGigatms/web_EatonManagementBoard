@@ -56,8 +56,8 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     const [_3B_capacity, set3BCapacity] = useState(6)
     const [timelineEpc, setTimelineEpc] = useState()
     
-    const fetchRequest = useCallback((url) => {
-        const fetchData = async () => {
+    const getRequest = useCallback((url) => {
+        const getData = async () => {
             try {
                 const response = await fetch(url)
                 const { result, dashboardDto } = await response.json()
@@ -76,33 +76,29 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             } catch (error) {
             }
         }
-        fetchData()
+        getData()
     }, [searchStateRef])
 
-    const postRequest = useCallback((url, requestOptions) => {
+    const postRequest = useCallback((url, requestOptions, getRequest) => {
         const postData = async () => {
             try {
                 const response = await fetch(url, requestOptions)
                 await response.json()
+                getRequest(getApiUrl())
             } catch (error) {
             }
-
-            const getUrl = getApiUrl()
-            fetchRequest(getUrl)
         }
         postData()
     }, [])
 
-    const delRequest = useCallback((url, requestOptions) => {
+    const delRequest = useCallback((url, requestOptions, getRequest) => {
         const delData = async () => {
             try {
                 const response = await fetch(url, requestOptions)
                 await response.json()
+                getRequest(getApiUrl())
             } catch (error) {
             }
-
-            const getUrl = getApiUrl()
-            fetchRequest(getUrl)
         }
         delData()
     }, [])
@@ -124,18 +120,18 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
 
     useEffect(() => {
         const url = getApiUrl()
-        fetchRequest(url)
+        getRequest(url)
 
         const interval = setInterval(() => {
             // if front-end goes to idle state or searching state, web stops requesting api
             if (searchStateRef.current === false && idleState === false) {
                 const url = getApiUrl()
-                fetchRequest(url)
+                getRequest(url)
             }
         }, 5000)
 
         return () => clearInterval(interval)
-    }, [searchStateRef, fetchRequest, idleState])
+    }, [searchStateRef, getRequest, idleState])
 
     useEffect(() => {
         if (searchParameter) {
@@ -143,10 +139,10 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             if (wo || pn || palletId) {
                 searchStateRef.current = true
                 const url = getApiUrl() + "?wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
-                fetchRequest(url)
+                getRequest(url)
             }
         }
-    }, [searchParameter, searchStateRef, fetchRequest])
+    }, [searchParameter, searchStateRef, getRequest])
 
     function getApiUrl() {
         const url = window.location.origin + URL_EPC
@@ -171,8 +167,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             },
             body: getJson(timelineEpc)
         }
-        postRequest(url, requestOptions)
-        fetchRequest()
+        postRequest(url, requestOptions, getRequest)
     }
 
     function del() {
@@ -185,7 +180,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 'Content-Type': 'application/json'
             },
         }
-        delRequest(url, requestOptions)
+        delRequest(url, requestOptions, getRequest)
     }
 
     function renderDashboard() {
