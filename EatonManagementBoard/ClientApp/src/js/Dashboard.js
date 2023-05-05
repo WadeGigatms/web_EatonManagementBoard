@@ -142,7 +142,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 getRequest(url)
             }
         }
-    }, [searchParameter, searchStateRef, getRequest])
+    }, [searchParameter, searchStateRef, getRequest, searchState])
 
     function getApiUrl() {
         const url = window.location.origin + URL_EPC
