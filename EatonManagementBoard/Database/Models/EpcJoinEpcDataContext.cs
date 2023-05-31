@@ -5,14 +5,19 @@ using System.Threading.Tasks;
 
 namespace EatonManagementBoard.Database
 {
-    public class EpcDataContext
+    public class EpcJoinEpcDataContext
     {
-        public int id { get; set; } 
-        public string f_eaton_epc_ids { get; set; }
+        // eaton_epc_data
+        public int epc_data_id { get; set; }
         public string wo { get; set; }
         public string pn { get; set; }
         public string line { get; set; }
         public int qty { get; set; }
         public string pallet_id { get; set; }
+
+        // eaton_epc
+        public int epc_id { get; set; }
+        public string reader_id { get; set; }
+        public DateTime timestamp { get; set; }
     }
 }

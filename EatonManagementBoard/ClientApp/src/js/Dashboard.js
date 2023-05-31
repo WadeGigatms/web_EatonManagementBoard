@@ -1,14 +1,14 @@
 ﻿import React, { useEffect, useState, useCallback } from 'react'
-import Block from './block/Block'
+import SmallBlock from './block/SmallBlock'
 import LeftBlock from './block/LeftBlock'
 import RightBlock from './block/RightBlock'
-import TerminalBlock from './block/TerminalBlock'
-import PopUpCapacity from './popup/PopUpCapacity'
-import PopUpSearchForm from './popup/PopUpSearchForm'
-import PopUpTimeline from './popup/PopUpTimeline'
-import PopUpMoveConfirm from './popup/PopUpMoveConfirm'
-import PopUpRecoverConfirm from './popup/PopUpRecoverConfirm'
-import PopUpSetting from './popup/PopUpSetting'
+import BigBlock from './block/BigBlock'
+import PopupCapacity from './popup/PopupCapacity'
+import PopupSearchForm from './popup/PopupSearchForm'
+import PopupTimeline from './popup/PopupTimeline'
+import PopupMoveConfirm from './popup/PopupMoveConfirm'
+import PopupRecoverConfirm from './popup/PopupRecoverConfirm'
+import PopupSetting from './popup/PopupSetting'
 import {
     BLOCK_3F_A,
     BLOCK_3F_B,
@@ -31,9 +31,20 @@ import {
     _3B_modal_target,
     _search_form_modal_target,
 } from './constants'
-import { LoadLocationCapacity } from './others/Cookie'
+import { LoadLocationCapacity } from './Cookie'
 
-const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchState, searchStateRef, idleState, idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
+const Dashboard = ({
+    dashboardState,
+    searchParameter,
+    setSearchParameter,
+    searchState,
+    searchStateRef,
+    idleState,
+    idleSeconds,
+    setIdleSeconds,
+    carouselMiniSeconds,
+    setCarouselMiniSeconds
+}) => {
     const [result, setResult] = useState()
     const [onDashboard, setOnDashboard] = useState({
         warehouseAEpcDtos: null,
@@ -55,7 +66,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     const [_2A_capacity, set2ACapacity] = useState(6)
     const [_3B_capacity, set3BCapacity] = useState(6)
     const [timelineEpc, setTimelineEpc] = useState()
-    
+
     const getRequest = useCallback((url) => {
         const getData = async () => {
             try {
@@ -171,7 +182,6 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
     }
 
     function del() {
-        console.log(timelineEpc)
         const url = getApiUrl() + "?id=" + timelineEpc.epcContext.id
         const requestOptions = {
             method: 'DELETE',
@@ -248,7 +258,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                                 result={result}
                                 epcs={onDashboard.warehouseFEpcDtos}
                                 setTimelineEpc={setTimelineEpc} />
-                            <Block
+                            <SmallBlock
                                 height={"h-5 card-margin-top"}
                                 isLight={false}
                                 title={BLOCK_1F}
@@ -260,7 +270,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                         </div>
                     </div>
                     <div className="col-sm-4 h-100 p-025">
-                        <Block
+                        <SmallBlock
                             height={"h-100"}
                             isLight={false}
                             title={BLOCK_1F_TEMP}
@@ -275,7 +285,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
             <div className="col-sm-3 h-100 p-025">
                 <div className="h-3">
                     <div className="h-3 bg-a-3f"></div>
-                    <Block
+                    <SmallBlock
                         height={"h-100"}
                         isLight={true}
                         title={BLOCK_3F_B}
@@ -287,7 +297,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 </div>
                 <div className="h-3">
                     <div className="h-3 bg-a-2f"></div>
-                    <Block
+                    <SmallBlock
                         height={"h-100 card-margin-top"}
                         isLight={true}
                         title={BLOCK_2F_A}
@@ -299,7 +309,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 </div>
                 <div className="h-3">
                     <div className="h-3 bg-b-3f"></div>
-                    <Block
+                    <SmallBlock
                         height={"h-100 card-margin-top"}
                         isLight={true}
                         title={BLOCK_3F_A}
@@ -320,7 +330,7 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
                 <div className="row h-100">
                     <div className="h-100 bg-1f"></div>
                     <div className="col-sm h-100">
-                        <TerminalBlock
+                        <BigBlock
                             height={"h-100"}
                             title={NAV_TERMINAL}
                             result={result}
@@ -335,15 +345,15 @@ const Dashboard = ({ showDashboard, searchParameter, setSearchParameter, searchS
 
     function render() {
         return <div className="row h-100 p-3">
-            <PopUpSetting idleSeconds={idleSeconds} setIdleSeconds={setIdleSeconds} carouselMiniSeconds={carouselMiniSeconds} setCarouselMiniSeconds={setCarouselMiniSeconds} />
-            <PopUpTimeline epc={timelineEpc} />
-            <PopUpMoveConfirm post={post} />
-            <PopUpRecoverConfirm del={del} />
-            <PopUpSearchForm searchState={searchState} searchStateRef={searchStateRef} setSearchParameter={setSearchParameter} />
-            <PopUpCapacity id={_3A_modal_target} title={BLOCK_3F_A} capacity={_3A_capacity} setCapacity={set3ACapacity} />
-            <PopUpCapacity id={_2A_modal_target} title={BLOCK_2F_A} capacity={_2A_capacity} setCapacity={set2ACapacity} />
-            <PopUpCapacity id={_3B_modal_target} title={BLOCK_3F_B} capacity={_3B_capacity} setCapacity={set3BCapacity} />
-            {showDashboard === true ? <>{renderDashboard()}</> : <>{renderTerminal()}</>}
+            <PopupSetting idleSeconds={idleSeconds} setIdleSeconds={setIdleSeconds} carouselMiniSeconds={carouselMiniSeconds} setCarouselMiniSeconds={setCarouselMiniSeconds} />
+            <PopupTimeline epc={timelineEpc} />
+            <PopupMoveConfirm post={post} />
+            <PopupRecoverConfirm del={del} />
+            <PopupSearchForm searchState={searchState} searchStateRef={searchStateRef} setSearchParameter={setSearchParameter} />
+            <PopupCapacity id={_3A_modal_target} title={BLOCK_3F_A} capacity={_3A_capacity} setCapacity={set3ACapacity} />
+            <PopupCapacity id={_2A_modal_target} title={BLOCK_2F_A} capacity={_2A_capacity} setCapacity={set2ACapacity} />
+            <PopupCapacity id={_3B_modal_target} title={BLOCK_3F_B} capacity={_3B_capacity} setCapacity={set3BCapacity} />
+            {dashboardState === true ? <>{renderDashboard()}</> : <>{renderTerminal()}</>}
         </div>
     }
      

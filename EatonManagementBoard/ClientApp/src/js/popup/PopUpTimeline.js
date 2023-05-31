@@ -2,16 +2,15 @@
 import $ from 'jquery'
 import Timeline from '../timeline/Timeline'
 import {
-    CLOSE,
-    MOVE,
-    RECOVER,
+    FORM_CLOSE,
+    FORM_MOVE,    FORM_RECOVER,
     TH_PALLET_TRACE,
     _timeline_modal_target,
     _move_modal_target,
     _recover_modal_target,
 } from '../constants'
 
-const PopUpTimeline = ({ epc }) => {
+const PopupTimeline = ({ epc }) => {
 
     function handleClick() {
         $('#timelineModalTarget').modal('hide')
@@ -23,19 +22,19 @@ const PopUpTimeline = ({ epc }) => {
         const modalFooter = () => {
             if (epc.epcContext.reader_id !== "Terminal" && epc.epcContext.reader_id !== "ManualTerminal") {
                 return <div className="modal-footer justify-content-between">
-                    <button type="button" className="btn btn-default" data-toggle="modal" data-target={moveDataTarget} onClick={handleClick}>{MOVE}</button>
-                    <button type="button" className="btn btn-secondary" data-dismiss="modal">{CLOSE}</button>
+                    <button type="button" className="btn btn-default" data-toggle="modal" data-target={moveDataTarget} onClick={handleClick}>{FORM_MOVE}</button>
+                    <button type="button" className="btn btn-secondary" data-dismiss="modal">{FORM_CLOSE}</button>
                 </div>
             }
             else if (epc.epcContext.reader_id === "ManualTerminal") {
                 return <div className="modal-footer justify-content-between">
-                    <button type="button" className="btn btn-default" data-toggle="modal" data-target={recoverDataTarget} onClick={handleClick}>{RECOVER}</button>
-                    <button type="button" className="btn btn-secondary" data-dismiss="modal">{CLOSE}</button>
+                    <button type="button" className="btn btn-default" data-toggle="modal" data-target={recoverDataTarget} onClick={handleClick}>{FORM_RECOVER}</button>
+                    <button type="button" className="btn btn-secondary" data-dismiss="modal">{FORM_CLOSE}</button>
                 </div>
             }
             else {
                 return <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" data-dismiss="modal">{CLOSE}</button>
+                    <button type="button" className="btn btn-secondary" data-dismiss="modal">{FORM_CLOSE}</button>
                 </div>
             }
         }
@@ -65,4 +64,4 @@ const PopUpTimeline = ({ epc }) => {
     return <>{render(epc)}</>
 }
 
-export default PopUpTimeline
+export default PopupTimeline

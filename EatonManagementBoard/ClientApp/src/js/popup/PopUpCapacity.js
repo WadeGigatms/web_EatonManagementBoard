@@ -1,16 +1,16 @@
 ﻿import React, { useEffect, useState } from 'react'
 import $ from 'jquery'
 import {
-    LIMIT,
-    SAVE,
-    CANCEL,
-    SELECT,
+    FORM_LIMIT,
+    FORM_SAVE,
+    FORM_CANCEL,
+    FORM_SELECT,
 } from '../constants'
 import {
     SaveLocationCapacity,
-} from '../others/Cookie'
+} from '../Cookie'
 
-const PopUpCapacity = ({ id, title, capacity, setCapacity }) => {
+const PopupCapacity = ({ id, title, capacity, setCapacity }) => {
     const [currentCapacity, setCurrentCapacity] = useState(6)
 
     useEffect(() => {
@@ -48,9 +48,9 @@ const PopUpCapacity = ({ id, title, capacity, setCapacity }) => {
                     </div>
                     <div className="modal-body">
                         <div className="form-group">
-                            <label>{LIMIT}</label>
+                            <label>{FORM_LIMIT}</label>
                             <select className="form-control" value={currentCapacity} onChange={handleChange} >
-                                <option value={parseInt(-1, 10)}>{SELECT}</option>
+                                <option value={parseInt(-1, 10)}>{FORM_SELECT}</option>
                                 <option value={parseInt(0, 10)}>0</option>
                                 <option value={parseInt(1, 10)}>1</option>
                                 <option value={parseInt(2, 10)}>2</option>
@@ -66,8 +66,8 @@ const PopUpCapacity = ({ id, title, capacity, setCapacity }) => {
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn" data-dismiss="modal">{CANCEL}</button>
-                        <button type="button" className="btn btn-primary" onClick={handleSubmit}>{SAVE}</button>
+                        <button type="button" className="btn" data-dismiss="modal">{FORM_CANCEL}</button>
+                        <button type="button" className="btn btn-primary" onClick={handleSubmit}>{FORM_SAVE}</button>
                     </div>
                 </div>
             </div>
@@ -77,4 +77,4 @@ const PopUpCapacity = ({ id, title, capacity, setCapacity }) => {
     return <>{render()}</>
 }
 
-export default PopUpCapacity
+export default PopupCapacity

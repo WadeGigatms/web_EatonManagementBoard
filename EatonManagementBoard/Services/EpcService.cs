@@ -150,6 +150,7 @@ namespace EatonManagementBoard.Services
                 HandheldEpcDtos = handheldEpcDtos
             };
 
+            // Memory cache
             _localMemoryCache.SaveSearchState(isSearchState);
             _localMemoryCache.SaveEpcCount(epcCount);
             _localMemoryCache.SaveRealTimeEpcContext(realTimeEpcContext);
@@ -618,10 +619,16 @@ namespace EatonManagementBoard.Services
 
             // Insert into database in eaton_epc_data 
             EpcContext epcContext = _connection.QueryEpcContext(epcPostDto.Epc, epcPostDto.ReaderId, epcPostDto.TransTime);
-            EpcDataContext epcDataContext = _connection.QueryEpcDataContext(epcDataDto.pallet_id);
+            EpcDataContext epcDataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
             if (epcDataContext == null)
             {
+                // Insert epc data
                 result = _connection.InsertEpcDataContext(epcContext.id, epcDataDto);
+            }
+            else
+            {
+                // Update f_eaton_epc_ids 
+                result = _connection.UpdateEpcDataContext(epcContext.id, epcDataContext.pallet_id);
             }
 
             return GetPostResultDto(ResultEnum.True, ErrorEnum.None);

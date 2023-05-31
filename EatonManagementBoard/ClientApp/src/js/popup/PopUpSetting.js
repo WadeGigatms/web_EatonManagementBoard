@@ -4,8 +4,7 @@ import {
     VERSION,
     FORM_VERSION,
     NAV_SETTING,
-    SAVE,
-    CANCEL,
+    FORM_SAVE,    FORM_CANCELANCEL,
     FORM_IDLE,
     FORM_CAROUSEL,
     SELECT_0,
@@ -24,11 +23,11 @@ import {
 import {
     SaveIdleSeconds,
     SaveCarouselSeconds,
-} from '../others/Cookie'
+} from '../Cookie'
 
-const PopUpSetting = ({ idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
+const PopupSetting = ({ idleSeconds, setIdleSeconds, carouselMiniSeconds, setCarouselMiniSeconds }) => {
     const [idleInterval, setIdleInterval] = useState(idleSeconds)
-    const [carouselInterval, setCaoruselInterval] = useState(carouselMiniSeconds/1000)
+    const [carouselInterval, setCaoruselInterval] = useState(5)
 
     useEffect(() => {
         $('#settingModalTarget').on('hide.bs.modal', handleHideModal)
@@ -56,6 +55,7 @@ const PopUpSetting = ({ idleSeconds, setIdleSeconds, carouselMiniSeconds, setCar
     }
 
     function render() {
+        if (carouselInterval === undefined || idleInterval === undefined) { return <></> }
         return <div className="modal fade" id={_setting_modal_target} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered" role="document">
                 <div className="modal-content">
@@ -99,8 +99,8 @@ const PopUpSetting = ({ idleSeconds, setIdleSeconds, carouselMiniSeconds, setCar
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn" data-dismiss="modal">{CANCEL}</button>
-                        <button type="button" className="btn btn-primary" onClick={handleSubmit}>{SAVE}</button>
+                        <button type="button" className="btn" data-dismiss="modal">{FORM_CANCELANCEL}</button>
+                        <button type="button" className="btn btn-primary" onClick={handleSubmit}>{FORM_SAVE}</button>
                     </div>
                 </div>
             </div>
@@ -110,4 +110,4 @@ const PopUpSetting = ({ idleSeconds, setIdleSeconds, carouselMiniSeconds, setCar
     return <>{render()}</>
 }
 
-export default PopUpSetting
+export default PopupSetting

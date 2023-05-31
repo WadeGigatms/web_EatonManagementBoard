@@ -13,7 +13,7 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
 
     function render(result, epcs) {
         if (result === true && epcs) {
-            return <table className="table table-hover text-nowrap table-sticky">
+            return <table className="table  text-nowrap table-sticky">
                 {renderThead(result)}
                 {renderTbody(result, epcs)}
                 {renderTfoot()}
@@ -46,9 +46,6 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
                 </thead>
             }
         }
-        else {
-            return <></>
-        }
     }
 
     function renderTbody(result, epcs) {
@@ -64,8 +61,6 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
             return <tbody>
                 {rows}
             </tbody>
-        } else {
-            return <></>
         }
     }
 

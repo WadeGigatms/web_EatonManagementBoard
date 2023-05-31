@@ -13,6 +13,19 @@ namespace EatonManagementBoard.Database
         {
         }
 
+        public List<EpcContext> QueryAll()
+        {
+            try
+            {
+                var sql = @"SELECT * FROM [scannel].[dbo].[eaton_epc]  ";
+                return _connection.Query<EpcContext>(sql).ToList();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         #region QUERY
 
         public List<EpcContext> QueryRealTimeEpcContext()
@@ -36,7 +49,7 @@ namespace EatonManagementBoard.Database
             try
             {
                 var sql = @"SELECT * 
-                            FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY [epc], [reader_id] ORDER BY id DESC) AS rowId FROM[scannel].[dbo].[eaton_epc]) AS epcs 
+                            FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY [epc], [reader_id] ORDER BY id DESC) AS rowId FROM [scannel].[dbo].[eaton_epc]) AS epcs 
                             WHERE epcs.rowId=1
                             ORDER BY id ";
                 return _connection.Query<EpcContext>(sql).ToList();
@@ -100,7 +113,7 @@ namespace EatonManagementBoard.Database
             }
         }
 
-        public EpcDataContext QueryEpcDataContext(string pallet_id)
+        public EpcDataContext QueryEpcDataContextByPalletId(string pallet_id)
         {
             try
             {
@@ -111,7 +124,156 @@ namespace EatonManagementBoard.Database
                     pallet_id = pallet_id 
                 }).FirstOrDefault();
             }
-            catch {
+            catch 
+            {
+                return null;
+            }
+        }
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByStartDate(DateTime startDate)
+        {
+            try
+            {
+                var sql = @"SELECT 
+                            d.id AS epc_data_id, 
+                            d.wo, 
+                            d.pn, 
+                            d.qty, 
+                            d.line, 
+                            d.pallet_id, 
+                            e.id AS epc_id, 
+                            e.reader_id, 
+                            e.timestamp 
+                            FROM [scannel].[dbo].[eaton_epc] AS e 
+                            INNER JOIN [scannel].[dbo].[eaton_epc_data] AS d 
+                            ON e.id IN (SELECT * FROM string_split(d.f_eaton_epc_ids, ',')) 
+                            WHERE CONVERT(date, e.timestamp) = @startDate
+                            ORDER BY d.pallet_id, e.timestamp ";
+                return _connection.Query<EpcJoinEpcDataContext>(sql, new
+                {
+                    startDate = startDate
+                }).ToList();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByStartAndEndDate(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var sql = @"SELECT 
+                            d.id AS epc_data_id, 
+                            d.wo, 
+                            d.pn, 
+                            d.qty, 
+                            d.line, 
+                            d.pallet_id, 
+                            e.id AS epc_id, 
+                            e.reader_id, 
+                            e.timestamp 
+                            FROM [scannel].[dbo].[eaton_epc] AS e 
+                            INNER JOIN [scannel].[dbo].[eaton_epc_data] AS d 
+                            ON e.id IN (SELECT * FROM string_split(d.f_eaton_epc_ids, ',')) 
+                            WHERE CONVERT(date, e.timestamp) BETWEEN @startDate AND @endDate 
+                            ORDER BY d.pallet_id, e.timestamp ";
+                return _connection.Query<EpcJoinEpcDataContext>(sql, new
+                {
+                    startDate = startDate,
+                    endDate = endDate
+                }).ToList();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByWo(string wo)
+        {
+            try
+            {
+                var sql = @"SELECT 
+                            d.id AS epc_data_id, 
+                            d.wo, 
+                            d.pn, 
+                            d.qty, 
+                            d.line, 
+                            d.pallet_id, 
+                            e.id AS epc_id, 
+                            e.reader_id, 
+                            e.timestamp 
+                            FROM [scannel].[dbo].[eaton_epc] AS e 
+                            INNER JOIN (SELECT * FROM [scannel].[dbo].[eaton_epc_data] WHERE wo=@wo) AS d 
+                            ON e.id IN (SELECT * FROM string_split(d.f_eaton_epc_ids, ',')) 
+                            ORDER BY d.pallet_id, e.timestamp ";
+                return _connection.Query<EpcJoinEpcDataContext>(sql, new
+                {
+                    wo = wo
+                }).ToList();
+            }
+            catch (Exception error)
+            {
+                return null;
+            }
+        }
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByPn(string pn)
+        {
+            try
+            {
+                var sql = @"SELECT 
+                            d.id AS epc_data_id, 
+                            d.wo, 
+                            d.pn, 
+                            d.qty, 
+                            d.line, 
+                            d.pallet_id, 
+                            e.id AS epc_id, 
+                            e.reader_id, 
+                            e.timestamp 
+                            FROM [scannel].[dbo].[eaton_epc] AS e 
+                            INNER JOIN (SELECT * FROM [scannel].[dbo].[eaton_epc_data] WHERE pn=@pn) AS d 
+                            ON e.id IN (SELECT * FROM string_split(d.f_eaton_epc_ids, ',')) 
+                            ORDER BY d.pallet_id, e.timestamp ";
+                return _connection.Query<EpcJoinEpcDataContext>(sql, new
+                {
+                    pn = pn
+                }).ToList();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByPalletId(string pallet_id)
+        {
+            try
+            {
+                var sql = @"SELECT 
+                            d.id AS epc_data_id, 
+                            d.wo, 
+                            d.pn, 
+                            d.qty, 
+                            d.line, 
+                            d.pallet_id, 
+                            e.id AS epc_id, 
+                            e.reader_id, 
+                            e.timestamp 
+                            FROM [scannel].[dbo].[eaton_epc] AS e 
+                            INNER JOIN (SELECT * FROM [scannel].[dbo].[eaton_epc_data] WHERE pallet_id=@pallet_id) AS d 
+                            ON e.id IN (SELECT * FROM string_split(d.f_eaton_epc_ids, ',')) 
+                            ORDER BY d.pallet_id, e.timestamp ";
+                return _connection.Query<EpcJoinEpcDataContext>(sql, new
+                {
+                    pallet_id = pallet_id
+                }).ToList();
+            }
+            catch
+            {
                 return null;
             }
         }
@@ -143,11 +305,11 @@ namespace EatonManagementBoard.Database
         {
             try
             {
-                var sql = @"INSERT INTO [scannel].[dbo].[eaton_epc_data](f_eaton_epc_id, wo, qty, pn, line, pallet_id)
-                            VALUES(@f_eaton_epc_id, @wo, @qty, @pn, @line, @pallet_id) ";
+                var sql = @"INSERT INTO [scannel].[dbo].[eaton_epc_data](f_eaton_epc_ids, wo, qty, pn, line, pallet_id)
+                            VALUES(@f_eaton_epc_ids, @wo, @qty, @pn, @line, @pallet_id) ";
                 return _connection.Execute(sql, new 
                 {
-                    f_eaton_epc_id = f_eaton_epc_id,
+                    f_eaton_epc_ids = f_eaton_epc_id,
                     wo = epcDataDto.wo,
                     qty = epcDataDto.qty,
                     pn = epcDataDto.pn,
@@ -164,6 +326,26 @@ namespace EatonManagementBoard.Database
         #endregion
 
         #region UPDATE
+
+        public bool UpdateEpcDataContext(int f_eaton_epc_id, string pallet_id)
+        {
+            try
+            {
+                var sql = @"UPDATE [scannel].[dbo].[eaton_epc_data] 
+                            SET f_eaton_epc_ids=CONCAT(f_eaton_epc_ids, @f_eaton_epc_id) 
+                            WHERE pallet_id=@pallet_id ";
+                return _connection.Execute(sql, new
+                {
+                    f_eaton_epc_id = $",{f_eaton_epc_id}",
+                    pallet_id = pallet_id
+                }) > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         #endregion
 
         #region DELETE

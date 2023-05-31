@@ -8,7 +8,7 @@ import { VERSION } from './js/constants'
 const App = () => {
 	return <Layout version={VERSION}>
 		<Switch>
-			<Route exact path='/' component={Dashboard} />
+			<Route exact path="/" component={Dashboard} />
 		</Switch>
 	</Layout>
 }

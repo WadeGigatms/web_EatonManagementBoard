@@ -40,23 +40,23 @@ namespace EatonManagementBoard.Enums
                 case ReaderIdEnum.Elevator:
                     return "Elevator";
                 case ReaderIdEnum.WareHouseA:
-                    return "WareHouseA";
+                    return "WarehouseA";
                 case ReaderIdEnum.WareHouseB:
-                    return "WareHouseB";
+                    return "WarehouseB";
                 case ReaderIdEnum.WareHouseC:
-                    return "WareHouseC";
+                    return "WarehouseC";
                 case ReaderIdEnum.WareHouseD:
-                    return "WareHouseD";
+                    return "WarehouseD";
                 case ReaderIdEnum.WareHouseE:
-                    return "WareHouseE";
+                    return "WarehouseE";
                 case ReaderIdEnum.WareHouseF:
-                    return "WareHouseF";
+                    return "WarehouseF";
                 case ReaderIdEnum.WareHouseG:
-                    return "WareHouseG";
+                    return "WarehouseG";
                 case ReaderIdEnum.WareHouseH:
-                    return "WareHouseH";
+                    return "WarehouseH";
                 case ReaderIdEnum.WareHouseI:
-                    return "WareHouseI";
+                    return "WarehouseI";
                 case ReaderIdEnum.Terminal:
                     return "Terminal";
                 case ReaderIdEnum.ManualTerminal:

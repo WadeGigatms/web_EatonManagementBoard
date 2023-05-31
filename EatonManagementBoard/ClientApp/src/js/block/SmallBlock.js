@@ -2,7 +2,7 @@
 import EpcList from '../epc/EpcList'
 
 
-const Block = ({ height, isLight, title, modalId, capacity, result, epcs, setTimelineEpc }) => {
+const SmallBlock = ({ height, isLight, title, modalId, capacity, result, epcs, setTimelineEpc }) => {
     
     function render() {
         const cardClass = "card card-secondary card-display " + height
@@ -46,4 +46,4 @@ const Block = ({ height, isLight, title, modalId, capacity, result, epcs, setTim
     return <>{render()}</>
 }
 
-export default Block
+export default SmallBlock

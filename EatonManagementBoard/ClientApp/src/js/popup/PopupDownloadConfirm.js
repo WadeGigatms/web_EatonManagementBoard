@@ -2,25 +2,25 @@
 import $ from 'jquery'
 import {
     FORM_CANCEL,
-    FORM_MOVE,
     FORM_CONFIRM,
-    _move_modal_target,
+    NAV_DOWNLOAD,
+    _download_confirm_modal_target,
 } from '../constants'
 
-const PopupMoveConfirm = ({ post }) => {
+const PopupDownloadConfirm = ({ exportToExcel }) => {
 
     function handleConfirm() {
-        const hasTagId = "#" + _move_modal_target
+        const hasTagId = "#" + _download_confirm_modal_target
         $(hasTagId).modal('hide')
-        post()
+        exportToExcel()
     }
 
     function render() {
-        return <div className="modal fade" id={_move_modal_target} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+        return <div className="modal fade" id={_download_confirm_modal_target} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="ModalCenterTitle">{FORM_MOVE} ?</h5>
+                        <h5 className="modal-title" id="ModalCenterTitle">{NAV_DOWNLOAD} ?</h5>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -37,4 +37,4 @@ const PopupMoveConfirm = ({ post }) => {
     return <>{render()}</>
 }
 
-export default PopupMoveConfirm
+export default PopupDownloadConfirm

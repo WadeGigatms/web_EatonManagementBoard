@@ -1,15 +1,15 @@
 ﻿import React, { useEffect, useState } from 'react'
 import $ from 'jquery'
 import {
-    SEARCH,
+    FORM_SEARCH,
     TH_PN,
     TH_TASKNO,
     TH_PALLET,
-    ERROR,
+    FORM_ERROR,
     _search_form_modal_target,
 } from '../constants'
 
-const PopUpSearchForm = ({ searchState, searchStateRef, setSearchParameter }) => {
+const PopupSearchForm = ({ searchState, searchStateRef, setSearchParameter }) => {
     const [wo, setWo] = useState("")
     const [pn, setPn] = useState("")
     const [palletId, setPalletId] = useState("")
@@ -51,17 +51,18 @@ const PopUpSearchForm = ({ searchState, searchStateRef, setSearchParameter }) =>
             setError("")
             setSearchParameter({ wo, pn, palletId })
         } else {
-            setError(ERROR)
+            setError(FORM_ERROR)
         }
     }
 
     function render() {
+        if (!searchStateRef) { return <></> }
         const id = searchStateRef.current === false ? _search_form_modal_target : ""
         return <div className="modal fade" id={id} tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="ModalCenterTitle">{SEARCH}</h5>
+                        <h5 className="modal-title" id="ModalCenterTitle">{FORM_SEARCH}</h5>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -86,7 +87,7 @@ const PopUpSearchForm = ({ searchState, searchStateRef, setSearchParameter }) =>
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-primary btn-block" onClick={handleSubmit}>{SEARCH}</button>
+                        <button type="button" className="btn btn-primary btn-block" onClick={handleSubmit}>{FORM_SEARCH}</button>
                     </div>
                 </div>
             </div>
@@ -96,4 +97,4 @@ const PopUpSearchForm = ({ searchState, searchStateRef, setSearchParameter }) =>
     return <>{render()}</>
 }
 
-export default PopUpSearchForm
+export default PopupSearchForm

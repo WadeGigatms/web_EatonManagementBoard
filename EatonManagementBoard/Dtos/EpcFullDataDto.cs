@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EatonManagementBoard.Database
+namespace EatonManagementBoard.Dtos
 {
-    public class EpcDataContext
+    public class EpcFullDataDto
     {
-        public int id { get; set; } 
-        public string f_eaton_epc_ids { get; set; }
+        // eaton_epc_data
         public string wo { get; set; }
         public string pn { get; set; }
         public string line { get; set; }
-        public int qty { get; set; }
+        public string qty { get; set; }
         public string pallet_id { get; set; }
+
+        // eaton_epc
+        public string location { get; set; }
+        public string timestamp { get; set; }
     }
 }

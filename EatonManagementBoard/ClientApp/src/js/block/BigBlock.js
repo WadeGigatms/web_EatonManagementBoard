@@ -2,7 +2,7 @@
 import EpcList from '../epc/EpcList'
 
 
-const TerminalBlock = ({ height, title, result, epcs, showTransTime, setTimelineEpc }) => {
+const BigBlock = ({ height, title, result, epcs, showTransTime, setTimelineEpc }) => {
 
     function render() {
         const cardClass = "card card-secondary card-display " + height
@@ -27,4 +27,4 @@ const TerminalBlock = ({ height, title, result, epcs, showTransTime, setTimeline
     return <>{render()}</>
 }
 
-export default TerminalBlock
+export default BigBlock

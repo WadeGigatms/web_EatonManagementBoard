@@ -14,6 +14,8 @@ namespace EatonManagementBoard.Database
             MsSqlConnectionRepository = msSqlConnectionRepository;
         }
 
+        public List<EpcContext> QueryAll() => MsSqlConnectionRepository.QueryAll();
+
         #region Query
 
         public List<EpcContext> QueryRealTimeEpcContext()
@@ -31,8 +33,23 @@ namespace EatonManagementBoard.Database
         public int QueryEpcCount()
             => MsSqlConnectionRepository.QueryEpcCount();
 
-        public EpcDataContext QueryEpcDataContext(string palletId)
-             => MsSqlConnectionRepository.QueryEpcDataContext(palletId);
+        public EpcDataContext QueryEpcDataContextByPalletId(string palletId)
+             => MsSqlConnectionRepository.QueryEpcDataContextByPalletId(palletId);
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByStartDate(DateTime startDate)
+            => MsSqlConnectionRepository.QueryEpcJoinEpcDataContextByStartDate(startDate);
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByStartAndEndDate(DateTime startDate, DateTime endDate)
+            => MsSqlConnectionRepository.QueryEpcJoinEpcDataContextByStartAndEndDate(startDate, endDate);
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByWo(string wo)
+            => MsSqlConnectionRepository.QueryEpcJoinEpcDataContextByWo(wo);
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByPn(string pn)
+            => MsSqlConnectionRepository.QueryEpcJoinEpcDataContextByPn(pn);
+
+        public List<EpcJoinEpcDataContext> QueryEpcJoinEpcDataContextByPalletId(string palletId)
+            => MsSqlConnectionRepository.QueryEpcJoinEpcDataContextByPalletId(palletId);
 
         #endregion
 
@@ -41,8 +58,15 @@ namespace EatonManagementBoard.Database
         public bool InsertEpcContext(string epc, string readerId, string transTime)
             => MsSqlConnectionRepository.InsertEpcContext(epc, readerId, transTime);
 
-        public bool InsertEpcDataContext(int eatonEpcId, EpcDataDto epcDataDto)
-            => MsSqlConnectionRepository.InsertEpcDataContext(eatonEpcId, epcDataDto);
+        public bool InsertEpcDataContext(int epcId, EpcDataDto epcDataDto)
+            => MsSqlConnectionRepository.InsertEpcDataContext(epcId, epcDataDto);
+
+        #endregion
+
+        #region Update
+
+        public bool UpdateEpcDataContext(int epcId, string palletId)
+            => MsSqlConnectionRepository.UpdateEpcDataContext(epcId, palletId);
 
         #endregion
 
