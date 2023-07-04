@@ -72,7 +72,7 @@ const PopupReportSearchForm = ({ setEpcFullDataDtos, setEpcFullDataJson }) => {
             }
         }
         getData()
-    }, [])
+    }, [setEpcFullDataDtos, setEpcFullDataJson])
 
     useEffect(() => {
         $('#reportSearchFormModalTarget').on('hide.bs.modal', handleHideModal)
@@ -87,7 +87,7 @@ const PopupReportSearchForm = ({ setEpcFullDataDtos, setEpcFullDataJson }) => {
             const api = getApiUrl(outputParameter)
             getRequest(api)
         }
-    }, [outputParameter])
+    }, [outputParameter, getRequest])
 
     function getApiUrl(data) {
         const url = window.location.origin + URL_EPC_DATA +
@@ -130,7 +130,7 @@ const PopupReportSearchForm = ({ setEpcFullDataDtos, setEpcFullDataJson }) => {
         setDateSelect(value)
         setEnableSubmit(value !== -1 ? true : false)
 
-        if (valuevalue === 0) {
+        if (value === 0) {
             setStart(new Date())
         } else if (value === 1) {
             setStart(new Date())

@@ -4,7 +4,7 @@ import {
     VERSION,
     FORM_VERSION,
     NAV_SETTING,
-    FORM_SAVE,    FORM_CANCELANCEL,
+    FORM_SAVE,    FORM_CANCEL,
     FORM_IDLE,
     FORM_CAROUSEL,
     SELECT_0,
@@ -99,7 +99,7 @@ const PopupSetting = ({ idleSeconds, setIdleSeconds, carouselMiniSeconds, setCar
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn" data-dismiss="modal">{FORM_CANCELANCEL}</button>
+                        <button type="button" className="btn" data-dismiss="modal">{FORM_CANCEL}</button>
                         <button type="button" className="btn btn-primary" onClick={handleSubmit}>{FORM_SAVE}</button>
                     </div>
                 </div>
