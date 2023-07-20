@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace EatonManagementBoard.Database
 {
-    public class EpcContext
+    public class EpcRawContext
     {
         public int id { get; set; }
         public string epc { get; set; }

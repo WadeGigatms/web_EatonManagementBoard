@@ -9,7 +9,7 @@ namespace EatonManagementBoard.Dtos
 {
     public class EpcDto
     {
-        public EpcContext EpcContext { get; set; }
+        public EpcRawContext EpcContext { get; set; }
         public EpcDataDto EpcDataDto { get; set; }
         public List<LocationTimeDto> LocationTimeDtos { get; set; }
         public string EpcState { get; set; }

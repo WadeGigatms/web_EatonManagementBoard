@@ -8,7 +8,7 @@ namespace EatonManagementBoard.Database
     public class EpcDataContext
     {
         public int id { get; set; } 
-        public string f_eaton_epc_ids { get; set; }
+        public string f_epc_raw_ids { get; set; }
         public string wo { get; set; }
         public string pn { get; set; }
         public string line { get; set; }

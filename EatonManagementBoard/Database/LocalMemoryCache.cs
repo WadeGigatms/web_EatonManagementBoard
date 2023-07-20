@@ -35,18 +35,18 @@ namespace EatonManagementBoard.Database
             return cacheEntry;
         }
 
-        public List<EpcContext> ReadRealTimeEpcContext()
+        public List<EpcRawContext> ReadRealTimeEpcRawContext()
         {
-            if (!_cache.TryGetValue(LocalMemoryCacheKey.RealTimeEpcContext, out List<EpcContext> cacheEntry)) 
+            if (!_cache.TryGetValue(LocalMemoryCacheKey.RealTimeEpcRawContext, out List<EpcRawContext> cacheEntry)) 
             {
                 cacheEntry = null;
             }
             return cacheEntry;
         }
 
-        public List<EpcContext> ReadHistoryEpcContext()
+        public List<EpcRawContext> ReadHistoryEpcRawContext()
         {
-            if (!_cache.TryGetValue(LocalMemoryCacheKey.HistoryEpcContext, out List<EpcContext> cacheEntry))
+            if (!_cache.TryGetValue(LocalMemoryCacheKey.HistoryEpcRawContext, out List<EpcRawContext> cacheEntry))
             {
                 cacheEntry = null;
             }
@@ -72,14 +72,14 @@ namespace EatonManagementBoard.Database
             _cache.Set(LocalMemoryCacheKey.EpcCount, dataCount, TimeSpan.FromHours(1));
         }
 
-        public void SaveRealTimeEpcContext(List<EpcContext> context)
+        public void SaveRealTimeEpcRawContext(List<EpcRawContext> context)
         {
-            _cache.Set(LocalMemoryCacheKey.RealTimeEpcContext, context, TimeSpan.FromHours(1));
+            _cache.Set(LocalMemoryCacheKey.RealTimeEpcRawContext, context, TimeSpan.FromHours(1));
         }
 
-        public void SaveHistoryEpcContext(List<EpcContext> context)
+        public void SaveHistoryEpcRawContext(List<EpcRawContext> context)
         {
-            _cache.Set(LocalMemoryCacheKey.HistoryEpcContext, context, TimeSpan.FromHours(1));
+            _cache.Set(LocalMemoryCacheKey.HistoryEpcRawContext, context, TimeSpan.FromHours(1));
         }
 
         public void SaveDashboardDto(DashboardDto dashboardDto)
@@ -92,8 +92,8 @@ namespace EatonManagementBoard.Database
     {
         public static readonly string SearchState = "SearchState";
         public static readonly string EpcCount = "EpcCount";
-        public static readonly string RealTimeEpcContext = "RealTimeEpcContext";
-        public static readonly string HistoryEpcContext = "HistoryEpcContext";
+        public static readonly string RealTimeEpcRawContext = "RealTimeEpcRawContext";
+        public static readonly string HistoryEpcRawContext = "HistoryEpcRawContext";
         public static readonly string DashboardDto = "DashboardDto";
     }
 }

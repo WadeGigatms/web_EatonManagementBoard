@@ -24,7 +24,7 @@ namespace EatonManagementBoard.Services
 
         private bool Test()
         {
-            List<EpcContext> epcContexts = _connection.QueryAll();
+            List<EpcRawContext> epcContexts = _connection.QueryAll();
             foreach(var epcContext in epcContexts)
             {
                 var properties = epcContext.epc.Split("#")[1].Split("&"); 
@@ -61,7 +61,7 @@ namespace EatonManagementBoard.Services
                 return GetEpcDataResultDto(ResultEnum.False, ErrorEnum.InvalidParameters, null);
             }
 
-            List<EpcJoinEpcDataContext> contexts = new List<EpcJoinEpcDataContext>();
+            List<EpcRawJoinEpcDataContext> contexts = new List<EpcRawJoinEpcDataContext>();
 
             if (!string.IsNullOrEmpty(startDate) ||
                 !string.IsNullOrEmpty(endDate) ||
@@ -72,34 +72,34 @@ namespace EatonManagementBoard.Services
                 {
                     DateTime date = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
 
-                    contexts = _connection.QueryEpcJoinEpcDataContextByStartDate(date);
+                    contexts = _connection.QueryEpcRawJoinEpcDataContextByStartDate(date);
                 }
                 else if (datepicker == DatePickerEnum.DateRange)
                 {
                     DateTime start = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
                     DateTime end = DateTime.ParseExact(endDate, "yyyy-MM-dd", null).Date;
 
-                    contexts = _connection.QueryEpcJoinEpcDataContextByStartAndEndDate(start, end);
+                    contexts = _connection.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
                 }
                 else if (datepicker == DatePickerEnum.PastDays)
                 {
                     DateTime end = DateTime.Today;
                     DateTime start = GetPastDate(end, int.Parse(pastDays)).Date;
 
-                    contexts = _connection.QueryEpcJoinEpcDataContextByStartAndEndDate(start, end);
+                    contexts = _connection.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
                 }
             }
             else if (!string.IsNullOrEmpty(wo))
             {
-                contexts = _connection.QueryEpcJoinEpcDataContextByWo(wo);
+                contexts = _connection.QueryEpcRawJoinEpcDataContextByWo(wo);
             }
             else if (!string.IsNullOrEmpty(pn))
             {
-                contexts = _connection.QueryEpcJoinEpcDataContextByPn(pn);
+                contexts = _connection.QueryEpcRawJoinEpcDataContextByPn(pn);
             }
             else if (!string.IsNullOrEmpty(palletId))
             {
-                contexts = _connection.QueryEpcJoinEpcDataContextByPalletId(palletId);
+                contexts = _connection.QueryEpcRawJoinEpcDataContextByPalletId(palletId);
             }
 
             // context to dto
@@ -181,7 +181,7 @@ namespace EatonManagementBoard.Services
             }
         }
 
-        private EpcFullDataDto GetEpcFullDataDto(EpcJoinEpcDataContext context)
+        private EpcFullDataDto GetEpcFullDataDto(EpcRawJoinEpcDataContext context)
         {
             return new EpcFullDataDto
             {
