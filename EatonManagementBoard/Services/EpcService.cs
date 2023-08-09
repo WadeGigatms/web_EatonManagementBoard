@@ -1,12 +1,15 @@
 ﻿using EatonManagementBoard.Database;
 using EatonManagementBoard.Dtos;
 using EatonManagementBoard.Enums;
+using EatonManagementBoard.HttpClients;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using LocalMemoryCache = EatonManagementBoard.Database.LocalMemoryCache;
 
 namespace EatonManagementBoard.Services
@@ -629,6 +632,12 @@ namespace EatonManagementBoard.Services
             {
                 // Update f_epc_raw_ids 
                 result = _connection.UpdateEpcDataContext(epcRawContext.id, epcDataContext.pallet_id);
+            }
+
+            // Call api for delivery
+            if (epcPostDto.ReaderId == ReaderIdEnum.Terminal.ToString())
+            {
+                result = HttpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
             }
 
             return GetPostResultDto(ResultEnum.True, ErrorEnum.None);
