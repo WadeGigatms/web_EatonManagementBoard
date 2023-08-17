@@ -10,13 +10,19 @@ using System.Threading.Tasks;
 
 namespace EatonManagementBoard.HttpClients
 {
-    public static class HttpClientManager
+    public class HttpClientManager
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
-
-        public static bool PostToServerWithDeliveryTerminal(EpcRawContext epcRawContext, EpcDataContext epcDataContext)
+        public HttpClientManager(IHttpClientFactory httpClientFactory)
         {
-            _httpClient.BaseAddress = new Uri("http://localhost/");
+            _httpClientFactory = httpClientFactory;
+        }
+
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public bool PostToServerWithDeliveryTerminal(EpcRawContext epcRawContext, EpcDataContext epcDataContext)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri("https://localhost:44361/");
             DeliveryTerminalPostDto dto = new DeliveryTerminalPostDto
             {
                 epc_raw_id = epcRawContext.id,
@@ -29,7 +35,7 @@ namespace EatonManagementBoard.HttpClients
             };
             var json = JsonConvert.SerializeObject(dto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = _httpClient.PostAsync("api/delivery/terminal", content).Result;
+            var response = httpClient.PostAsync("api/delivery/terminal", content).Result;
             return response.IsSuccessStatusCode;
         }
     }

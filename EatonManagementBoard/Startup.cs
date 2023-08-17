@@ -27,6 +27,9 @@ namespace EatonManagementBoard
 
             services.AddControllersWithViews();
 
+            // IHttpClientFactory
+            services.AddHttpClient();
+
             // MemoryCache
             services.AddMemoryCache();
 

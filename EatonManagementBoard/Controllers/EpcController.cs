@@ -41,7 +41,7 @@ namespace EatonManagementBoard.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] dynamic value)
         {
-            ResultDto epcResultDto = _service.Post(value);
+            ResultDto epcResultDto = _service.PostAsync(value);
             return epcResultDto.Result == true ? Ok(epcResultDto) : BadRequest(epcResultDto);
         }
 

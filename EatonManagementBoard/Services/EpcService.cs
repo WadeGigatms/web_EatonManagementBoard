@@ -10,18 +10,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using LocalMemoryCache = EatonManagementBoard.Database.LocalMemoryCache;
 
 namespace EatonManagementBoard.Services
 {
     public class EpcService
     {
-        public EpcService(ConnectionRepositoryManager connection, IMemoryCache memoryCache)
+        public EpcService(ConnectionRepositoryManager connection, IMemoryCache memoryCache, IHttpClientFactory httpClientFactory)
         {
             _connection = connection;
             _localMemoryCache = new LocalMemoryCache(memoryCache);
+            _httpClientManager = new HttpClientManager(httpClientFactory);
         }
 
+        private readonly HttpClientManager _httpClientManager;
         private readonly LocalMemoryCache _localMemoryCache;
         private readonly ConnectionRepositoryManager _connection;
         private readonly string doubleHash = "##";
@@ -544,7 +547,7 @@ namespace EatonManagementBoard.Services
 
         #region Post
 
-        public ResultDto Post(dynamic value)
+        public ResultDto PostAsync(dynamic value)
         {
             EpcPostDto epcPostDto;
 
@@ -627,6 +630,7 @@ namespace EatonManagementBoard.Services
             {
                 // Insert epc data
                 result = _connection.InsertEpcDataContext(epcRawContext.id, epcDataDto);
+                epcDataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
             }
             else
             {
@@ -637,7 +641,7 @@ namespace EatonManagementBoard.Services
             // Call api for delivery
             if (epcPostDto.ReaderId == ReaderIdEnum.Terminal.ToString())
             {
-                result = HttpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
+                result = _httpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
             }
 
             return GetPostResultDto(ResultEnum.True, ErrorEnum.None);
