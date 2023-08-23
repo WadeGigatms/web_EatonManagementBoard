@@ -49,6 +49,8 @@ namespace EatonManagementBoard.Services
             return true;
         }
 
+        #region Public
+
         public EpcDataResultDto Get(string wo, string pn, string palletId, string startDate, string endDate, string pastDays)
         {
             if (string.IsNullOrEmpty(wo) &&
@@ -120,6 +122,10 @@ namespace EatonManagementBoard.Services
 
             return GetEpcDataResultDto(ResultEnum.True, ErrorEnum.None, epcFullDataDtos);
         }
+
+        #endregion
+
+        #region Private
 
         private EpcDataResultDto GetEpcDataResultDto(ResultEnum result, ErrorEnum error, List<EpcFullDataDto> dtos)
         {
@@ -236,5 +242,7 @@ namespace EatonManagementBoard.Services
 
             }
         }
+
+        #endregion
     }
 }

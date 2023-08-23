@@ -32,7 +32,12 @@ namespace EatonManagementBoard.Services
         private readonly string singleHash = "#";
         private readonly string singleAnd = "&";
 
-        #region Get
+        #region Public
+
+        public RtcResultDto GetRtc()
+        {
+            return GetRtcResultDto(ResultEnum.True, ErrorEnum.None, DateTime.Now);
+        }
 
         public EpcResultDto Get(string wo = null, string pn = null, string palletId = null)
         {
@@ -165,6 +170,131 @@ namespace EatonManagementBoard.Services
 
             return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None, dashboardDto);
         }
+
+        public ResultDto PostAsync(dynamic value)
+        {
+            EpcPostDto epcPostDto;
+
+            // Check value
+            try
+            {
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Include,
+                    MissingMemberHandling = MissingMemberHandling.Error
+                };
+                epcPostDto = JsonConvert.DeserializeObject<EpcPostDto>(value.ToString(), settings);
+            }
+            catch
+            {
+                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            // Check readerId is valid
+            if (IsValidReaderId(epcPostDto.ReaderId) == false)
+            {
+                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidReaderId);
+            }
+
+
+            EpcDataDto epcDataDto;
+            // Check epc format is valid
+            try
+            {
+                string asciiEpcString = GetHexToAscii(epcPostDto.Epc);
+                if (string.IsNullOrEmpty(asciiEpcString) == true)
+                {
+                    return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
+                }
+
+                epcDataDto = GetEpcDataDto(asciiEpcString);
+                if (epcDataDto == null)
+                {
+                    return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcContextFormat);
+                }
+            }
+            catch
+            {
+                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
+            }
+
+            // Check epc is effective data
+            var realTimeEpcRawContext = _localMemoryCache.ReadRealTimeEpcRawContext();
+            if (realTimeEpcRawContext != null)
+            {
+                var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == epcPostDto.Epc && epc.reader_id == epcPostDto.ReaderId);
+                if (sameRealTimeEpcRawContext != null)
+                {
+                    return GetPostResultDto(ResultEnum.False, ErrorEnum.NoEffectiveData);
+                }
+            }
+
+            // Check epc hasnt manually moved to terminal
+            bool hasMovedToTerminal = _connection.QueryEpcRawContexts(epcPostDto.Epc, ReaderIdEnum.ManualTerminal.ToString()).Count() > 0;
+            if (hasMovedToTerminal == true)
+            {
+                return GetPostResultDto(ResultEnum.False, ErrorEnum.DidMoveToTerminal);
+            }
+
+            // Insert into database in eaton_epc_raw
+            if (epcPostDto.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
+            {
+                epcPostDto.TransTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+            }
+            bool result = _connection.InsertEpcRawContext(epcPostDto.Epc, epcPostDto.ReaderId, epcPostDto.TransTime);
+            if (result == false)
+            {
+                return GetPostResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout);
+            }
+
+            // Insert into database in eaton_epc_data 
+            EpcRawContext epcRawContext = _connection.QueryEpcRawContext(epcPostDto.Epc, epcPostDto.ReaderId, epcPostDto.TransTime);
+            EpcDataContext epcDataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
+            if (epcDataContext == null)
+            {
+                // Insert epc data
+                result = _connection.InsertEpcDataContext(epcRawContext.id, epcDataDto);
+                epcDataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
+            }
+            else
+            {
+                // Update f_epc_raw_ids 
+                result = _connection.UpdateEpcDataContext(epcRawContext.id, epcDataContext.pallet_id);
+            }
+
+            // Call api for delivery
+            if (epcPostDto.ReaderId == ReaderIdEnum.Terminal.ToString())
+            {
+                result = _httpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
+            }
+
+            return GetPostResultDto(ResultEnum.True, ErrorEnum.None);
+        }
+
+        public ResultDto Delete(string id)
+        {
+            if (string.IsNullOrEmpty(id) == true)
+            {
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            if (int.TryParse(id, out int sid) == false)
+            {
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+            }
+
+            var result = _connection.DeleteEpcRawContext(sid);
+            if (result == false)
+            {
+                return EpcResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout);
+            }
+
+            return EpcResultDto(ResultEnum.True, ErrorEnum.None);
+        }
+
+        #endregion
+
+        #region Private
 
         private string GetHexToAscii(string hexString)
         {
@@ -528,11 +658,6 @@ namespace EatonManagementBoard.Services
             }
         }
 
-        public RtcResultDto GetRtc()
-        {
-            return GetRtcResultDto(ResultEnum.True, ErrorEnum.None, DateTime.Now);
-        }
-
         private RtcResultDto GetRtcResultDto(ResultEnum result, ErrorEnum error, DateTime timestamp)
         {
             return new RtcResultDto
@@ -541,110 +666,6 @@ namespace EatonManagementBoard.Services
                 Error = error.ToDescription(),
                 Timestamp = timestamp.ToString("yyyy/MM/dd HH:mm:ss"),
             };
-        }
-
-        #endregion
-
-        #region Post
-
-        public ResultDto PostAsync(dynamic value)
-        {
-            EpcPostDto epcPostDto;
-
-            // Check value
-            try
-            {
-                var settings = new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Include,
-                    MissingMemberHandling = MissingMemberHandling.Error
-                };
-                epcPostDto = JsonConvert.DeserializeObject<EpcPostDto>(value.ToString(), settings);
-            }
-            catch
-            {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
-            }
-
-            // Check readerId is valid
-            if (IsValidReaderId(epcPostDto.ReaderId) == false)
-            {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidReaderId);
-            }
-
-
-            EpcDataDto epcDataDto;
-            // Check epc format is valid
-            try
-            {
-                string asciiEpcString = GetHexToAscii(epcPostDto.Epc);
-                if (string.IsNullOrEmpty(asciiEpcString) == true)
-                {
-                    return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
-                }
-
-                epcDataDto = GetEpcDataDto(asciiEpcString);
-                if (epcDataDto == null)
-                {
-                    return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcContextFormat);
-                }
-            }
-            catch
-            {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
-            }
-
-            // Check epc is effective data
-            var realTimeEpcRawContext = _localMemoryCache.ReadRealTimeEpcRawContext();
-            if (realTimeEpcRawContext != null)
-            {
-                var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == epcPostDto.Epc && epc.reader_id == epcPostDto.ReaderId);
-                if (sameRealTimeEpcRawContext != null)
-                {
-                    return GetPostResultDto(ResultEnum.False, ErrorEnum.NoEffectiveData);
-                }
-            }
-
-            // Check epc hasnt manually moved to terminal
-            bool hasMovedToTerminal = _connection.QueryEpcRawContexts(epcPostDto.Epc, ReaderIdEnum.ManualTerminal.ToString()).Count() > 0;
-            if (hasMovedToTerminal == true)
-            {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.DidMoveToTerminal);
-            }
-
-            // Insert into database in eaton_epc_raw
-            if (epcPostDto.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
-            {
-                epcPostDto.TransTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
-            }
-            bool result = _connection.InsertEpcRawContext(epcPostDto.Epc, epcPostDto.ReaderId, epcPostDto.TransTime);
-            if (result == false)
-            {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout);
-            }
-
-            // Insert into database in eaton_epc_data 
-            EpcRawContext epcRawContext = _connection.QueryEpcRawContext(epcPostDto.Epc, epcPostDto.ReaderId, epcPostDto.TransTime);
-            EpcDataContext epcDataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
-            if (epcDataContext == null)
-            {
-                // Insert epc data
-                result = _connection.InsertEpcDataContext(epcRawContext.id, epcDataDto);
-                epcDataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
-            }
-            else
-            {
-                // Update f_epc_raw_ids 
-                result = _connection.UpdateEpcDataContext(epcRawContext.id, epcDataContext.pallet_id);
-            }
-
-            // Call api for delivery
-            if (epcPostDto.ReaderId == ReaderIdEnum.Terminal.ToString())
-            {
-                result = _httpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
-            }
-
-            return GetPostResultDto(ResultEnum.True, ErrorEnum.None);
         }
 
         private ResultDto GetPostResultDto(ResultEnum result, ErrorEnum error)
@@ -681,31 +702,6 @@ namespace EatonManagementBoard.Services
             {
                 return false;
             }
-        }
-
-        #endregion
-
-        #region Delete
-
-        public ResultDto Delete(string id)
-        {
-            if (string.IsNullOrEmpty(id) == true)
-            {
-                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
-            }
-
-            if (int.TryParse(id, out int sid) == false)
-            {
-                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
-            }
-
-            var result = _connection.DeleteEpcRawContext(sid);
-            if (result == false)
-            {
-                return EpcResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout);
-            }
-
-            return EpcResultDto(ResultEnum.True, ErrorEnum.None);
         }
 
         private ResultDto EpcResultDto(ResultEnum result, ErrorEnum error)

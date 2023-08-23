@@ -13,7 +13,7 @@ const EpcList = ({ result, epcs, showTransTime, setTimelineEpc }) => {
 
     function render(result, epcs) {
         if (result === true && epcs) {
-            return <table className="table  text-nowrap table-sticky">
+            return <table className="table text-nowrap table-sticky">
                 {renderThead(result)}
                 {renderTbody(result, epcs)}
                 {renderTfoot()}

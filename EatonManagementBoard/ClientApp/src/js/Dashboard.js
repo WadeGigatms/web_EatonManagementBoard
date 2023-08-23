@@ -67,6 +67,47 @@ const Dashboard = ({
     const [_3B_capacity, set3BCapacity] = useState(6)
     const [timelineEpc, setTimelineEpc] = useState()
 
+    useEffect(() => {
+        const cookie3ALocationCapacity = LoadLocationCapacity(_3A_modal_target) === undefined ? 6 : LoadLocationCapacity(_3A_modal_target)
+        set3ACapacity(cookie3ALocationCapacity)
+    }, [_3A_capacity])
+
+    useEffect(() => {
+        const cookie2ALocationCapacity = LoadLocationCapacity(_2A_modal_target) === undefined ? 6 : LoadLocationCapacity(_2A_modal_target)
+        set2ACapacity(cookie2ALocationCapacity)
+    }, [_2A_capacity])
+
+    useEffect(() => {
+        const cookie3BLocationCapacity = LoadLocationCapacity(_3B_modal_target) === undefined ? 6 : LoadLocationCapacity(_3B_modal_target)
+        set3BCapacity(cookie3BLocationCapacity)
+    }, [_3B_capacity])
+
+    useEffect(() => {
+        const url = getApiUrl()
+        getRequest(url)
+
+        const interval = setInterval(() => {
+            // if front-end goes to idle state or searching state, web stops requesting api
+            if (searchStateRef.current === false && idleState === false) {
+                const url = getApiUrl()
+                getRequest(url)
+            }
+        }, 5000)
+
+        return () => clearInterval(interval)
+    }, [searchStateRef, getRequest, idleState])
+
+    useEffect(() => {
+        if (searchParameter) {
+            const { wo, pn, palletId } = searchParameter
+            if (wo || pn || palletId) {
+                searchStateRef.current = true
+                const url = getApiUrl() + "?wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
+                getRequest(url)
+            }
+        }
+    }, [searchParameter, searchStateRef, getRequest, searchState])
+
     const getRequest = useCallback((url) => {
         const getData = async () => {
             try {
@@ -113,47 +154,6 @@ const Dashboard = ({
         }
         delData()
     }, [])
-
-    useEffect(() => {
-        const cookie3ALocationCapacity = LoadLocationCapacity(_3A_modal_target) === undefined ? 6 : LoadLocationCapacity(_3A_modal_target)
-        set3ACapacity(cookie3ALocationCapacity)
-    }, [_3A_capacity])
-
-    useEffect(() => {
-        const cookie2ALocationCapacity = LoadLocationCapacity(_2A_modal_target) === undefined ? 6 : LoadLocationCapacity(_2A_modal_target)
-        set2ACapacity(cookie2ALocationCapacity)
-    }, [_2A_capacity])
-
-    useEffect(() => {
-        const cookie3BLocationCapacity = LoadLocationCapacity(_3B_modal_target) === undefined ? 6 : LoadLocationCapacity(_3B_modal_target)
-        set3BCapacity(cookie3BLocationCapacity)
-    }, [_3B_capacity])
-
-    useEffect(() => {
-        const url = getApiUrl()
-        getRequest(url)
-
-        const interval = setInterval(() => {
-            // if front-end goes to idle state or searching state, web stops requesting api
-            if (searchStateRef.current === false && idleState === false) {
-                const url = getApiUrl()
-                getRequest(url)
-            }
-        }, 5000)
-
-        return () => clearInterval(interval)
-    }, [searchStateRef, getRequest, idleState])
-
-    useEffect(() => {
-        if (searchParameter) {
-            const { wo, pn, palletId } = searchParameter
-            if (wo || pn || palletId) {
-                searchStateRef.current = true
-                const url = getApiUrl() + "?wo=" + wo + "&pn=" + pn + "&palletId=" + palletId
-                getRequest(url)
-            }
-        }
-    }, [searchParameter, searchStateRef, getRequest, searchState])
 
     function getApiUrl() {
         const url = window.location.origin + URL_EPC

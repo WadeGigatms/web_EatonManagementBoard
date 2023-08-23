@@ -15,7 +15,7 @@ namespace EatonManagementBoard.Database
         public int qty { get; set; }
         public string pallet_id { get; set; }
 
-        // eaton_epc
+        // eaton_epc_raw
         public int epc_raw_id { get; set; }
         public string reader_id { get; set; }
         public DateTime timestamp { get; set; }

@@ -22,7 +22,8 @@ namespace EatonManagementBoard.HttpClients
         public bool PostToServerWithDeliveryTerminal(EpcRawContext epcRawContext, EpcDataContext epcDataContext)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri("https://localhost:44361/");
+            //httpClient.BaseAddress = new Uri("https://localhost:44361/");
+            httpClient.BaseAddress = new Uri("http://localhost:84/");
             DeliveryTerminalPostDto dto = new DeliveryTerminalPostDto
             {
                 epc_raw_id = epcRawContext.id,

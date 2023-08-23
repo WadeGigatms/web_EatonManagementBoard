@@ -15,6 +15,7 @@ namespace EatonManagementBoard.Enums
         NoEffectiveData,
         MsSqlTimeout,
         DidMoveToTerminal,
+        FailToPostDelivery,
     }
 
     public static class ErrorEnumExtensions
@@ -39,6 +40,8 @@ namespace EatonManagementBoard.Enums
                     return "MsSqlTimeout";
                 case ErrorEnum.DidMoveToTerminal:
                     return "DidMoveToTerminal";
+                case ErrorEnum.FailToPostDelivery:
+                    return "FailToPostDelivery";
                 default:
                     return "Unknown";
             }
