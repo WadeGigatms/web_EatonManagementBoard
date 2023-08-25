@@ -20,7 +20,7 @@ namespace EatonManagementBoard.Database
                 var sql = @"SELECT * FROM [scannel].[dbo].[eaton_epc_raw]  ";
                 return _connection.Query<EpcRawContext>(sql).ToList();
             }
-            catch
+            catch (Exception exp)
             {
                 return null;
             }
@@ -38,7 +38,7 @@ namespace EatonManagementBoard.Database
                             ORDER BY id DESC ";
                 return _connection.Query<EpcRawContext>(sql).ToList();
             }
-            catch 
+            catch (Exception exp)
             {
                 return null;
             }
@@ -54,7 +54,7 @@ namespace EatonManagementBoard.Database
                             ORDER BY id ";
                 return _connection.Query<EpcRawContext>(sql).ToList();
             }
-            catch
+            catch (Exception exp)
             {
                 return null;
             }
@@ -68,7 +68,7 @@ namespace EatonManagementBoard.Database
                 var sql = "SELECT COUNT(*) FROM [scannel].[dbo].[eaton_epc_raw] ";
                 return _connection.ExecuteScalar<int>(sql);
             }
-            catch
+            catch (Exception exp)
             {
                 return 0;
             }
@@ -93,7 +93,7 @@ namespace EatonManagementBoard.Database
             }
         }
 
-        public EpcRawContext QueryEpcRawContext(string epc, string reader_id, string timestamp)
+        public EpcRawContext QueryEpcRawContext(EpcPostDto dto)
         {
             try
             {
@@ -102,12 +102,12 @@ namespace EatonManagementBoard.Database
                             WHERE epc=@epc AND reader_id=@reader_id AND timestamp=@timestamp ";
                 return _connection.Query<EpcRawContext>(sql, new 
                 { 
-                    epc = epc,
-                    reader_id = reader_id,
-                    timestamp = timestamp
+                    epc = dto.Epc,
+                    reader_id = dto.ReaderId,
+                    timestamp = dto.TransTime,
                 }).FirstOrDefault();
             }
-            catch
+            catch (Exception exp)
             {
                 return null;
             }
@@ -124,7 +124,7 @@ namespace EatonManagementBoard.Database
                     pallet_id = pallet_id 
                 }).FirstOrDefault();
             }
-            catch 
+            catch (Exception exp)
             {
                 return null;
             }
@@ -154,7 +154,7 @@ namespace EatonManagementBoard.Database
                     startDate = startDate
                 }).ToList();
             }
-            catch
+            catch (Exception exp)
             {
                 return null;
             }
@@ -185,7 +185,7 @@ namespace EatonManagementBoard.Database
                     endDate = endDate
                 }).ToList();
             }
-            catch
+            catch (Exception exp)
             {
                 return null;
             }
@@ -214,7 +214,7 @@ namespace EatonManagementBoard.Database
                     wo = wo
                 }).ToList();
             }
-            catch (Exception error)
+            catch (Exception exp)
             {
                 return null;
             }
@@ -243,7 +243,7 @@ namespace EatonManagementBoard.Database
                     pn = pn
                 }).ToList();
             }
-            catch
+            catch (Exception exp)
             {
                 return null;
             }
@@ -272,7 +272,7 @@ namespace EatonManagementBoard.Database
                     pallet_id = pallet_id
                 }).ToList();
             }
-            catch
+            catch (Exception exp)
             {
                 return null;
             }
@@ -282,7 +282,7 @@ namespace EatonManagementBoard.Database
 
         #region INSERT
 
-        public bool InsertEpcRawContext(string epc, string reader_id, string timestamp)
+        public bool InsertEpcRawContext(EpcPostDto dto)
         {
             try
             {
@@ -290,18 +290,18 @@ namespace EatonManagementBoard.Database
                             VALUES(@epc, @reader_id, @timestamp)";
                 return _connection.Execute(sql, new 
                 { 
-                    epc = epc,
-                    reader_id = reader_id,
-                    timestamp = timestamp
+                    epc = dto.Epc,
+                    reader_id = dto.ReaderId,
+                    timestamp = dto.TransTime,
                 }) > 0;
             }
-            catch
+            catch (Exception exp)
             {
                 return false;
             }
         }
 
-        public bool InsertEpcDataContext(int f_epc_raw_id, EpcDataDto epcDataDto)
+        public bool InsertEpcDataContext(int f_epc_raw_id, EpcDataDto dto)
         {
             try
             {
@@ -310,14 +310,14 @@ namespace EatonManagementBoard.Database
                 return _connection.Execute(sql, new 
                 {
                     f_epc_raw_ids = f_epc_raw_id,
-                    wo = epcDataDto.wo,
-                    qty = epcDataDto.qty,
-                    pn = epcDataDto.pn,
-                    line = epcDataDto.line,
-                    pallet_id = epcDataDto.pallet_id,
+                    wo = dto.wo,
+                    qty = dto.qty,
+                    pn = dto.pn,
+                    line = dto.line,
+                    pallet_id = dto.pallet_id,
                 }) > 0;
             }
-            catch
+            catch (Exception exp)
             {
                 return false;
             }
@@ -340,7 +340,7 @@ namespace EatonManagementBoard.Database
                     pallet_id = pallet_id
                 }) > 0;
             }
-            catch
+            catch (Exception exp)
             {
                 return false;
             }
@@ -359,7 +359,7 @@ namespace EatonManagementBoard.Database
                 return _connection.Execute(sql, new { id = id }) > 0;
 
             }
-            catch
+            catch (Exception exp)
             {
                 return false;
             }

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Caching;
 using System.Threading.Tasks;
 using EatonManagementBoard.Dtos;
 
@@ -86,14 +85,5 @@ namespace EatonManagementBoard.Database
         {
             _cache.Set(LocalMemoryCacheKey.DashboardDto, dashboardDto, TimeSpan.FromHours(1));
         }
-    }
-
-    public static class LocalMemoryCacheKey
-    {
-        public static readonly string SearchState = "SearchState";
-        public static readonly string EpcCount = "EpcCount";
-        public static readonly string RealTimeEpcRawContext = "RealTimeEpcRawContext";
-        public static readonly string HistoryEpcRawContext = "HistoryEpcRawContext";
-        public static readonly string DashboardDto = "DashboardDto";
     }
 }

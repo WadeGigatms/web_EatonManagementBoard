@@ -9,6 +9,7 @@ namespace EatonManagementBoard.Database
     public class ConnectionRepositoryManager
     {
         public MsSqlConnectionRepository MsSqlConnectionRepository { get; private set; }
+
         public ConnectionRepositoryManager(MsSqlConnectionRepository msSqlConnectionRepository)
         {
             MsSqlConnectionRepository = msSqlConnectionRepository;
@@ -27,8 +28,8 @@ namespace EatonManagementBoard.Database
         public List<EpcRawContext> QueryEpcRawContexts(string epc, string readerId)
             => MsSqlConnectionRepository.QueryEpcRawContexts(epc, readerId);
 
-        public EpcRawContext QueryEpcRawContext(string epc, string readerId, string transTime)
-            => MsSqlConnectionRepository.QueryEpcRawContext(epc, readerId, transTime);
+        public EpcRawContext QueryEpcRawContext(EpcPostDto dto)
+            => MsSqlConnectionRepository.QueryEpcRawContext(dto);
 
         public int QueryEpcCount()
             => MsSqlConnectionRepository.QueryEpcCount();
@@ -55,8 +56,8 @@ namespace EatonManagementBoard.Database
 
         #region Insert
 
-        public bool InsertEpcRawContext(string epc, string readerId, string transTime)
-            => MsSqlConnectionRepository.InsertEpcRawContext(epc, readerId, transTime);
+        public bool InsertEpcRawContext(EpcPostDto dto)
+            => MsSqlConnectionRepository.InsertEpcRawContext(dto);
 
         public bool InsertEpcDataContext(int epcId, EpcDataDto epcDataDto)
             => MsSqlConnectionRepository.InsertEpcDataContext(epcId, epcDataDto);

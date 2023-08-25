@@ -22,33 +22,6 @@ namespace EatonManagementBoard.Services
         private readonly LocalMemoryCache _localMemoryCache;
         private readonly ConnectionRepositoryManager _connection;
 
-        private bool Test()
-        {
-            List<EpcRawContext> epcContexts = _connection.QueryAll();
-            foreach(var epcContext in epcContexts)
-            {
-                var properties = epcContext.epc.Split("#")[1].Split("&"); 
-                var epcDataDto = new EpcDataDto
-                {
-                    wo = properties[0],
-                    qty = properties[1],
-                    pn = properties[2],
-                    line = properties[3],
-                    pallet_id = properties[4],
-                };
-                var dataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
-                if (dataContext == null)
-                {
-                    var result = _connection.InsertEpcDataContext(epcContext.id, epcDataDto);
-                }
-                else
-                {
-                    var result = _connection.UpdateEpcDataContext(epcContext.id, epcDataDto.pallet_id); 
-                }
-            }
-            return true;
-        }
-
         #region Public
 
         public EpcDataResultDto Get(string wo, string pn, string palletId, string startDate, string endDate, string pastDays)
