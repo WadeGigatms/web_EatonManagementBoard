@@ -47,19 +47,11 @@ const Content = ({ children }) => {
     const exportToExcel = async () => {
         try {
             const worksheet = XLSX.utils.json_to_sheet(epcFullDataJson);
-            worksheet["!cols"] = [
-                { wch: 20 },
-                { wch: 20 },
-                { wch: 20 },
-                { wch: 20 },
-                { wch: 20 },
-                { wch: 20 },
-                { wch: 20 },            ]
             const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] }
             const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
             const data = new Blob([excelBuffer], { type: fileType })
 
-            FileSaver.saveAs(data, "test" + fileExtension)
+            FileSaver.saveAs(data, "EATON成品報表" + fileExtension)
         } catch (error) {
             console.log(error)
         }

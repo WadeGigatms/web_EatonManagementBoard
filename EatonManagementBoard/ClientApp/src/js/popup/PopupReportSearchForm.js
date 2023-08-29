@@ -7,7 +7,11 @@ import {
     TH_TASKNO,
     TH_PN,
     TH_TIME,
+    TH_QTY,
     TH_PALLET,
+    TH_LINE,
+    TH_LOCATION,
+    TH_DURATION,
     NAV_OUTPUT,
     NAV_REPORT,
     FORM_SPEC_TIMESTAMP,
@@ -51,16 +55,26 @@ const PopupReportSearchForm = ({ setEpcFullDataDtos, setEpcFullDataJson }) => {
                 const { result, epcFullDataDtos } = await response.json()
                 if (result === true && epcFullDataDtos) {
                     setEpcFullDataDtos(epcFullDataDtos)
-                    const rows = epcFullDataDtos.map(row => ({
-                        WO: row.wo,
-                        PN: row.pn,
-                        QTY: row.qty,
-                        LINE: row.line,
-                        PALLET_ID: row.pallet_id,
-                        LOCATION: row.location,
-                        TIMESTAMP: row.timestamp
-                    }))
-                    setEpcFullDataJson(rows)
+                    var dtos = JSON.parse(JSON.stringify(epcFullDataDtos))
+                    dtos.map((dto) => {
+                        dto[TH_TASKNO] = dto["wo"]
+                        dto[TH_PN] = dto["pn"]
+                        dto[TH_QTY] = dto["qty"]
+                        dto[TH_LINE] = dto["line"]
+                        dto[TH_PALLET] = dto["pallet_id"]
+                        dto[TH_LOCATION] = dto["location"]
+                        dto[TH_TIME] = dto["timestamp"]
+                        dto[TH_DURATION] = dto["duration"]
+                        delete dto["wo"]
+                        delete dto["pn"]
+                        delete dto["qty"]
+                        delete dto["line"]
+                        delete dto["pallet_id"]
+                        delete dto["location"]
+                        delete dto["timestamp"]
+                        delete dto["duration"]
+                    })
+                    setEpcFullDataJson(dtos)
                     $('#reportSearchFormModalTarget').modal('hide')
                 }
                 else {

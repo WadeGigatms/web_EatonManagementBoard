@@ -1,4 +1,4 @@
-﻿export const VERSION = "v3.0.1"
+﻿export const VERSION = "v3.0.2"
 
 export const URL_EPC = `/api/epc`
 export const URL_EPC_DATA = `/api/epcdata`
@@ -70,6 +70,7 @@ export const TH_DELIVERY_TIME = "出貨時間"
 export const TH_PALLET_TRACE = "單板移動軌跡追蹤"
 export const TH_NOW = "現在"
 export const TH_LOCATION = "站別"
+export const TH_DURATION = "儲存時間"
 
 export const _3A_modal_target = "threeAModalTarget"
 export const _2A_modal_target = "twoAModalTarget"

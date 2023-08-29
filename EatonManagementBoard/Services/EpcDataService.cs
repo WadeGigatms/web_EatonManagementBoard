@@ -2,6 +2,7 @@
 using EatonManagementBoard.Dtos;
 using EatonManagementBoard.Enums;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -90,8 +91,11 @@ namespace EatonManagementBoard.Services
                 epcFullDataDtos.Add(dto);
             }
 
-            // Json
-            var epcFullDataJson = JsonSerializer.Serialize(epcFullDataDtos);
+            // Get duration from dtos
+            GetDuration(ref epcFullDataDtos);
+
+            // Get json
+            var json = GetJson(epcFullDataDtos);
 
             return GetEpcDataResultDto(ResultEnum.True, ErrorEnum.None, epcFullDataDtos);
         }
@@ -170,7 +174,8 @@ namespace EatonManagementBoard.Services
                 line = context.line,
                 pallet_id = context.pallet_id,
                 location = GetLocationString(context.reader_id),
-                timestamp = context.timestamp.ToString("yyyy-MM-dd HH:mm:ss")
+                timestamp = context.timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
+                duration = "",
             };
         }
 
@@ -213,6 +218,44 @@ namespace EatonManagementBoard.Services
                 default:
                     return "";
 
+            }
+        }
+
+        private string GetJson(List<EpcFullDataDto> epcFullDataDtos)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(epcFullDataDtos);
+                json = json.Replace("wo", "工單");
+                json = json.Replace("pn", "料號");
+                json = json.Replace("qty", "數量");
+                json = json.Replace("line", "線別");
+                json = json.Replace("pallet_id", "棧板編碼");
+                json = json.Replace("location", "站別");
+                json = json.Replace("timestamp", "經過時間");
+                json = json.Replace("duration", "儲存時間");
+                return json;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private void GetDuration(ref List<EpcFullDataDto> dtos)
+        {
+            var groupByPalletIdDtos = dtos.GroupBy(dto => dto.pallet_id).Select(dto => dto);
+            foreach (var groupByPalletIdDto in groupByPalletIdDtos)
+            {
+                groupByPalletIdDto.OrderBy(d => d.timestamp);
+                var firstTimestamp = DateTime.Parse(groupByPalletIdDto.FirstOrDefault().timestamp);
+                var lastTimestamp = DateTime.Parse(groupByPalletIdDto.LastOrDefault().timestamp);
+                var totalHours = lastTimestamp.Subtract(firstTimestamp).TotalHours;
+                var hours = totalHours % 10 >= 5 ? $"{Math.Round(totalHours).ToString()} hours" : $"{Math.Floor(totalHours)}.5 hours";
+                foreach (var dto in groupByPalletIdDto)
+                {
+                    dto.duration = hours;
+                }
             }
         }
 

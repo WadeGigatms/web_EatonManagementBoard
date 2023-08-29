@@ -8,6 +8,7 @@ import {
     TH_PALLET,
     TH_LOCATION,
     TH_TIME,
+    TH_DURATION
 } from "./constants"
 
 const Output = ({ epcFullDataDtos }) => {
@@ -32,12 +33,13 @@ const Output = ({ epcFullDataDtos }) => {
         for (var i = 0; i < epcFullDataDtos.length; i++) {
             rows.push(<tr key={i}>
                 <td className="th-width-5">{epcFullDataDtos[i].line}</td>
-                <td className="th-width-20">{epcFullDataDtos[i].wo}</td>
-                <td className="th-width-20">{epcFullDataDtos[i].pn}</td>
+                <td className="th-width-15">{epcFullDataDtos[i].wo}</td>
+                <td className="th-width-15">{epcFullDataDtos[i].pn}</td>
                 <td className="th-width-5">{epcFullDataDtos[i].qty}</td>
                 <td className="th-width-15">{epcFullDataDtos[i].pallet_id}</td>
                 <td className="th-width-15">{epcFullDataDtos[i].location}</td>
-                <td className="th-width-20">{epcFullDataDtos[i].timestamp}</td>
+                <td className="th-width-15">{epcFullDataDtos[i].timestamp}</td>
+                <td className="th-width-15">{epcFullDataDtos[i].duration}</td>
             </tr>)
         }
 
@@ -46,12 +48,13 @@ const Output = ({ epcFullDataDtos }) => {
                 <thead>
                     <tr>
                         <th className="th-width-5">{TH_LINE}</th>
-                        <th className="th-width-20">{TH_TASKNO}</th>
-                        <th className="th-width-20">{TH_PN}</th>
+                        <th className="th-width-15">{TH_TASKNO}</th>
+                        <th className="th-width-15">{TH_PN}</th>
                         <th className="th-width-5">{TH_QTY}</th>
                         <th className="th-width-15">{TH_PALLET}</th>
                         <th className="th-width-15">{TH_LOCATION}</th>
-                        <th className="th-width-20">{TH_TIME}</th>
+                        <th className="th-width-15">{TH_TIME}</th>
+                        <td className="th-width-15">{TH_DURATION}</td>
                     </tr>
                 </thead>
                 <tbody>

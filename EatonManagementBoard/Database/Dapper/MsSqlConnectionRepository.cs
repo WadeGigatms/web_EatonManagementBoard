@@ -136,6 +136,7 @@ namespace EatonManagementBoard.Database
             {
                 var sql = @"SELECT 
                             d.id AS epc_data_id, 
+                            d.f_epc_raw_ids, 
                             d.wo, 
                             d.pn, 
                             d.qty, 
@@ -166,6 +167,7 @@ namespace EatonManagementBoard.Database
             {
                 var sql = @"SELECT 
                             d.id AS epc_data_id, 
+                            d.f_epc_raw_ids, 
                             d.wo, 
                             d.pn, 
                             d.qty, 
@@ -197,6 +199,7 @@ namespace EatonManagementBoard.Database
             {
                 var sql = @"SELECT 
                             d.id AS epc_data_id, 
+                            d.f_epc_raw_ids, 
                             d.wo, 
                             d.pn, 
                             d.qty, 
@@ -226,6 +229,7 @@ namespace EatonManagementBoard.Database
             {
                 var sql = @"SELECT 
                             d.id AS epc_data_id, 
+                            d.f_epc_raw_ids, 
                             d.wo, 
                             d.pn, 
                             d.qty, 
@@ -255,6 +259,7 @@ namespace EatonManagementBoard.Database
             {
                 var sql = @"SELECT 
                             d.id AS epc_data_id, 
+                            d.f_epc_raw_ids, 
                             d.wo, 
                             d.pn, 
                             d.qty, 

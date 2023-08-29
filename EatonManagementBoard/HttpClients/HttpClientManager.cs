@@ -21,23 +21,31 @@ namespace EatonManagementBoard.HttpClients
 
         public bool PostToServerWithDeliveryTerminal(EpcRawContext epcRawContext, EpcDataContext epcDataContext)
         {
-            var httpClient = _httpClientFactory.CreateClient();
-            //httpClient.BaseAddress = new Uri("https://localhost:44361/");
-            httpClient.BaseAddress = new Uri("http://localhost:84/");
-            DeliveryTerminalPostDto dto = new DeliveryTerminalPostDto
+            try
             {
-                epc_raw_id = epcRawContext.id,
-                epc_data_id = epcDataContext.id,
-                wo = epcDataContext.wo,
-                qty = epcDataContext.qty,
-                pn = epcDataContext.pn,
-                line = epcDataContext.line,
-                pallet_id = epcDataContext.pallet_id,
-            };
-            var json = JsonConvert.SerializeObject(dto);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = httpClient.PostAsync("api/delivery/terminal", content).Result;
-            return response.IsSuccessStatusCode;
+                var httpClient = _httpClientFactory.CreateClient();
+                //httpClient.BaseAddress = new Uri("https://localhost:44361/"); // local
+                httpClient.BaseAddress = new Uri("http://localhost:84/"); // test
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+                DeliveryTerminalPostDto dto = new DeliveryTerminalPostDto
+                {
+                    epc_raw_id = epcRawContext.id,
+                    epc_data_id = epcDataContext.id,
+                    wo = epcDataContext.wo,
+                    qty = epcDataContext.qty,
+                    pn = epcDataContext.pn,
+                    line = epcDataContext.line,
+                    pallet_id = epcDataContext.pallet_id,
+                };
+                var json = JsonConvert.SerializeObject(dto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = httpClient.PostAsync("api/delivery/terminal", content).Result;
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exp)
+            {
+                return false;
+            }
         }
     }
 }
