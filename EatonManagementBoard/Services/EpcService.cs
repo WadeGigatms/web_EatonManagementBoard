@@ -478,9 +478,10 @@ namespace EatonManagementBoard.Services
                     isArrivedElevator = true;
 
                     // Arrived at elevator without arriving at production
+
                     if (i == 0 && isArrivedProduction == false) 
                     { 
-                        state = EpcStateEnum.NG;
+                        //state = EpcStateEnum.NG;
                     }
                 }
                 else if (locationTimeDtos[i].Location == ReaderIdEnum.WareHouseA.ToChineseString() ||
@@ -498,7 +499,7 @@ namespace EatonManagementBoard.Services
                     // Arrived at warehouse without arriving at production
                     if (isArrivedProduction == false)
                     {
-                        state = EpcStateEnum.NG;
+                        //state = EpcStateEnum.NG;
                     }
 
                     // Arrived at warehouse after arriving at terminal

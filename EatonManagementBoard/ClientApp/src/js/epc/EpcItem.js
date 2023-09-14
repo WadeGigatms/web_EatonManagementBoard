@@ -18,8 +18,6 @@ const EpcItem = ({ epc, showTransTime, setTimelineEpc }) => {
             switch (epc.epcState) {
                 case "OK":
                     return ""
-                case "NG":
-                    return "tr-bg-y"
                 case "Return":
                     return "tr-bg-r"
                 default:
