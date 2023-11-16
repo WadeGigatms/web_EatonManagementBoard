@@ -21,6 +21,8 @@ namespace EatonManagementBoard.Enums
         WareHouseH,
         WareHouseI,
         Terminal,
+        TerminalLeft,
+        TerminalRight,
         ManualTerminal,
         Handheld,
     }
@@ -59,6 +61,10 @@ namespace EatonManagementBoard.Enums
                     return "WarehouseI";
                 case ReaderIdEnum.Terminal:
                     return "Terminal";
+                case ReaderIdEnum.TerminalLeft:
+                    return "TerminalLeft";
+                case ReaderIdEnum.TerminalRight:
+                    return "TerminalRight";
                 case ReaderIdEnum.ManualTerminal:
                     return "ManualTerminal";
                 case ReaderIdEnum.Handheld:
@@ -100,6 +106,10 @@ namespace EatonManagementBoard.Enums
                     return "I-1F 成品區";
                 case ReaderIdEnum.Terminal:
                     return "已出貨";
+                case ReaderIdEnum.TerminalLeft:
+                    return "已出貨 L";
+                case ReaderIdEnum.TerminalRight:
+                    return "已出貨 R";
                 case ReaderIdEnum.ManualTerminal:
                     return "已出貨";
                 case ReaderIdEnum.Handheld:

@@ -99,7 +99,11 @@ namespace EatonManagementBoard.Services
             List<EpcRawContext> secondFloorEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.SecondFloorA.ToString()).ToList();
             List<EpcRawContext> thirdFloorAEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.ThirdFloorA.ToString()).ToList();
             List<EpcRawContext> thirdFloorBEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.ThirdFloorB.ToString()).ToList();
-            List<EpcRawContext> terminalEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.Terminal.ToString() || epc.reader_id == ReaderIdEnum.ManualTerminal.ToString()).ToList();
+            List<EpcRawContext> terminalEpcRawContext = realTimeEpcRawContext.Where(
+                epc => epc.reader_id == ReaderIdEnum.Terminal.ToString() || 
+                epc.reader_id == ReaderIdEnum.TerminalLeft.ToString() ||
+                epc.reader_id == ReaderIdEnum.TerminalRight.ToString() ||
+                epc.reader_id == ReaderIdEnum.ManualTerminal.ToString()).ToList();
             List<EpcRawContext> handheldEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.Handheld.ToString()).ToList();
 
             List<EpcDto> warehouseAEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseAEpcRawContext, wo, pn, palletId);
@@ -237,7 +241,9 @@ namespace EatonManagementBoard.Services
             }
 
             // Call api for delivery
-            if (dto.ReaderId == ReaderIdEnum.Terminal.ToString())
+            if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
+                dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
+                dto.ReaderId == ReaderIdEnum.TerminalRight.ToString())
             {
                 result = _httpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
             }
@@ -509,6 +515,8 @@ namespace EatonManagementBoard.Services
                     }
                 }
                 else if (locationTimeDtos[i].Location == ReaderIdEnum.Terminal.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.TerminalLeft.ToChineseString() ||
+                    locationTimeDtos[i].Location == ReaderIdEnum.TerminalRight.ToChineseString() ||
                     locationTimeDtos[i].Location == ReaderIdEnum.ManualTerminal.ToChineseString())
                 {
                     isArrivedTerminal = true;
@@ -626,6 +634,10 @@ namespace EatonManagementBoard.Services
                     return ReaderIdEnum.WareHouseI.ToChineseString();
                 case "Terminal":
                     return ReaderIdEnum.Terminal.ToChineseString();
+                case "TerminalLeft":
+                    return ReaderIdEnum.TerminalLeft.ToChineseString();
+                case "TerminalRight":
+                    return ReaderIdEnum.TerminalRight.ToChineseString();
                 case "ManualTerminal":
                     return ReaderIdEnum.ManualTerminal.ToChineseString();
                 case "Handheld":
@@ -670,6 +682,8 @@ namespace EatonManagementBoard.Services
                 ReaderIdEnum.ThirdFloorA.ToString() == readerId ||
                 ReaderIdEnum.ThirdFloorB.ToString() == readerId ||
                 ReaderIdEnum.Terminal.ToString() == readerId ||
+                ReaderIdEnum.TerminalLeft.ToString() == readerId ||
+                ReaderIdEnum.TerminalRight.ToString() == readerId ||
                 ReaderIdEnum.ManualTerminal.ToString() == readerId ||
                 ReaderIdEnum.Handheld.ToString() == readerId)
             {
