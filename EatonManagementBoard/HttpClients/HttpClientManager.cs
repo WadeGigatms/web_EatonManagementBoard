@@ -24,8 +24,8 @@ namespace EatonManagementBoard.HttpClients
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
-                httpClient.BaseAddress = new Uri("https://localhost:44361/"); // local
-                //httpClient.BaseAddress = new Uri("http://localhost:84/"); // test
+                //httpClient.BaseAddress = new Uri("https://localhost:44361/"); // local
+                httpClient.BaseAddress = new Uri("http://localhost:84/"); // test
                 httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
                 DeliveryTerminalPostDto dto = new DeliveryTerminalPostDto
                 {

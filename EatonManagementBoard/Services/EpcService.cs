@@ -200,10 +200,13 @@ namespace EatonManagementBoard.Services
             var realTimeEpcRawContext = _localMemoryCache.ReadRealTimeEpcRawContext();
             if (realTimeEpcRawContext != null)
             {
-                var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == dto.Epc && epc.reader_id == dto.ReaderId);
+                var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == dto.Epc);
                 if (sameRealTimeEpcRawContext != null)
                 {
-                    return GetPostResultDto(ResultEnum.False, ErrorEnum.NoEffectiveData);
+                    if (IsDuplicatedEpcFromSameReader(dto.ReaderId, sameRealTimeEpcRawContext.reader_id) == true)
+                    {
+                        return GetPostResultDto(ResultEnum.False, ErrorEnum.NoEffectiveData);
+                    }
                 }
             }
 
@@ -240,6 +243,10 @@ namespace EatonManagementBoard.Services
                 result = _connection.UpdateEpcDataContext(epcRawContext.id, epcDataContext.pallet_id);
             }
 
+            // Save memory cacche
+            var newRealTimeEpcRawContext = _connection.QueryRealTimeEpcRawContext();
+            _localMemoryCache.SaveRealTimeEpcRawContext(newRealTimeEpcRawContext);
+
             // Call api for delivery
             if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
                 dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
@@ -249,6 +256,24 @@ namespace EatonManagementBoard.Services
             }
 
             return GetPostResultDto(ResultEnum.True, ErrorEnum.None);
+        }
+
+        private bool IsDuplicatedEpcFromSameReader(string insertReaderId, string exsitedReaderId)
+        {
+            if (exsitedReaderId == ReaderIdEnum.Terminal.ToString() || exsitedReaderId == ReaderIdEnum.TerminalLeft.ToString() || exsitedReaderId == ReaderIdEnum.TerminalRight.ToString())
+            {
+                if (insertReaderId == ReaderIdEnum.Terminal.ToString() || insertReaderId == ReaderIdEnum.TerminalLeft.ToString() || insertReaderId == ReaderIdEnum.TerminalRight.ToString())
+                {
+                    return true;
+                } else
+                {
+                    return false;
+                }
+            } 
+            else
+            {
+                return insertReaderId == exsitedReaderId ? true : false;
+            }
         }
 
         public ResultDto Delete(string id)
