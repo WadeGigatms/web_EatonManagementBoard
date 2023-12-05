@@ -218,10 +218,7 @@ namespace EatonManagementBoard.Services
             }
 
             // Insert into [eaton_epc_raw]
-            if (dto.ReaderId == ReaderIdEnum.ManualTerminal.ToString())
-            {
-                dto.TransTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
-            }
+            UpdateTransTimeEpcPost(ref dto);
             bool result = _connection.InsertEpcRawContext(dto);
             if (result == false)
             {
@@ -256,6 +253,11 @@ namespace EatonManagementBoard.Services
             }
 
             return GetPostResultDto(ResultEnum.True, ErrorEnum.None);
+        }
+
+        private void UpdateTransTimeEpcPost(ref EpcPostDto dto)
+        {
+            dto.TransTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
         }
 
         private bool IsDuplicatedEpcFromSameReader(string insertReaderId, string exsitedReaderId)
