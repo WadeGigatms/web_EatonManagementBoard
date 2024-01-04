@@ -312,9 +312,7 @@ namespace EatonManagementBoard.Services
             }
 
             // Return if hexString is ascii string already
-            if (hexString.Contains(doubleHash) == false &&
-                hexString.Contains(doubleAnd) == false &&
-                hexString.Contains(singleHash) == true &&
+            if (hexString.Contains(singleHash) == true &&
                 hexString.Contains(singleAnd) == true)
             {
                 return hexString;
@@ -381,7 +379,7 @@ namespace EatonManagementBoard.Services
                         pallet_id = properties[4],
                     };
                 }
-                else if (isNewEpcFormat == false && isOldEpcFormat == true)
+                else if (isOldEpcFormat == true)
                 {
                     // Old epc string format
                     var oldEpcFormats = asciiEpcString.Split(doubleHash);
