@@ -211,6 +211,10 @@ namespace EatonManagementBoard.Services
                     return ReaderIdEnum.WareHouseI.ToChineseString();
                 case "Terminal":
                     return ReaderIdEnum.Terminal.ToChineseString();
+                case "TerminalLeft":
+                    return ReaderIdEnum.TerminalLeft.ToChineseString();
+                case "TerminalRight":
+                    return ReaderIdEnum.TerminalRight.ToChineseString();
                 case "ManualTerminal":
                     return ReaderIdEnum.ManualTerminal.ToChineseString();
                 case "Handheld":

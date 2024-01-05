@@ -351,15 +351,15 @@ namespace EatonManagementBoard.Services
                 if (isNewEpcFormat == true && isOldEpcFormat == false)
                 {
                     // New epc string format
+
+                    // Select and check the middle section string
                     var newEpcFormats = asciiEpcString.Split(singleHash);
-                    if (string.IsNullOrEmpty(newEpcFormats[0]) == false
-                        || string.IsNullOrEmpty(newEpcFormats[2]) == false
-                        || newEpcFormats[1].Split(singleAnd).Count() != 5)
+                    if (newEpcFormats[1].Split(singleAnd).Count() != 5)
                     {
                         return null;
                     }
 
-                    // Check epc context format
+                    // Check epc context format from the middle section string
                     var properties = newEpcFormats[1].Split(singleAnd);
                     if (properties[0].Length > woSize
                         || properties[1].Length > qtySize
@@ -382,15 +382,15 @@ namespace EatonManagementBoard.Services
                 else if (isOldEpcFormat == true)
                 {
                     // Old epc string format
+
+                    // Select and check the middle section string
                     var oldEpcFormats = asciiEpcString.Split(doubleHash);
-                    if (string.IsNullOrEmpty(oldEpcFormats[0]) == false
-                        || string.IsNullOrEmpty(oldEpcFormats[2]) == false
-                        || oldEpcFormats[1].Split(doubleAnd).Count() != 5)
+                    if (oldEpcFormats[1].Split(doubleAnd).Count() != 5)
                     {
                         return null;
                     }
 
-                    // Check epc context format
+                    // Check epc context format from the middle section string
                     var properties = oldEpcFormats[1].Split(doubleAnd);
                     if (properties[0].Length > woSize
                         || properties[1].Length > qtySize
