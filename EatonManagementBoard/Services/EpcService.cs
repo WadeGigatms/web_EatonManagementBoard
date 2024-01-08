@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LocalMemoryCache = EatonManagementBoard.Database.LocalMemoryCache;
 
@@ -179,12 +180,14 @@ namespace EatonManagementBoard.Services
             EpcDataDto epcDataDto;
             try
             {
+                // Convert hex string to ascii string
                 string asciiEpcString = GetHexToAscii(dto.Epc);
                 if (string.IsNullOrEmpty(asciiEpcString) == true)
                 {
                     return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
                 }
 
+                // Get Dto
                 epcDataDto = GetEpcDataDto(asciiEpcString);
                 if (epcDataDto == null)
                 {
@@ -303,6 +306,14 @@ namespace EatonManagementBoard.Services
 
         #region Private
 
+        private bool IsMatchGarbledString(string epcString)
+        {
+            // Check garbled text
+            string pattern = @"^[a-zA-Z0-9&#-]+$";
+            bool isMatch = Regex.IsMatch(epcString, pattern);
+            return !isMatch;
+        }
+
         private string GetHexToAscii(string hexString)
         {
             // Return if hexString is null or hexString is not double
@@ -370,6 +381,15 @@ namespace EatonManagementBoard.Services
                         return null;
                     }
 
+                    // Check that all properties are not garbled text
+                    foreach(var property in properties)
+                    {
+                        if (IsMatchGarbledString(property))
+                        {
+                            return null;
+                        }
+                    }
+
                     return new EpcDataDto
                     {
                         wo = properties[0],
@@ -399,6 +419,15 @@ namespace EatonManagementBoard.Services
                         || properties[4].Length > palletIdSize)
                     {
                         return null;
+                    }
+
+                    // Check that all properties are not garbled text
+                    foreach (var property in properties)
+                    {
+                        if (IsMatchGarbledString(property))
+                        {
+                            return null;
+                        }
                     }
 
                     return new EpcDataDto

@@ -87,7 +87,7 @@ namespace EatonManagementBoard.Database
                     reader_id = reader_id 
                 }).ToList();
             }
-            catch
+            catch (Exception exp)
             {
                 return null;
             }
