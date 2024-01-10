@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EatonManagementBoard.Database
+namespace EatonManagementBoard.Database.Dapper
 {
     public class ConnectionRepositoryManager
     {
@@ -14,8 +14,6 @@ namespace EatonManagementBoard.Database
         {
             MsSqlConnectionRepository = msSqlConnectionRepository;
         }
-
-        public List<EpcRawContext> QueryAll() => MsSqlConnectionRepository.QueryAll();
 
         #region Query
 

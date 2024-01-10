@@ -1,4 +1,5 @@
 using EatonManagementBoard.Database;
+using EatonManagementBoard.Database.Dapper;
 using EatonManagementBoard.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

@@ -40,6 +40,7 @@ namespace EatonManagementBoard.HttpClients
                 var json = JsonConvert.SerializeObject(dto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 httpClient.PostAsync("api/delivery/terminal", content).ConfigureAwait(false);
+
                 return true;
             }
             catch (Exception exp)

@@ -1,4 +1,5 @@
 ﻿using EatonManagementBoard.Database;
+using EatonManagementBoard.Database.Dapper;
 using EatonManagementBoard.Dtos;
 using EatonManagementBoard.Enums;
 using EatonManagementBoard.HttpClients;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -18,16 +20,16 @@ namespace EatonManagementBoard.Services
 {
     public class EpcService
     {
-        public EpcService(ConnectionRepositoryManager connection, IMemoryCache memoryCache, IHttpClientFactory httpClientFactory)
+        public EpcService(ConnectionRepositoryManager manager, IMemoryCache memoryCache, IHttpClientFactory httpClientFactory)
         {
-            _connection = connection;
+            _manager = manager;
             _localMemoryCache = new LocalMemoryCache(memoryCache);
             _httpClientManager = new HttpClientManager(httpClientFactory);
         }
 
         private readonly HttpClientManager _httpClientManager;
         private readonly LocalMemoryCache _localMemoryCache;
-        private readonly ConnectionRepositoryManager _connection;
+        private readonly ConnectionRepositoryManager _manager;
         private readonly string doubleHash = "##";
         private readonly string doubleAnd = "&&";
         private readonly string singleHash = "#";
@@ -47,108 +49,117 @@ namespace EatonManagementBoard.Services
 
         public EpcResultDto Get(string wo = null, string pn = null, string palletId = null)
         {
-            var isSearchState = false;
-            if (string.IsNullOrEmpty(wo) &&
-                string.IsNullOrEmpty(pn) &&
-                string.IsNullOrEmpty(palletId))
+            try
             {
-                isSearchState = false;
+                var isSearchState = false;
+                if (string.IsNullOrEmpty(wo) &&
+                    string.IsNullOrEmpty(pn) &&
+                    string.IsNullOrEmpty(palletId))
+                {
+                    isSearchState = false;
+                }
+                else
+                {
+                    isSearchState = true;
+                }
+
+                // Check there were new data inserted in database
+                var epcCount = _manager.QueryEpcCount();
+                if (epcCount == 0)
+                {
+                    return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None.ToDescription(), new DashboardDto());
+                }
+
+                // Determine to query data from database
+                var cacheEpcCount = _localMemoryCache.ReadEpcCount();
+                var cacheSearchState = _localMemoryCache.ReadSearchState();
+                if (cacheEpcCount == epcCount && cacheSearchState == isSearchState)
+                {
+                    // Same data count in database so return local memory cache
+                    var dashboard = _localMemoryCache.ReadDashboardDto();
+
+                    return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None.ToDescription(), dashboard);
+                }
+
+                // Connect to database
+                List<EpcRawContext> realTimeEpcRawContext = _manager.QueryRealTimeEpcRawContext();
+                List<EpcRawContext> historyEpcRawContext = _manager.QueryHistoryEpcRawContext();
+
+                // Check database were throw timeout
+                if (realTimeEpcRawContext == null || historyEpcRawContext == null)
+                {
+                    throw new Exception(ErrorEnum.FailToAccessDatabase.ToDescription());
+                }
+
+                // Get epc context in each location
+                List<EpcRawContext> warehouseAEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseA.ToString()).ToList();
+                List<EpcRawContext> warehouseBEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseB.ToString()).ToList();
+                List<EpcRawContext> warehouseCEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseC.ToString()).ToList();
+                List<EpcRawContext> warehouseDEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseD.ToString()).ToList();
+                List<EpcRawContext> warehouseEEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseE.ToString()).ToList();
+                List<EpcRawContext> warehouseFEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseF.ToString()).ToList();
+                List<EpcRawContext> warehouseGEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseG.ToString()).ToList();
+                List<EpcRawContext> warehouseHEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseH.ToString()).ToList();
+                List<EpcRawContext> warehouseIEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseI.ToString()).ToList();
+                List<EpcRawContext> elevatorEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.Elevator.ToString()).ToList();
+                List<EpcRawContext> secondFloorEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.SecondFloorA.ToString()).ToList();
+                List<EpcRawContext> thirdFloorAEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.ThirdFloorA.ToString()).ToList();
+                List<EpcRawContext> thirdFloorBEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.ThirdFloorB.ToString()).ToList();
+                List<EpcRawContext> terminalEpcRawContext = realTimeEpcRawContext.Where(
+                    epc => epc.reader_id == ReaderIdEnum.Terminal.ToString() ||
+                    epc.reader_id == ReaderIdEnum.TerminalLeft.ToString() ||
+                    epc.reader_id == ReaderIdEnum.TerminalRight.ToString() ||
+                    epc.reader_id == ReaderIdEnum.ManualTerminal.ToString()).ToList();
+                List<EpcRawContext> handheldEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.Handheld.ToString()).ToList();
+
+                List<EpcDto> warehouseAEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseAEpcRawContext, wo, pn, palletId);
+                List<EpcDto> warehouseBEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseBEpcRawContext, wo, pn, palletId);
+                List<EpcDto> warehouseCEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseCEpcRawContext, wo, pn, palletId);
+                List<EpcDto> warehouseDEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseDEpcRawContext, wo, pn, palletId);
+                List<EpcDto> warehouseEEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseEEpcRawContext, wo, pn, palletId);
+                List<EpcDto> warehouseFEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseFEpcRawContext, wo, pn, palletId);
+                List<EpcDto> warehouseGEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseGEpcRawContext, wo, pn, palletId);
+                List<EpcDto> warehouseHEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseHEpcRawContext, wo, pn, palletId);
+                List<EpcDto> warehouseIEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseIEpcRawContext, wo, pn, palletId);
+                List<EpcDto> elevatorEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref elevatorEpcRawContext, wo, pn, palletId);
+                List<EpcDto> secondFloorEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref secondFloorEpcRawContext, wo, pn, palletId);
+                List<EpcDto> thirdFloorAEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref thirdFloorAEpcRawContext, wo, pn, palletId);
+                List<EpcDto> thirdFloorBEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref thirdFloorBEpcRawContext, wo, pn, palletId);
+                List<EpcDto> terminalEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref terminalEpcRawContext, wo, pn, palletId);
+                List<EpcDto> handheldEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref handheldEpcRawContext, wo, pn, palletId);
+
+                DashboardDto dashboardDto = new DashboardDto()
+                {
+                    WarehouseAEpcDtos = warehouseAEpcDtos,
+                    WarehouseBEpcDtos = warehouseBEpcDtos,
+                    WarehouseCEpcDtos = warehouseCEpcDtos,
+                    WarehouseDEpcDtos = warehouseDEpcDtos,
+                    WarehouseEEpcDtos = warehouseEEpcDtos,
+                    WarehouseFEpcDtos = warehouseFEpcDtos,
+                    WarehouseGEpcDtos = warehouseGEpcDtos,
+                    WarehouseHEpcDtos = warehouseHEpcDtos,
+                    WarehouseIEpcDtos = warehouseIEpcDtos,
+                    ElevatorEpcDtos = elevatorEpcDtos,
+                    SecondFloorEpcDtos = secondFloorEpcDtos,
+                    ThirdFloorAEpcDtos = thirdFloorAEpcDtos,
+                    ThirdFloorBEpcDtos = thirdFloorBEpcDtos,
+                    TerminalEpcDtos = terminalEpcDtos,
+                    HandheldEpcDtos = handheldEpcDtos
+                };
+
+                // Memory cache
+                _localMemoryCache.SaveSearchState(isSearchState);
+                _localMemoryCache.SaveEpcCount(epcCount);
+                _localMemoryCache.SaveRealTimeEpcRawContext(realTimeEpcRawContext);
+                _localMemoryCache.SaveHistoryEpcRawContext(historyEpcRawContext);
+                _localMemoryCache.SaveDashboardDto(dashboardDto);
+
+                return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None.ToDescription(), dashboardDto);
             }
-            else
+            catch (Exception exp)
             {
-                isSearchState = true;
+                return GetEpcGetResultDto(ResultEnum.False, exp.Message, null);
             }
-
-            // Check there were new data inserted in database
-            var epcCount = _connection.QueryEpcCount();
-            if (epcCount == 0)
-            {
-                return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None, new DashboardDto());
-            }
-
-            // Determine to query data from database
-            var cacheEpcCount = _localMemoryCache.ReadEpcCount();
-            var cacheSearchState = _localMemoryCache.ReadSearchState();
-            if (cacheEpcCount == epcCount && cacheSearchState == isSearchState)
-            {
-                // Same data count in database so return local memory cache
-                var dashboard = _localMemoryCache.ReadDashboardDto();
-                return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None, dashboard);
-            }
-
-            // Connect to database
-            List<EpcRawContext> realTimeEpcRawContext = _connection.QueryRealTimeEpcRawContext();
-            List<EpcRawContext> historyEpcRawContext = _connection.QueryHistoryEpcRawContext();
-
-            // Check database were throw timeout
-            if (realTimeEpcRawContext == null || historyEpcRawContext == null)
-            {
-                return GetEpcGetResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout, null);
-            }
-
-            // Get epc context in each location
-            List<EpcRawContext> warehouseAEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseA.ToString()).ToList();
-            List<EpcRawContext> warehouseBEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseB.ToString()).ToList();
-            List<EpcRawContext> warehouseCEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseC.ToString()).ToList();
-            List<EpcRawContext> warehouseDEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseD.ToString()).ToList();
-            List<EpcRawContext> warehouseEEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseE.ToString()).ToList();
-            List<EpcRawContext> warehouseFEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseF.ToString()).ToList();
-            List<EpcRawContext> warehouseGEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseG.ToString()).ToList();
-            List<EpcRawContext> warehouseHEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseH.ToString()).ToList();
-            List<EpcRawContext> warehouseIEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.WareHouseI.ToString()).ToList();
-            List<EpcRawContext> elevatorEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.Elevator.ToString()).ToList();
-            List<EpcRawContext> secondFloorEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.SecondFloorA.ToString()).ToList();
-            List<EpcRawContext> thirdFloorAEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.ThirdFloorA.ToString()).ToList();
-            List<EpcRawContext> thirdFloorBEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.ThirdFloorB.ToString()).ToList();
-            List<EpcRawContext> terminalEpcRawContext = realTimeEpcRawContext.Where(
-                epc => epc.reader_id == ReaderIdEnum.Terminal.ToString() || 
-                epc.reader_id == ReaderIdEnum.TerminalLeft.ToString() ||
-                epc.reader_id == ReaderIdEnum.TerminalRight.ToString() ||
-                epc.reader_id == ReaderIdEnum.ManualTerminal.ToString()).ToList();
-            List<EpcRawContext> handheldEpcRawContext = realTimeEpcRawContext.Where(epc => epc.reader_id == ReaderIdEnum.Handheld.ToString()).ToList();
-
-            List<EpcDto> warehouseAEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseAEpcRawContext, wo, pn, palletId);
-            List<EpcDto> warehouseBEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseBEpcRawContext, wo, pn, palletId);
-            List<EpcDto> warehouseCEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseCEpcRawContext, wo, pn, palletId);
-            List<EpcDto> warehouseDEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseDEpcRawContext, wo, pn, palletId);
-            List<EpcDto> warehouseEEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseEEpcRawContext, wo, pn, palletId);
-            List<EpcDto> warehouseFEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseFEpcRawContext, wo, pn, palletId);
-            List<EpcDto> warehouseGEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseGEpcRawContext, wo, pn, palletId);
-            List<EpcDto> warehouseHEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseHEpcRawContext, wo, pn, palletId);
-            List<EpcDto> warehouseIEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref warehouseIEpcRawContext, wo, pn, palletId);
-            List<EpcDto> elevatorEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref elevatorEpcRawContext, wo, pn, palletId);
-            List<EpcDto> secondFloorEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref secondFloorEpcRawContext, wo, pn, palletId);
-            List<EpcDto> thirdFloorAEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref thirdFloorAEpcRawContext, wo, pn, palletId);
-            List<EpcDto> thirdFloorBEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref thirdFloorBEpcRawContext, wo, pn, palletId);
-            List<EpcDto> terminalEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref terminalEpcRawContext, wo, pn, palletId);
-            List<EpcDto> handheldEpcDtos = GetEpcDtos(ref historyEpcRawContext, ref handheldEpcRawContext, wo, pn, palletId);
-
-            DashboardDto dashboardDto = new DashboardDto() {               
-                WarehouseAEpcDtos = warehouseAEpcDtos,
-                WarehouseBEpcDtos = warehouseBEpcDtos,
-                WarehouseCEpcDtos = warehouseCEpcDtos,
-                WarehouseDEpcDtos = warehouseDEpcDtos,
-                WarehouseEEpcDtos = warehouseEEpcDtos,
-                WarehouseFEpcDtos = warehouseFEpcDtos,
-                WarehouseGEpcDtos = warehouseGEpcDtos,
-                WarehouseHEpcDtos = warehouseHEpcDtos,
-                WarehouseIEpcDtos = warehouseIEpcDtos,
-                ElevatorEpcDtos = elevatorEpcDtos,
-                SecondFloorEpcDtos = secondFloorEpcDtos,
-                ThirdFloorAEpcDtos = thirdFloorAEpcDtos,
-                ThirdFloorBEpcDtos = thirdFloorBEpcDtos,
-                TerminalEpcDtos = terminalEpcDtos,
-                HandheldEpcDtos = handheldEpcDtos
-            };
-
-            // Memory cache
-            _localMemoryCache.SaveSearchState(isSearchState);
-            _localMemoryCache.SaveEpcCount(epcCount);
-            _localMemoryCache.SaveRealTimeEpcRawContext(realTimeEpcRawContext);
-            _localMemoryCache.SaveHistoryEpcRawContext(historyEpcRawContext);
-            _localMemoryCache.SaveDashboardDto(dashboardDto);
-
-            return GetEpcGetResultDto(ResultEnum.True, ErrorEnum.None, dashboardDto);
         }
 
         public IResultDto PostAsync(dynamic value)
@@ -165,98 +176,163 @@ namespace EatonManagementBoard.Services
                 };
                 dto = JsonConvert.DeserializeObject<EpcPostDto>(value.ToString(), settings);
             }
-            catch
+            catch (Exception exp)
             {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
+                return GetPostResultDto(ResultEnum.False, exp.Message);
             }
 
-            // Check readerId is valid
-            if (IsValidReaderId(dto.ReaderId) == false)
+            using (var connection = _manager.MsSqlConnectionRepository.InitConnection())
             {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidReaderId);
-            }
+                connection.Open();
 
-            // Check epc format is valid
-            EpcDataDto epcDataDto;
-            try
-            {
-                // Convert hex string to ascii string
-                string asciiEpcString = GetHexToAscii(dto.Epc);
-                if (string.IsNullOrEmpty(asciiEpcString) == true)
+                using (var transaction = _manager.MsSqlConnectionRepository.BeginTransaction())
                 {
-                    return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
-                }
-
-                // Get Dto
-                epcDataDto = GetEpcDataDto(asciiEpcString);
-                if (epcDataDto == null)
-                {
-                    return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcContextFormat);
-                }
-            }
-            catch
-            {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.InvalidEpcFormat);
-            }
-
-            // Check epc is effective data
-            var realTimeEpcRawContext = _localMemoryCache.ReadRealTimeEpcRawContext();
-            if (realTimeEpcRawContext != null)
-            {
-                var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == dto.Epc);
-                if (sameRealTimeEpcRawContext != null)
-                {
-                    if (IsDuplicatedEpcFromSameReader(dto.ReaderId, sameRealTimeEpcRawContext.reader_id) == true)
+                    try
                     {
-                        return GetPostResultDto(ResultEnum.False, ErrorEnum.NoEffectiveData);
+                        // Set transcation
+                        _manager.MsSqlConnectionRepository.SetTransaction(transaction);
+
+                        // Check readerId is valid
+                        if (IsValidReaderId(dto.ReaderId) == false)
+                        {
+                            throw new Exception(ErrorEnum.InvalidReaderId.ToDescription());
+                        }
+
+                        // Check epc format is valid
+                        // Convert hex string to ascii string
+                        string asciiEpcString = GetHexToAscii(dto.Epc);
+                        if (string.IsNullOrEmpty(asciiEpcString) == true)
+                        {
+                            throw new Exception(ErrorEnum.InvalidEpcFormat.ToDescription());
+                        }
+
+                        // Get EpcDataDto
+                        EpcDataDto epcDataDto = GetEpcDataDto(asciiEpcString);
+                        if (epcDataDto == null)
+                        {
+                            throw new Exception(ErrorEnum.InvalidEpcContextFormat.ToDescription());
+                        }
+
+                        // Check epc is effective data
+                        var realTimeEpcRawContext = _localMemoryCache.ReadRealTimeEpcRawContext();
+                        if (realTimeEpcRawContext != null)
+                        {
+                            var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == dto.Epc);
+                            if (sameRealTimeEpcRawContext != null)
+                            {
+                                if (IsDuplicatedEpcFromSameReader(dto.ReaderId, sameRealTimeEpcRawContext.reader_id) == true)
+                                {
+                                    throw new Exception(ErrorEnum.NoEffectiveData.ToDescription());
+                                }
+                            }
+                        }
+
+                        // Check epc hasnt manually moved to terminal
+                        bool hasMovedToTerminal = _manager.QueryEpcRawContexts(dto.Epc, ReaderIdEnum.ManualTerminal.ToString()).Count() > 0;
+                        if (hasMovedToTerminal == true)
+                        {
+                            throw new Exception(ErrorEnum.DidMoveToTerminal.ToDescription());
+                        }
+
+                        // Insert into [eaton_epc_raw]
+                        UpdateTransTimeEpcPost(ref dto);
+                        bool result = _manager.InsertEpcRawContext(dto);
+                        if (result == false)
+                        {
+                            throw new Exception(ErrorEnum.FailToAccessDatabase.ToDescription());
+                        }
+
+                        // Insert into [eaton_epc_data]
+                        EpcRawContext epcRawContext = _manager.QueryEpcRawContext(dto);
+                        EpcDataContext epcDataContext = _manager.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
+                        if (epcDataContext == null)
+                        {
+                            // Insert into [eaton_epc_data]
+                            result = _manager.InsertEpcDataContext(epcRawContext.id, epcDataDto);
+                            epcDataContext = _manager.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
+                        }
+                        else
+                        {
+                            // Update f_epc_raw_ids 
+                            result = _manager.UpdateEpcDataContext(epcRawContext.id, epcDataContext.pallet_id);
+                        }
+
+                        // Save memory cacche
+                        var newRealTimeEpcRawContext = _manager.QueryRealTimeEpcRawContext();
+                        _localMemoryCache.SaveRealTimeEpcRawContext(newRealTimeEpcRawContext);
+
+                        // Call api for delivery
+                        if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
+                            dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
+                            dto.ReaderId == ReaderIdEnum.TerminalRight.ToString())
+                        {
+                            result = _httpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
+                        }
+
+                        // Commit the transaction if everything is successful
+                        transaction.Commit();
+
+                        return GetPostResultDto(ResultEnum.True, ErrorEnum.None.ToDescription());
+                    }
+                    catch (Exception exp)
+                    {
+                        // Handle exceptions and optionally roll back the transaction
+                        transaction.Rollback();
+                        return GetPostResultDto(ResultEnum.False, exp.Message);
                     }
                 }
             }
-
-            // Check epc hasnt manually moved to terminal
-            bool hasMovedToTerminal = _connection.QueryEpcRawContexts(dto.Epc, ReaderIdEnum.ManualTerminal.ToString()).Count() > 0;
-            if (hasMovedToTerminal == true)
-            {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.DidMoveToTerminal);
-            }
-
-            // Insert into [eaton_epc_raw]
-            UpdateTransTimeEpcPost(ref dto);
-            bool result = _connection.InsertEpcRawContext(dto);
-            if (result == false)
-            {
-                return GetPostResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout);
-            }
-
-            // Insert into [eaton_epc_data]
-            EpcRawContext epcRawContext = _connection.QueryEpcRawContext(dto);
-            EpcDataContext epcDataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
-            if (epcDataContext == null)
-            {
-                // Insert into [eaton_epc_data]
-                result = _connection.InsertEpcDataContext(epcRawContext.id, epcDataDto);
-                epcDataContext = _connection.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
-            }
-            else
-            {
-                // Update f_epc_raw_ids 
-                result = _connection.UpdateEpcDataContext(epcRawContext.id, epcDataContext.pallet_id);
-            }
-
-            // Save memory cacche
-            var newRealTimeEpcRawContext = _connection.QueryRealTimeEpcRawContext();
-            _localMemoryCache.SaveRealTimeEpcRawContext(newRealTimeEpcRawContext);
-
-            // Call api for delivery
-            if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
-                dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
-                dto.ReaderId == ReaderIdEnum.TerminalRight.ToString())
-            {
-                result = _httpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
-            }
-
-            return GetPostResultDto(ResultEnum.True, ErrorEnum.None);
         }
+
+        public ResultDto Delete(string id)
+        {
+
+            if (string.IsNullOrEmpty(id) == true)
+            {
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters.ToDescription());
+            }
+
+            if (int.TryParse(id, out int sid) == false)
+            {
+                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters.ToDescription());
+            }
+
+            using (var connection = _manager.MsSqlConnectionRepository.InitConnection())
+            {
+                connection.Open();
+
+                using (var transaction = _manager.MsSqlConnectionRepository.BeginTransaction())
+                {
+                    try
+                    {
+                        // Set transcation
+                        _manager.MsSqlConnectionRepository.SetTransaction(transaction);
+
+                        var result = _manager.DeleteEpcRawContext(sid);
+                        if (result == false)
+                        {
+                            throw new Exception(ErrorEnum.FailToAccessDatabase.ToDescription());
+                        }
+
+                        // Commit the transaction if everything is successful
+                        transaction.Commit();
+
+                        return EpcResultDto(ResultEnum.True, ErrorEnum.None.ToDescription());
+                    }
+                    catch (Exception exp)
+                    {
+                        // Handle exceptions and optionally roll back the transaction
+                        transaction.Rollback();
+                        return EpcResultDto(ResultEnum.False, exp.Message);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Private
+
 
         private void UpdateTransTimeEpcPost(ref EpcPostDto dto)
         {
@@ -270,41 +346,17 @@ namespace EatonManagementBoard.Services
                 if (insertReaderId == ReaderIdEnum.Terminal.ToString() || insertReaderId == ReaderIdEnum.TerminalLeft.ToString() || insertReaderId == ReaderIdEnum.TerminalRight.ToString())
                 {
                     return true;
-                } else
+                }
+                else
                 {
                     return false;
                 }
-            } 
+            }
             else
             {
                 return insertReaderId == exsitedReaderId ? true : false;
             }
         }
-
-        public ResultDto Delete(string id)
-        {
-            if (string.IsNullOrEmpty(id) == true)
-            {
-                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
-            }
-
-            if (int.TryParse(id, out int sid) == false)
-            {
-                return EpcResultDto(ResultEnum.False, ErrorEnum.InvalidParameters);
-            }
-
-            var result = _connection.DeleteEpcRawContext(sid);
-            if (result == false)
-            {
-                return EpcResultDto(ResultEnum.False, ErrorEnum.MsSqlTimeout);
-            }
-
-            return EpcResultDto(ResultEnum.True, ErrorEnum.None);
-        }
-
-        #endregion
-
-        #region Private
 
         private bool IsMatchGarbledString(string epcString)
         {
@@ -620,12 +672,12 @@ namespace EatonManagementBoard.Services
             return locationTimeDtos;
         }
 
-        private EpcResultDto GetEpcGetResultDto(ResultEnum result, ErrorEnum error, DashboardDto dashboardDto)
+        private EpcResultDto GetEpcGetResultDto(ResultEnum result, string error, DashboardDto dashboardDto)
         {
             return new EpcResultDto
             {
                 Result = result.ToBoolean(),
-                Error = error.ToDescription(),
+                Error = error,
                 DashboardDto = dashboardDto,
             };
         }
@@ -711,12 +763,12 @@ namespace EatonManagementBoard.Services
             };
         }
 
-        private IResultDto GetPostResultDto(ResultEnum result, ErrorEnum error)
+        private IResultDto GetPostResultDto(ResultEnum result, string error)
         {
             return new ResultDto
             {
                 Result = result.ToBoolean(),
-                Error = error.ToDescription()
+                Error = error,
             };
         }
 
@@ -749,12 +801,12 @@ namespace EatonManagementBoard.Services
             }
         }
 
-        private ResultDto EpcResultDto(ResultEnum result, ErrorEnum error)
+        private ResultDto EpcResultDto(ResultEnum result, string error)
         {
             return new ResultDto
             {
                 Result = result.ToBoolean(),
-                Error = error.ToDescription()
+                Error = error,
             };
         }
 

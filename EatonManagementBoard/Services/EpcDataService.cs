@@ -1,4 +1,5 @@
 ﻿using EatonManagementBoard.Database;
+using EatonManagementBoard.Database.Dapper;
 using EatonManagementBoard.Dtos;
 using EatonManagementBoard.Enums;
 using Microsoft.Extensions.Caching.Memory;
@@ -14,14 +15,14 @@ namespace EatonManagementBoard.Services
 {
     public class EpcDataService
     {
-        public EpcDataService(ConnectionRepositoryManager connection, IMemoryCache memoryCache)
+        public EpcDataService(ConnectionRepositoryManager manager, IMemoryCache memoryCache)
         {
-            _connection = connection;
+            _manager = manager;
             _localMemoryCache = new LocalMemoryCache(memoryCache);
         }
 
         private readonly LocalMemoryCache _localMemoryCache;
-        private readonly ConnectionRepositoryManager _connection;
+        private readonly ConnectionRepositoryManager _manager;
 
         #region Public
 
@@ -34,82 +35,108 @@ namespace EatonManagementBoard.Services
                 string.IsNullOrEmpty(endDate) &&
                 string.IsNullOrEmpty(pastDays))
             {
-                return GetEpcDataResultDto(ResultEnum.False, ErrorEnum.InvalidParameters, null);
+                return GetEpcDataResultDto(ResultEnum.False, ErrorEnum.InvalidParameters.ToDescription(), null);
             }
 
-            List<EpcRawJoinEpcDataContext> contexts = new List<EpcRawJoinEpcDataContext>();
-
-            if (!string.IsNullOrEmpty(startDate) ||
-                !string.IsNullOrEmpty(endDate) ||
-                !string.IsNullOrEmpty(pastDays) && int.Parse(pastDays) >= 0)
+            using (var connection = _manager.MsSqlConnectionRepository.InitConnection())
             {
-                DatePickerEnum datepicker = HandleDatePicker(startDate, endDate, pastDays);
-                if (datepicker == DatePickerEnum.StartDate)
+                connection.Open();
+
+                using (var transaction = _manager.MsSqlConnectionRepository.BeginTransaction())
                 {
-                    DateTime date = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
+                    try
+                    {
+                        // Set transcation
+                        _manager.MsSqlConnectionRepository.SetTransaction(transaction);
 
-                    contexts = _connection.QueryEpcRawJoinEpcDataContextByStartDate(date);
+                        List<EpcRawJoinEpcDataContext> contexts = new List<EpcRawJoinEpcDataContext>();
+
+                        if (!string.IsNullOrEmpty(startDate) ||
+                            !string.IsNullOrEmpty(endDate) ||
+                            !string.IsNullOrEmpty(pastDays) && int.Parse(pastDays) >= 0)
+                        {
+                            DatePickerEnum datepicker = HandleDatePicker(startDate, endDate, pastDays);
+                            if (datepicker == DatePickerEnum.StartDate)
+                            {
+                                DateTime date = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
+
+                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartDate(date);
+                            }
+                            else if (datepicker == DatePickerEnum.DateRange)
+                            {
+                                DateTime start = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
+                                DateTime end = DateTime.ParseExact(endDate, "yyyy-MM-dd", null).Date;
+
+                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
+                            }
+                            else if (datepicker == DatePickerEnum.PastDays)
+                            {
+                                DateTime end = DateTime.Today;
+                                DateTime start = GetPastDate(end, int.Parse(pastDays)).Date;
+
+                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(wo))
+                        {
+                            contexts = _manager.QueryEpcRawJoinEpcDataContextByWo(wo);
+                        }
+                        else if (!string.IsNullOrEmpty(pn))
+                        {
+                            contexts = _manager.QueryEpcRawJoinEpcDataContextByPn(pn);
+                        }
+                        else if (!string.IsNullOrEmpty(palletId))
+                        {
+                            contexts = _manager.QueryEpcRawJoinEpcDataContextByPalletId(palletId);
+                        }
+
+                        // context to dto
+                        List<EpcFullDataDto> epcFullDataDtos = new List<EpcFullDataDto>();
+                        if (contexts == null || contexts.Count() == 0)
+                        {
+                            // Commit the transaction if everything is successful
+                            transaction.Commit();
+
+                            return GetEpcDataResultDto(ResultEnum.True, ErrorEnum.None.ToDescription(), null);
+                        }
+
+                        foreach (var context in contexts)
+                        {
+                            var dto = GetEpcFullDataDto(context);
+                            epcFullDataDtos.Add(dto);
+                        }
+
+                        // Get duration from dtos
+                        GetDuration(ref epcFullDataDtos);
+
+                        // Get json
+                        var json = GetJson(epcFullDataDtos);
+
+                        // Commit the transaction if everything is successful
+                        transaction.Commit();
+
+                        return GetEpcDataResultDto(ResultEnum.True, ErrorEnum.None.ToDescription(), epcFullDataDtos);
+                    }
+                    catch (Exception exp)
+                    {
+                        // Handle exceptions and optionally roll back the transaction
+                        transaction.Rollback();
+                        return GetEpcDataResultDto(ResultEnum.False, exp.Message, null);
+                    }
                 }
-                else if (datepicker == DatePickerEnum.DateRange)
-                {
-                    DateTime start = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
-                    DateTime end = DateTime.ParseExact(endDate, "yyyy-MM-dd", null).Date;
-
-                    contexts = _connection.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
-                }
-                else if (datepicker == DatePickerEnum.PastDays)
-                {
-                    DateTime end = DateTime.Today;
-                    DateTime start = GetPastDate(end, int.Parse(pastDays)).Date;
-
-                    contexts = _connection.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
-                }
             }
-            else if (!string.IsNullOrEmpty(wo))
-            {
-                contexts = _connection.QueryEpcRawJoinEpcDataContextByWo(wo);
-            }
-            else if (!string.IsNullOrEmpty(pn))
-            {
-                contexts = _connection.QueryEpcRawJoinEpcDataContextByPn(pn);
-            }
-            else if (!string.IsNullOrEmpty(palletId))
-            {
-                contexts = _connection.QueryEpcRawJoinEpcDataContextByPalletId(palletId);
-            }
-
-            // context to dto
-            List<EpcFullDataDto> epcFullDataDtos = new List<EpcFullDataDto>();
-            if (contexts == null || contexts.Count() == 0)
-            {
-                return GetEpcDataResultDto(ResultEnum.True, ErrorEnum.None, null);
-            }
-
-            foreach (var context in contexts)
-            {
-                var dto = GetEpcFullDataDto(context);
-                epcFullDataDtos.Add(dto);
-            }
-
-            // Get duration from dtos
-            GetDuration(ref epcFullDataDtos);
-
-            // Get json
-            var json = GetJson(epcFullDataDtos);
-
-            return GetEpcDataResultDto(ResultEnum.True, ErrorEnum.None, epcFullDataDtos);
         }
 
         #endregion
 
         #region Private
 
-        private EpcDataResultDto GetEpcDataResultDto(ResultEnum result, ErrorEnum error, List<EpcFullDataDto> dtos)
+        private EpcDataResultDto GetEpcDataResultDto(ResultEnum result, string error, List<EpcFullDataDto> dtos)
         {
             return new EpcDataResultDto
             {
                 Result = result.ToBoolean(),
-                Error = error.ToDescription(),
+                Error = error,
                 EpcFullDataDtos = dtos
             };
         }

@@ -2,28 +2,23 @@
 using EatonManagementBoard.Dtos;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EatonManagementBoard.Database
+namespace EatonManagementBoard.Database.Dapper
 {
     public class MsSqlConnectionRepository: ConnectionRepositoryBase
     {
+        public IDbTransaction Transaction { private set; get; }
+
         public MsSqlConnectionRepository(string connectionString) : base(DatabaseConnectionName.MsSql, connectionString)
         {
         }
 
-        public List<EpcRawContext> QueryAll()
+        public void SetTransaction(IDbTransaction transaction)
         {
-            try
-            {
-                var sql = @"SELECT * FROM [scannel].[dbo].[eaton_epc_raw]  ";
-                return _connection.Query<EpcRawContext>(sql).ToList();
-            }
-            catch (Exception exp)
-            {
-                return null;
-            }
+            Transaction = transaction;
         }
 
         #region QUERY
@@ -36,7 +31,7 @@ namespace EatonManagementBoard.Database
                             FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY [epc] ORDER BY id DESC) AS rowId FROM [scannel].[dbo].[eaton_epc_raw]) AS epcs 
                             WHERE epcs.rowId=1 
                             ORDER BY id DESC ";
-                return _connection.Query<EpcRawContext>(sql).ToList();
+                return _constantConnection.Query<EpcRawContext>(sql, null).ToList();
             }
             catch (Exception exp)
             {
@@ -52,7 +47,7 @@ namespace EatonManagementBoard.Database
                             FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY [epc], [reader_id] ORDER BY id DESC) AS rowId FROM [scannel].[dbo].[eaton_epc_raw]) AS epcs 
                             WHERE epcs.rowId=1
                             ORDER BY id ";
-                return _connection.Query<EpcRawContext>(sql).ToList();
+                return _constantConnection.Query<EpcRawContext>(sql, null).ToList();
             }
             catch (Exception exp)
             {
@@ -66,7 +61,7 @@ namespace EatonManagementBoard.Database
             try
             {
                 var sql = "SELECT COUNT(*) FROM [scannel].[dbo].[eaton_epc_raw] ";
-                return _connection.ExecuteScalar<int>(sql);
+                return _constantConnection.ExecuteScalar<int>(sql, null);
             }
             catch (Exception exp)
             {
@@ -85,7 +80,7 @@ namespace EatonManagementBoard.Database
                 { 
                     epc = epc, 
                     reader_id = reader_id 
-                }).ToList();
+                }, Transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -105,7 +100,7 @@ namespace EatonManagementBoard.Database
                     epc = dto.Epc,
                     reader_id = dto.ReaderId,
                     timestamp = dto.TransTime,
-                }).FirstOrDefault();
+                }, Transaction).FirstOrDefault();
             }
             catch (Exception exp)
             {
@@ -122,7 +117,7 @@ namespace EatonManagementBoard.Database
                 return _connection.Query<EpcDataContext>(sql, new 
                 { 
                     pallet_id = pallet_id 
-                }).FirstOrDefault();
+                }, Transaction).FirstOrDefault();
             }
             catch (Exception exp)
             {
@@ -153,7 +148,7 @@ namespace EatonManagementBoard.Database
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
                     startDate = startDate
-                }).ToList();
+                }, Transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -185,7 +180,7 @@ namespace EatonManagementBoard.Database
                 {
                     startDate = startDate,
                     endDate = endDate
-                }).ToList();
+                }, Transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -215,7 +210,7 @@ namespace EatonManagementBoard.Database
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
                     wo = wo
-                }).ToList();
+                }, Transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -245,7 +240,7 @@ namespace EatonManagementBoard.Database
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
                     pn = pn
-                }).ToList();
+                }, Transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -275,7 +270,7 @@ namespace EatonManagementBoard.Database
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
                     pallet_id = pallet_id
-                }).ToList();
+                }, Transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -298,7 +293,7 @@ namespace EatonManagementBoard.Database
                     epc = dto.Epc,
                     reader_id = dto.ReaderId,
                     timestamp = dto.TransTime,
-                }) > 0;
+                }, Transaction) > 0;
             }
             catch (Exception exp)
             {
@@ -320,7 +315,7 @@ namespace EatonManagementBoard.Database
                     pn = dto.pn,
                     line = dto.line,
                     pallet_id = dto.pallet_id,
-                }) > 0;
+                }, Transaction) > 0;
             }
             catch (Exception exp)
             {
@@ -343,7 +338,7 @@ namespace EatonManagementBoard.Database
                 {
                     f_epc_raw_id = $",{f_epc_raw_id}",
                     pallet_id = pallet_id
-                }) > 0;
+                }, Transaction) > 0;
             }
             catch (Exception exp)
             {
@@ -361,7 +356,7 @@ namespace EatonManagementBoard.Database
             {
                 var sql = @"DELETE FROM [scannel].[dbo].[eaton_epc_raw]
                             WHERE id=@id ";
-                return _connection.Execute(sql, new { id = id }) > 0;
+                return _connection.Execute(sql, new { id = id }, Transaction) > 0;
 
             }
             catch (Exception exp)

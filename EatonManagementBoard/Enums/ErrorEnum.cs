@@ -13,7 +13,7 @@ namespace EatonManagementBoard.Enums
         InvalidEpcContextFormat,
         InvalidReaderId,
         NoEffectiveData,
-        MsSqlTimeout,
+        FailToAccessDatabase,
         DidMoveToTerminal,
         FailToPostDelivery,
     }
@@ -36,8 +36,8 @@ namespace EatonManagementBoard.Enums
                     return "InvalidReaderId";
                 case ErrorEnum.NoEffectiveData:
                     return "NoEffectiveData";
-                case ErrorEnum.MsSqlTimeout:
-                    return "MsSqlTimeout";
+                case ErrorEnum.FailToAccessDatabase:
+                    return "FailToAccessDatabase";
                 case ErrorEnum.DidMoveToTerminal:
                     return "DidMoveToTerminal";
                 case ErrorEnum.FailToPostDelivery:
