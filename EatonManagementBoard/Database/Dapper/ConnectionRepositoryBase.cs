@@ -9,8 +9,8 @@ namespace EatonManagementBoard.Database.Dapper
 {
     public class ConnectionRepositoryBase
     {
-        protected IDbConnection _constantConnection { private set; get; }
         protected IDbConnection _connection { private set; get; }
+        protected IDbTransaction _transaction { private set; get; }
         public DatabaseConnectionName DatabaseConnectionName { private set; get; }
         public String ConnectionString { private set; get; }
 
@@ -18,11 +18,6 @@ namespace EatonManagementBoard.Database.Dapper
         {
             DatabaseConnectionName = connectionName;
             ConnectionString = connectionString;
-            switch (connectionName) {
-                case DatabaseConnectionName.MsSql:
-                    _constantConnection = new SqlConnection(ConnectionString);
-                    break;
-            }
         }
 
         public IDbConnection InitConnection()
@@ -33,7 +28,8 @@ namespace EatonManagementBoard.Database.Dapper
 
         public IDbTransaction BeginTransaction()
         {
-            return _connection?.BeginTransaction();
+            _transaction = _connection.BeginTransaction();
+            return _transaction;
         }
 
         public void Dispose()

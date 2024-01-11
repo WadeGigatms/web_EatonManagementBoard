@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http;
 
 namespace EatonManagementBoard
 {
@@ -16,7 +18,6 @@ namespace EatonManagementBoard
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            // Scaffold-DbContext "Server=127.0.0.1,1433;Database=scannel;User ID=scannel;Password=26954214" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Force -Context EatonManagementBoardDbContext
         }
 
         public IConfiguration Configuration { get; }
@@ -30,7 +31,7 @@ namespace EatonManagementBoard
             // IHttpClientFactory
             services.AddHttpClient();
 
-            // MemoryCache
+            // IMemoryCache
             services.AddMemoryCache();
 
             // In production, the React files will be served from this directory
@@ -39,16 +40,21 @@ namespace EatonManagementBoard
                 configuration.RootPath = "ClientApp/build";
             });
 
-            // Database: for Dapper
-            services.AddScoped<ConnectionRepositoryManager>(serviceProvider =>
+            // Add services to scoped with database for Dapper
+            services.AddScoped<EpcService>(serviceProvider =>
             {
                 var msSqlConnection = new MsSqlConnectionRepository(Configuration.GetConnectionString("DefaultConnection"));
                 var manager = new ConnectionRepositoryManager(msSqlConnection);
-                return manager;
+                var memoryCache = serviceProvider.GetRequiredService<IMemoryCache>();
+                var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+                return new EpcService(manager, memoryCache, httpClientFactory);
             });
-
-            services.AddScoped<EpcService>();
-            services.AddScoped<EpcDataService>();
+            services.AddScoped<EpcDataService>(serviceProvider =>
+            {
+                var msSqlConnection = new MsSqlConnectionRepository(Configuration.GetConnectionString("DefaultConnection"));
+                var manager = new ConnectionRepositoryManager(msSqlConnection);
+                return new EpcDataService(manager);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

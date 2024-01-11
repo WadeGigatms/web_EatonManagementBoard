@@ -10,15 +10,8 @@ namespace EatonManagementBoard.Database.Dapper
 {
     public class MsSqlConnectionRepository: ConnectionRepositoryBase
     {
-        public IDbTransaction Transaction { private set; get; }
-
         public MsSqlConnectionRepository(string connectionString) : base(DatabaseConnectionName.MsSql, connectionString)
         {
-        }
-
-        public void SetTransaction(IDbTransaction transaction)
-        {
-            Transaction = transaction;
         }
 
         #region QUERY
@@ -31,7 +24,7 @@ namespace EatonManagementBoard.Database.Dapper
                             FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY [epc] ORDER BY id DESC) AS rowId FROM [scannel].[dbo].[eaton_epc_raw]) AS epcs 
                             WHERE epcs.rowId=1 
                             ORDER BY id DESC ";
-                return _constantConnection.Query<EpcRawContext>(sql, null).ToList();
+                return _connection.Query<EpcRawContext>(sql, null, _transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -47,7 +40,7 @@ namespace EatonManagementBoard.Database.Dapper
                             FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY [epc], [reader_id] ORDER BY id DESC) AS rowId FROM [scannel].[dbo].[eaton_epc_raw]) AS epcs 
                             WHERE epcs.rowId=1
                             ORDER BY id ";
-                return _constantConnection.Query<EpcRawContext>(sql, null).ToList();
+                return _connection.Query<EpcRawContext>(sql, null, _transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -61,7 +54,7 @@ namespace EatonManagementBoard.Database.Dapper
             try
             {
                 var sql = "SELECT COUNT(*) FROM [scannel].[dbo].[eaton_epc_raw] ";
-                return _constantConnection.ExecuteScalar<int>(sql, null);
+                return _connection.ExecuteScalar<int>(sql, null, _transaction);
             }
             catch (Exception exp)
             {
@@ -80,7 +73,7 @@ namespace EatonManagementBoard.Database.Dapper
                 { 
                     epc = epc, 
                     reader_id = reader_id 
-                }, Transaction).ToList();
+                }, _transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -100,7 +93,7 @@ namespace EatonManagementBoard.Database.Dapper
                     epc = dto.Epc,
                     reader_id = dto.ReaderId,
                     timestamp = dto.TransTime,
-                }, Transaction).FirstOrDefault();
+                }, _transaction).FirstOrDefault();
             }
             catch (Exception exp)
             {
@@ -117,7 +110,7 @@ namespace EatonManagementBoard.Database.Dapper
                 return _connection.Query<EpcDataContext>(sql, new 
                 { 
                     pallet_id = pallet_id 
-                }, Transaction).FirstOrDefault();
+                }, _transaction).FirstOrDefault();
             }
             catch (Exception exp)
             {
@@ -148,7 +141,7 @@ namespace EatonManagementBoard.Database.Dapper
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
                     startDate = startDate
-                }, Transaction).ToList();
+                }, _transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -180,7 +173,7 @@ namespace EatonManagementBoard.Database.Dapper
                 {
                     startDate = startDate,
                     endDate = endDate
-                }, Transaction).ToList();
+                }, _transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -210,7 +203,7 @@ namespace EatonManagementBoard.Database.Dapper
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
                     wo = wo
-                }, Transaction).ToList();
+                }, _transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -240,7 +233,7 @@ namespace EatonManagementBoard.Database.Dapper
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
                     pn = pn
-                }, Transaction).ToList();
+                }, _transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -270,7 +263,7 @@ namespace EatonManagementBoard.Database.Dapper
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
                     pallet_id = pallet_id
-                }, Transaction).ToList();
+                }, _transaction).ToList();
             }
             catch (Exception exp)
             {
@@ -293,7 +286,7 @@ namespace EatonManagementBoard.Database.Dapper
                     epc = dto.Epc,
                     reader_id = dto.ReaderId,
                     timestamp = dto.TransTime,
-                }, Transaction) > 0;
+                }, _transaction) > 0;
             }
             catch (Exception exp)
             {
@@ -315,7 +308,7 @@ namespace EatonManagementBoard.Database.Dapper
                     pn = dto.pn,
                     line = dto.line,
                     pallet_id = dto.pallet_id,
-                }, Transaction) > 0;
+                }, _transaction) > 0;
             }
             catch (Exception exp)
             {
@@ -338,7 +331,7 @@ namespace EatonManagementBoard.Database.Dapper
                 {
                     f_epc_raw_id = $",{f_epc_raw_id}",
                     pallet_id = pallet_id
-                }, Transaction) > 0;
+                }, _transaction) > 0;
             }
             catch (Exception exp)
             {
@@ -356,7 +349,7 @@ namespace EatonManagementBoard.Database.Dapper
             {
                 var sql = @"DELETE FROM [scannel].[dbo].[eaton_epc_raw]
                             WHERE id=@id ";
-                return _connection.Execute(sql, new { id = id }, Transaction) > 0;
+                return _connection.Execute(sql, new { id = id }, _transaction) > 0;
 
             }
             catch (Exception exp)

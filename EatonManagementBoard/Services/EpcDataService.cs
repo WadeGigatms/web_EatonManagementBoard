@@ -15,14 +15,13 @@ namespace EatonManagementBoard.Services
 {
     public class EpcDataService
     {
-        public EpcDataService(ConnectionRepositoryManager manager, IMemoryCache memoryCache)
+
+        public EpcDataService(ConnectionRepositoryManager manager)
         {
-            _manager = manager;
-            _localMemoryCache = new LocalMemoryCache(memoryCache);
+            Manager = manager;
         }
 
-        private readonly LocalMemoryCache _localMemoryCache;
-        private readonly ConnectionRepositoryManager _manager;
+        public ConnectionRepositoryManager Manager { get; }
 
         #region Public
 
@@ -38,17 +37,14 @@ namespace EatonManagementBoard.Services
                 return GetEpcDataResultDto(ResultEnum.False, ErrorEnum.InvalidParameters.ToDescription(), null);
             }
 
-            using (var connection = _manager.MsSqlConnectionRepository.InitConnection())
+            using (var connection = Manager.MsSqlConnectionRepository.InitConnection())
             {
                 connection.Open();
 
-                using (var transaction = _manager.MsSqlConnectionRepository.BeginTransaction())
+                using (var transaction = Manager.MsSqlConnectionRepository.BeginTransaction())
                 {
                     try
                     {
-                        // Set transcation
-                        _manager.MsSqlConnectionRepository.SetTransaction(transaction);
-
                         List<EpcRawJoinEpcDataContext> contexts = new List<EpcRawJoinEpcDataContext>();
 
                         if (!string.IsNullOrEmpty(startDate) ||
@@ -60,34 +56,34 @@ namespace EatonManagementBoard.Services
                             {
                                 DateTime date = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
 
-                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartDate(date);
+                                contexts = Manager.QueryEpcRawJoinEpcDataContextByStartDate(date);
                             }
                             else if (datepicker == DatePickerEnum.DateRange)
                             {
                                 DateTime start = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
                                 DateTime end = DateTime.ParseExact(endDate, "yyyy-MM-dd", null).Date;
 
-                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
+                                contexts = Manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
                             }
                             else if (datepicker == DatePickerEnum.PastDays)
                             {
                                 DateTime end = DateTime.Today;
                                 DateTime start = GetPastDate(end, int.Parse(pastDays)).Date;
 
-                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
+                                contexts = Manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
                             }
                         }
                         else if (!string.IsNullOrEmpty(wo))
                         {
-                            contexts = _manager.QueryEpcRawJoinEpcDataContextByWo(wo);
+                            contexts = Manager.QueryEpcRawJoinEpcDataContextByWo(wo);
                         }
                         else if (!string.IsNullOrEmpty(pn))
                         {
-                            contexts = _manager.QueryEpcRawJoinEpcDataContextByPn(pn);
+                            contexts = Manager.QueryEpcRawJoinEpcDataContextByPn(pn);
                         }
                         else if (!string.IsNullOrEmpty(palletId))
                         {
-                            contexts = _manager.QueryEpcRawJoinEpcDataContextByPalletId(palletId);
+                            contexts = Manager.QueryEpcRawJoinEpcDataContextByPalletId(palletId);
                         }
 
                         // context to dto
