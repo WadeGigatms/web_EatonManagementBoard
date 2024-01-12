@@ -136,7 +136,7 @@ namespace EatonManagementBoard.Database.Dapper
                             FROM [scannel].[dbo].[eaton_epc_raw] AS e 
                             INNER JOIN [scannel].[dbo].[eaton_epc_data] AS d 
                             ON e.id IN (SELECT * FROM string_split(d.f_epc_raw_ids, ',')) 
-                            WHERE CONVERT(date, e.timestamp) = @startDate
+                            WHERE CONVERT(DATE, e.timestamp) = CONVERT(DATE, @startDate) 
                             ORDER BY d.pallet_id, e.timestamp ";
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {
@@ -167,7 +167,7 @@ namespace EatonManagementBoard.Database.Dapper
                             FROM [scannel].[dbo].[eaton_epc_raw] AS e 
                             INNER JOIN [scannel].[dbo].[eaton_epc_data] AS d 
                             ON e.id IN (SELECT * FROM string_split(d.f_epc_raw_ids, ',')) 
-                            WHERE CONVERT(date, e.timestamp) BETWEEN @startDate AND @endDate 
+                            WHERE CONVERT(DATE, e.timestamp) BETWEEN CONVERT(DATE, @startDate) AND CONVERT(DATE, @endDate) 
                             ORDER BY d.pallet_id, e.timestamp ";
                 return _connection.Query<EpcRawJoinEpcDataContext>(sql, new
                 {

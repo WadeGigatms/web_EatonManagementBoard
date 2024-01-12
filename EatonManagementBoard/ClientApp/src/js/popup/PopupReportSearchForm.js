@@ -253,7 +253,6 @@ const PopupReportSearchForm = ({ setEpcFullDataDtos, setEpcFullDataJson }) => {
                 <label>{TH_TIME}</label>
                 <select className="form-control" value={dateSelect} onChange={dateSelectChange} >
                     <option value={parseInt(-1, 10)}>{FORM_SELECT}</option>
-                    <option value={parseInt(0, 10)}>{FORM_SPEC_TIMESTAMP}</option>
                     <option value={parseInt(1, 10)}>{FORM_RANGE_TIMESTAMP}</option>
                     <option value={parseInt(2, 10)}>{FORM_FROM_NOW}</option>
                 </select>
@@ -339,6 +338,7 @@ const PopupReportSearchForm = ({ setEpcFullDataDtos, setEpcFullDataJson }) => {
         return <>
             <div className="input-group">
                 <select className="form-control" value={past} onChange={pastChange} >
+                    <option value={parseInt(-1, 10)}>{FORM_SELECT}</option>
                     <option value={parseInt(0, 10)}>{FORM_TODAY} - ({todayString})</option>
                     <option value={parseInt(1, 10)}>{FORM_YESTERDAY} - ({yesterdayString} ~ {todayString})</option>
                     <option value={parseInt(7, 10)}>{FORM_LAST_WEEK} - ({lastWeekString} ~ {todayString})</option>

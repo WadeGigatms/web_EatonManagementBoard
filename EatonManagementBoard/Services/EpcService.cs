@@ -184,6 +184,12 @@ namespace EatonManagementBoard.Services
 
         public IResultDto PostAsync(dynamic value)
         {
+            // Time and refused
+            if  (DateTime.Now.Hour > 20 && DateTime.Now.Hour < 5)
+            {
+                return GetPostResultDto(ResultEnum.False, "SLEEP");
+            }
+
             EpcPostDto dto;
 
             // Check value
@@ -350,7 +356,7 @@ namespace EatonManagementBoard.Services
 
         private void UpdateTransTimeEpcPost(ref EpcPostDto dto)
         {
-            dto.TransTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+            dto.TransTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         private bool IsDuplicatedEpcFromSameReader(string insertReaderId, string exsitedReaderId)
@@ -698,7 +704,7 @@ namespace EatonManagementBoard.Services
 
         private string GetDateTimeString(string dateTime)
         {
-            return DateTime.Parse(dateTime).ToString("yyyy/MM/dd HH:mm:ss");
+            return DateTime.Parse(dateTime).ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         private string GetTimeSpanString(TimeSpan time)

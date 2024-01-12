@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -18,10 +19,10 @@ namespace EatonManagementBoard.Services
 
         public EpcDataService(ConnectionRepositoryManager manager)
         {
-            Manager = manager;
+            _manager = manager;
         }
 
-        public ConnectionRepositoryManager Manager { get; }
+        private ConnectionRepositoryManager _manager { get; }
 
         #region Public
 
@@ -37,11 +38,11 @@ namespace EatonManagementBoard.Services
                 return GetEpcDataResultDto(ResultEnum.False, ErrorEnum.InvalidParameters.ToDescription(), null);
             }
 
-            using (var connection = Manager.MsSqlConnectionRepository.InitConnection())
+            using (var connection = _manager.MsSqlConnectionRepository.InitConnection())
             {
                 connection.Open();
 
-                using (var transaction = Manager.MsSqlConnectionRepository.BeginTransaction())
+                using (var transaction = _manager.MsSqlConnectionRepository.BeginTransaction())
                 {
                     try
                     {
@@ -49,41 +50,41 @@ namespace EatonManagementBoard.Services
 
                         if (!string.IsNullOrEmpty(startDate) ||
                             !string.IsNullOrEmpty(endDate) ||
-                            !string.IsNullOrEmpty(pastDays) && int.Parse(pastDays) >= 0)
+                            int.Parse(pastDays) > -1)
                         {
                             DatePickerEnum datepicker = HandleDatePicker(startDate, endDate, pastDays);
                             if (datepicker == DatePickerEnum.StartDate)
                             {
-                                DateTime date = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
+                                DateTime date = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).Date;
 
-                                contexts = Manager.QueryEpcRawJoinEpcDataContextByStartDate(date);
+                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartDate(date);
                             }
                             else if (datepicker == DatePickerEnum.DateRange)
                             {
-                                DateTime start = DateTime.ParseExact(startDate, "yyyy-MM-dd", null).Date;
-                                DateTime end = DateTime.ParseExact(endDate, "yyyy-MM-dd", null).Date;
+                                DateTime start = DateTime.ParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).Date;
+                                DateTime end = DateTime.ParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).Date;
 
-                                contexts = Manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
+                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
                             }
                             else if (datepicker == DatePickerEnum.PastDays)
                             {
                                 DateTime end = DateTime.Today;
-                                DateTime start = GetPastDate(end, int.Parse(pastDays)).Date;
+                                DateTime start = GetPastDate(end, int.Parse(pastDays));
 
-                                contexts = Manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
+                                contexts = _manager.QueryEpcRawJoinEpcDataContextByStartAndEndDate(start, end);
                             }
                         }
                         else if (!string.IsNullOrEmpty(wo))
                         {
-                            contexts = Manager.QueryEpcRawJoinEpcDataContextByWo(wo);
+                            contexts = _manager.QueryEpcRawJoinEpcDataContextByWo(wo);
                         }
                         else if (!string.IsNullOrEmpty(pn))
                         {
-                            contexts = Manager.QueryEpcRawJoinEpcDataContextByPn(pn);
+                            contexts = _manager.QueryEpcRawJoinEpcDataContextByPn(pn);
                         }
                         else if (!string.IsNullOrEmpty(palletId))
                         {
-                            contexts = Manager.QueryEpcRawJoinEpcDataContextByPalletId(palletId);
+                            contexts = _manager.QueryEpcRawJoinEpcDataContextByPalletId(palletId);
                         }
 
                         // context to dto
@@ -140,22 +141,19 @@ namespace EatonManagementBoard.Services
         private DatePickerEnum HandleDatePicker(string startDate, string endDate, string pastDays)
         {
             if (!string.IsNullOrEmpty(startDate) &&
-                string.IsNullOrEmpty(endDate) &&
-                string.IsNullOrEmpty(pastDays))
+                string.IsNullOrEmpty(endDate))
             {
                 // startDate
                 return DatePickerEnum.StartDate;
             }
             else if (!string.IsNullOrEmpty(startDate) &&
-                !string.IsNullOrEmpty(endDate) &&
-                string.IsNullOrEmpty(pastDays))
+                !string.IsNullOrEmpty(endDate))
             {
                 // startDate, endDate
                 return DatePickerEnum.DateRange;
             }
             else if (string.IsNullOrEmpty(startDate) &&
-               string.IsNullOrEmpty(endDate) &&
-               !string.IsNullOrEmpty(pastDays))
+               string.IsNullOrEmpty(endDate))
             {
                 // pastDays
                 return DatePickerEnum.PastDays;
