@@ -221,6 +221,18 @@ namespace EatonManagementBoard.Services
                             throw new Exception(ErrorEnum.InvalidReaderId.ToDescription());
                         }
 
+                        // Check readerId is from terminal and it is delivery time
+                        if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
+                            dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
+                            dto.ReaderId == ReaderIdEnum.TerminalRight.ToString())
+                        {
+                            int deliveringCount = _manager.QueryDeliveryingNumberContextsCount();
+                            if (deliveringCount <= 0)
+                            {
+                                throw new Exception(ErrorEnum.NotDuringDeliverying.ToDescription());
+                            }
+                        }
+
                         // Check epc format is valid
                         // Convert hex string to ascii string
                         string asciiEpcString = GetHexToAscii(dto.Epc);

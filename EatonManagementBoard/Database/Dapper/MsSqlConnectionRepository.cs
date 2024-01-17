@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using EatonManagementBoard.Dtos;
+using EatonManagementBoard.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -268,6 +269,23 @@ namespace EatonManagementBoard.Database.Dapper
             catch (Exception exp)
             {
                 return null;
+            }
+        }
+
+        public int QueryDeliveryingNumberContextsCount()
+        {
+            try
+            {
+                var states = new List<string>() { DeliveryStateEnum.Delivery.ToString(), DeliveryStateEnum.Alert.ToString() };
+                var sql = @"SELECT COUNT(*) FROM [scannel].[dbo].[eaton_delivery_number] WHERE state IN @states ";
+                return _connection.ExecuteScalar<int>(sql, new
+                {
+                    states = states
+                }, _transaction);
+            }
+            catch (Exception exp)
+            {
+                return -1;
             }
         }
 

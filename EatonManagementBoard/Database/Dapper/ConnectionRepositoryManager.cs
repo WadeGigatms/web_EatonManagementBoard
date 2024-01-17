@@ -50,6 +50,9 @@ namespace EatonManagementBoard.Database.Dapper
         public List<EpcRawJoinEpcDataContext> QueryEpcRawJoinEpcDataContextByPalletId(string palletId)
             => MsSqlConnectionRepository.QueryEpcRawJoinEpcDataContextByPalletId(palletId);
 
+        public int QueryDeliveryingNumberContextsCount()
+            => MsSqlConnectionRepository.QueryDeliveryingNumberContextsCount();
+
         #endregion
 
         #region Insert

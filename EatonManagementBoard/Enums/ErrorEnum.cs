@@ -16,6 +16,7 @@ namespace EatonManagementBoard.Enums
         FailToAccessDatabase,
         DidMoveToTerminal,
         FailToPostDelivery,
+        NotDuringDeliverying,
     }
 
     public static class ErrorEnumExtensions
@@ -42,6 +43,8 @@ namespace EatonManagementBoard.Enums
                     return "DidMoveToTerminal";
                 case ErrorEnum.FailToPostDelivery:
                     return "FailToPostDelivery";
+                case ErrorEnum.NotDuringDeliverying:
+                    return "NotDuringDeliverying";
                 default:
                     return "Unknown";
             }
