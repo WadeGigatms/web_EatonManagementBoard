@@ -23,7 +23,7 @@ namespace EatonManagementBoard.Database.Dapper
             {
                 var sql = @"SELECT * 
                             FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY [epc] ORDER BY id DESC) AS rowId FROM [scannel].[dbo].[eaton_epc_raw]) AS epcs 
-                            WHERE epcs.rowId=1 
+                            WHERE epcs.rowId=1 AND timestamp > GETDATE() - 30 
                             ORDER BY id DESC ";
                 return _connection.Query<EpcRawContext>(sql, null, _transaction).ToList();
             }
@@ -39,7 +39,7 @@ namespace EatonManagementBoard.Database.Dapper
             {
                 var sql = @"SELECT * 
                             FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY [epc], [reader_id] ORDER BY id DESC) AS rowId FROM [scannel].[dbo].[eaton_epc_raw]) AS epcs 
-                            WHERE epcs.rowId=1
+                            WHERE epcs.rowId=1 AND timestamp > GETDATE() - 30 
                             ORDER BY id ";
                 return _connection.Query<EpcRawContext>(sql, null, _transaction).ToList();
             }
