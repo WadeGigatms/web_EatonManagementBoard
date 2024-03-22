@@ -32,8 +32,8 @@ namespace EatonManagementBoard.Database.Dapper
         public int QueryEpcCount()
             => MsSqlConnectionRepository.QueryEpcCount();
 
-        public EpcDataContext QueryEpcDataContextByPalletId(string palletId)
-             => MsSqlConnectionRepository.QueryEpcDataContextByPalletId(palletId);
+        public EpcDataContext QueryEpcDataContextByEpcDataDto(EpcDataDto dto)
+             => MsSqlConnectionRepository.QueryEpcDataContextByEpcDataDto(dto);
 
         public List<EpcRawJoinEpcDataContext> QueryEpcRawJoinEpcDataContextByStartDate(DateTime startDate)
             => MsSqlConnectionRepository.QueryEpcRawJoinEpcDataContextByStartDate(startDate);

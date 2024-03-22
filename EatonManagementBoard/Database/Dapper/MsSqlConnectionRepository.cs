@@ -102,15 +102,19 @@ namespace EatonManagementBoard.Database.Dapper
             }
         }
 
-        public EpcDataContext QueryEpcDataContextByPalletId(string pallet_id)
+        public EpcDataContext QueryEpcDataContextByEpcDataDto(EpcDataDto dto)
         {
             try
             {
                 var sql = @"SELECT * FROM [scannel].[dbo].[eaton_epc_data] 
-                            WHERE pallet_id=@pallet_id ";
-                return _connection.Query<EpcDataContext>(sql, new 
-                { 
-                    pallet_id = pallet_id 
+                            WHERE wo=@wo AND pn=@pn AND line=@line AND qty=@qty AND pallet_id=@pallet_id ";
+                return _connection.Query<EpcDataContext>(sql, new
+                {
+                    wo = dto.wo,
+                    pn = dto.pn,
+                    line = dto.line,
+                    qty = dto.qty,
+                    pallet_id = dto.pallet_id
                 }, _transaction).FirstOrDefault();
             }
             catch (Exception exp)

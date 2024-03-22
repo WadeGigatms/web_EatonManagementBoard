@@ -185,7 +185,8 @@ namespace EatonManagementBoard.Services
         public IResultDto PostAsync(dynamic value)
         {
             // Time and refused
-            if  (DateTime.Now.Hour > 20 && DateTime.Now.Hour < 5)
+            DateTime now = DateTime.Now;
+            if  (now.Hour > 19 && now.Hour < 5)
             {
                 return GetPostResultDto(ResultEnum.False, "SLEEP");
             }
@@ -249,7 +250,7 @@ namespace EatonManagementBoard.Services
                         }
 
                         // Check epc is effective data
-                        var realTimeEpcRawContext = _localMemoryCache.ReadRealTimeEpcRawContext();
+                        var realTimeEpcRawContext = _manager.QueryRealTimeEpcRawContext();
                         if (realTimeEpcRawContext != null)
                         {
                             var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == dto.Epc);
@@ -279,22 +280,22 @@ namespace EatonManagementBoard.Services
 
                         // Insert into [eaton_epc_data]
                         EpcRawContext epcRawContext = _manager.QueryEpcRawContext(dto);
-                        EpcDataContext epcDataContext = _manager.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
+                        EpcDataContext epcDataContext = _manager.QueryEpcDataContextByEpcDataDto(epcDataDto);
                         if (epcDataContext == null)
                         {
                             // Insert into [eaton_epc_data]
                             result = _manager.InsertEpcDataContext(epcRawContext.id, epcDataDto);
-                            epcDataContext = _manager.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
+                            if (result == false)
+                            {
+                                throw new Exception(ErrorEnum.FailToAccessDatabase.ToDescription());
+                            }
+                            epcDataContext = _manager.QueryEpcDataContextByEpcDataDto(epcDataDto);
                         }
                         else
                         {
                             // Update f_epc_raw_ids 
                             result = _manager.UpdateEpcDataContext(epcRawContext.id, epcDataContext.pallet_id);
                         }
-
-                        // Save memory cacche
-                        var newRealTimeEpcRawContext = _manager.QueryRealTimeEpcRawContext();
-                        _localMemoryCache.SaveRealTimeEpcRawContext(newRealTimeEpcRawContext);
 
                         // Call api for delivery
                         if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
@@ -400,11 +401,6 @@ namespace EatonManagementBoard.Services
 
         private string GetHexToAscii(string hexString)
         {
-            // Return if hexString is null or hexString is not double
-            if (string.IsNullOrEmpty(hexString) == true)
-            {
-                return null;
-            }
 
             // Return if hexString is ascii string already
             if (hexString.Contains(singleHash) == true &&
@@ -413,8 +409,8 @@ namespace EatonManagementBoard.Services
                 return hexString;
             }
 
-            // Return if hexString is not double characters
-            if (hexString.Count() % 2 != 0)
+            // Return if hexString is null or hexString is not double characters
+            if (string.IsNullOrEmpty(hexString) == true || hexString.Count() % 2 != 0)
             {
                 return null;
             }
