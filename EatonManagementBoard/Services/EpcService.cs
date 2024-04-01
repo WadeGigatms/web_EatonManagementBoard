@@ -222,18 +222,6 @@ namespace EatonManagementBoard.Services
                             throw new Exception(ErrorEnum.InvalidReaderId.ToDescription());
                         }
 
-                        // Check readerId is from terminal and it is delivery time
-                        if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
-                            dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
-                            dto.ReaderId == ReaderIdEnum.TerminalRight.ToString())
-                        {
-                            int deliveringCount = _manager.QueryDeliveryingNumberContextsCount();
-                            if (deliveringCount <= 0)
-                            {
-                                throw new Exception(ErrorEnum.NotDuringDeliverying.ToDescription());
-                            }
-                        }
-
                         // Check epc format is valid
                         // Convert hex string to ascii string
                         string asciiEpcString = GetHexToAscii(dto.Epc);
@@ -248,6 +236,19 @@ namespace EatonManagementBoard.Services
                         {
                             throw new Exception(ErrorEnum.InvalidEpcContextFormat.ToDescription());
                         }
+                        bool isTest = epcDataDto.pn.Contains("test") || epcDataDto.pallet_id.Contains("test") ? true : false;
+
+                        // Check readerId is from terminal and it is delivery time
+                        if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
+                            dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
+                            dto.ReaderId == ReaderIdEnum.TerminalRight.ToString())
+                        {
+                            int deliveringCount = _manager.QueryDeliveryingNumberContextsCount();
+                            if (deliveringCount <= 0 && isTest == false)
+                            {
+                                throw new Exception(ErrorEnum.NotDuringDeliverying.ToDescription());
+                            }
+                        }
 
                         // Check epc is effective data
                         var realTimeEpcRawContext = _manager.QueryRealTimeEpcRawContext();
@@ -256,7 +257,7 @@ namespace EatonManagementBoard.Services
                             var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == dto.Epc);
                             if (sameRealTimeEpcRawContext != null)
                             {
-                                if (IsDuplicatedEpcFromSameReader(dto.ReaderId, sameRealTimeEpcRawContext.reader_id) == true)
+                                if (IsDuplicatedEpcFromSameReader(dto.ReaderId, sameRealTimeEpcRawContext.reader_id) == true && isTest == false)
                                 {
                                     throw new Exception(ErrorEnum.NoEffectiveData.ToDescription());
                                 }
