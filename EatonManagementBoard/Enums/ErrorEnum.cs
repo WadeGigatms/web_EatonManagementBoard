@@ -13,6 +13,7 @@ namespace EatonManagementBoard.Enums
         InvalidEpcContextFormat,
         InvalidReaderId,
         NoEffectiveData,
+        DuplicatedPalletId,
         FailToAccessDatabase,
         DidMoveToTerminal,
         FailToPostDelivery,
@@ -37,6 +38,8 @@ namespace EatonManagementBoard.Enums
                     return "InvalidReaderId";
                 case ErrorEnum.NoEffectiveData:
                     return "NoEffectiveData";
+                case ErrorEnum.DuplicatedPalletId:
+                    return "DuplicatedPalletId";
                 case ErrorEnum.FailToAccessDatabase:
                     return "FailToAccessDatabase";
                 case ErrorEnum.DidMoveToTerminal:

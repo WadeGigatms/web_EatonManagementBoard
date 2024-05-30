@@ -53,6 +53,9 @@ namespace EatonManagementBoard.Database.Dapper
         public int QueryDeliveryingNumberContextsCount()
             => MsSqlConnectionRepository.QueryDeliveryingNumberContextsCount();
 
+        public int QueryEpcDataContextByPalletId(string palletId)
+            => MsSqlConnectionRepository.QueryEpcDataContextByPalletId(palletId);
+
         #endregion
 
         #region Insert

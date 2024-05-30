@@ -239,21 +239,23 @@ namespace EatonManagementBoard.Services
                         bool isTest = epcDataDto.pn.Contains("test") || epcDataDto.pallet_id.Contains("test") ? true : false;
 
                         // Check readerId is from terminal and it is delivery time
-                        if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
-                            dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
+                        if (dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
                             dto.ReaderId == ReaderIdEnum.TerminalRight.ToString())
                         {
                             int deliveringCount = _manager.QueryDeliveryingNumberContextsCount();
+
+                            // If it is test case during not deliverying time, continue working
                             if (deliveringCount <= 0 && isTest == false)
                             {
                                 throw new Exception(ErrorEnum.NotDuringDeliverying.ToDescription());
                             }
                         }
 
-                        // Check epc is effective data
+                        // Check epc is effective data by epc, readerId, and palletId
                         var realTimeEpcRawContext = _manager.QueryRealTimeEpcRawContext();
                         if (realTimeEpcRawContext != null)
                         {
+                            // If it is test case during not deliverying time, continue working
                             var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == dto.Epc);
                             if (sameRealTimeEpcRawContext != null)
                             {
@@ -261,6 +263,13 @@ namespace EatonManagementBoard.Services
                                 {
                                     throw new Exception(ErrorEnum.NoEffectiveData.ToDescription());
                                 }
+                            }
+
+                            // If it is duplicated pallet id, then return
+                            int duplicatedPalletIdCount = _manager.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
+                            if (duplicatedPalletIdCount > 0)
+                            {
+                                throw new Exception(ErrorEnum.DuplicatedPalletId.ToDescription());
                             }
                         }
 
@@ -299,8 +308,7 @@ namespace EatonManagementBoard.Services
                         }
 
                         // Call api for delivery
-                        if (dto.ReaderId == ReaderIdEnum.Terminal.ToString() ||
-                            dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
+                        if (dto.ReaderId == ReaderIdEnum.TerminalLeft.ToString() ||
                             dto.ReaderId == ReaderIdEnum.TerminalRight.ToString())
                         {
                             result = _httpClientManager.PostToServerWithDeliveryTerminal(epcRawContext, epcDataContext);
@@ -375,9 +383,9 @@ namespace EatonManagementBoard.Services
 
         private bool IsDuplicatedEpcFromSameReader(string insertReaderId, string exsitedReaderId)
         {
-            if (exsitedReaderId == ReaderIdEnum.Terminal.ToString() || exsitedReaderId == ReaderIdEnum.TerminalLeft.ToString() || exsitedReaderId == ReaderIdEnum.TerminalRight.ToString())
+            if (exsitedReaderId == ReaderIdEnum.TerminalLeft.ToString() || exsitedReaderId == ReaderIdEnum.TerminalRight.ToString())
             {
-                if (insertReaderId == ReaderIdEnum.Terminal.ToString() || insertReaderId == ReaderIdEnum.TerminalLeft.ToString() || insertReaderId == ReaderIdEnum.TerminalRight.ToString())
+                if (insertReaderId == ReaderIdEnum.TerminalLeft.ToString() || insertReaderId == ReaderIdEnum.TerminalRight.ToString())
                 {
                     return true;
                 }
