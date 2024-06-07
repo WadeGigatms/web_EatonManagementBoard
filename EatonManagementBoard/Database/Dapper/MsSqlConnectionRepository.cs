@@ -293,22 +293,6 @@ namespace EatonManagementBoard.Database.Dapper
             }
         }
 
-        public int QueryEpcDataContextByPalletId(string palletId)
-        {
-            try
-            {
-                var sql = @"SELECT COUNT(*) FROM [scannel].[dbo].[eaton_epc_data] WHERE pallet_id=@pallet_id ";
-                return _connection.ExecuteScalar<int>(sql, new
-                {
-                    pallet_id = palletId
-                }, _transaction);
-            }
-            catch (Exception exp)
-            {
-                return -1;
-            }
-        }
-
         #endregion
 
         #region INSERT

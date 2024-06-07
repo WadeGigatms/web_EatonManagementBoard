@@ -259,18 +259,19 @@ namespace EatonManagementBoard.Services
                             var sameRealTimeEpcRawContext = realTimeEpcRawContext.FirstOrDefault(epc => epc.epc == dto.Epc);
                             if (sameRealTimeEpcRawContext != null)
                             {
+                                // Detected same epc, then check readerId to filter 
+                                // but always allow test epc
                                 if (IsDuplicatedEpcFromSameReader(dto.ReaderId, sameRealTimeEpcRawContext.reader_id) == true && isTest == false)
                                 {
+                                    // Epc from same readerId, then return
                                     throw new Exception(ErrorEnum.NoEffectiveData.ToDescription());
                                 }
                             }
-
-                            // If it is duplicated pallet id, then return
-                            int duplicatedPalletIdCount = _manager.QueryEpcDataContextByPalletId(epcDataDto.pallet_id);
-                            if (duplicatedPalletIdCount > 0)
-                            {
-                                throw new Exception(ErrorEnum.DuplicatedPalletId.ToDescription());
-                            }
+                        } 
+                        else
+                        {
+                            // Detected brand new epc
+                            // todo: filter duplicated pallet id
                         }
 
                         // Check epc hasnt manually moved to terminal
